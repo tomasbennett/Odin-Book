@@ -1,0 +1,39 @@
+.backgroundContainer{
+    position: relative;
+
+    flex: 1 1 0;
+    /* width: 100%; */
+    height: 100%;
+
+    background-color: var(--dark-consistent-bg-header-colour);
+    box-shadow: inset 0 0 2rem rgba(0, 0, 0, 0.5);
+
+    overflow: hidden;
+
+    /* background: linear-gradient(135deg, #8b5cf6, #5f9cff); */
+    /* background: linear-gradient(135deg, #2563eb, #7c3aed);
+    background: linear-gradient(
+  135deg,
+  #3b82f6 0%,
+  #6366f1 50%,
+  #8b5cf6 100%
+); */
+
+
+    /* padding: 2rem; */
+    background: linear-gradient(
+      270deg,
+      #2563eb,
+      #6366f1,
+      #7c3aed
+    );
+    background-size: 600% 600%;
+    animation: gradientMove 12s ease infinite;
+}
+
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
