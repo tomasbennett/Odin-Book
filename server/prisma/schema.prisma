@@ -13,20 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
-
-
-
-
 // enum Role {
 //   USER
 //   ADMIN
 // }
-
-
-
 
 model User {
   id       String @id @default(uuid()) @db.Uuid
@@ -34,32 +24,108 @@ model User {
   password String
 
   // role     Role   @default(USER)
-  
-  refreshTokens RefreshToken[]
-}
-
-
-
-model RefreshToken {
-  id        String   @id @default(uuid()) @db.Uuid
-  hashedToken     String   @unique
-
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
 
   createdAt DateTime @default(now())
-  expiresAt DateTime
+
+  profileImgId String? @db.Uuid
+  profileImg   Files?  @relation("UserProfileImage", fields: [profileImgId], references: [id])
+
+  refreshTokens RefreshToken[]
+
+  posts    Post[]
+  comments Comment[]
+  likedCommentsOrPosts UserLikes[]
 }
 
+model RefreshToken {
+  id          String @id @default(uuid()) @db.Uuid
+  hashedToken String @unique
 
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
+  // createdAt DateTime @default(now())
+  // expiresAt DateTime
+}
 
 model Files {
-  id        String   @id @default(uuid()) @db.Uuid
-  filename  String
-  filetype  String
-  filesize  Int
+  id String @id @default(uuid()) @db.Uuid
+
+  filename   String
+  mimetype   String
+  filesize   Int
   uploadedAt DateTime @default(now())
 
   supabaseFileId String @unique
+
+  profileImgFor User[] @relation("UserProfileImage")
+
+  commentContentFor Comment[] @relation("CommentContentFiles")
+  postContentFor    Post[]    @relation("PostFileContent")
+}
+
+model Comment {
+  id String @id @default(uuid()) @db.Uuid
+
+  textContent      String?
+  singleGifOrImgId String? @db.Uuid
+  singleGifOrImg   Files?  @relation("CommentContentFiles", fields: [singleGifOrImgId], references: [id])
+
+  likes UserLikes[]
+
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String @db.Uuid
+
+  parentCommentId String?  @db.Uuid
+  parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id])
+
+  replies Comment[] @relation("CommentReplies")
+}
+
+model Post {
+  id String @id @default(uuid()) @db.Uuid
+
+  title       String?
+  textContent String?
+  fileId      String? @db.Uuid
+  file        Files?  @relation("PostFileContent", fields: [fileId], references: [id])
+
+  likes UserLikes[]
+
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+
+  comments Comment[]
+
+
+  parentPostId String? @db.Uuid
+  parentPost   Post?  @relation("PostReplies", fields: [parentPostId], references: [id])
+
+  replies Post[] @relation("PostReplies")
+
+}
+
+
+
+
+model UserLikes {
+  id String @id @default(uuid()) @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+
+  post   Post?   @relation(fields: [postId], references: [id])
+  postId String? @db.Uuid
+
+  comment   Comment?   @relation(fields: [commentId], references: [id])
+  commentId String? @db.Uuid
+
+  createdAt DateTime @default(now())
 }
