@@ -3,13 +3,23 @@ import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErr
 
 import { router as authRouter } from "./auth";
 import { router as signInRouter } from "./sign-in";
+import { router as commentsRouter } from "./comments";
+import { router as postsRouter } from "./posts";
+import { router as usersRouter } from "./users";
+import { router as homeRouter } from "./home";
+import { router as repliesRouter } from "./replies";
+
 
 export const apiRouter = Router();
 
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/sign-in", signInRouter);
-
+apiRouter.use("/comments", commentsRouter);
+apiRouter.use("/posts", postsRouter);
+apiRouter.use("/users", usersRouter);
+apiRouter.use("/home", homeRouter);
+apiRouter.use("/replies", repliesRouter);
 
 
 apiRouter.use((req: Request, res: Response<ICustomErrorResponse>, next: NextFunction) => {
