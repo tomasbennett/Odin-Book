@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { maxUsernamePasswordLength, minUsernamePasswordLength, usernamePasswordRegex } from "../constants";
+import { USER_PROFILE_IMG_FILE_KEY, maxUsernamePasswordLength, minUsernamePasswordLength, usernamePasswordRegex } from "../constants";
 import { APISuccessSchema } from "../../api/models/APISuccessResponse";
 import { AuthUserInfoSchema } from "./IAuthUserInfo";
 
@@ -24,7 +24,7 @@ export type ILoginForm = z.infer<typeof loginFormSchema>;
 
 export const SignInErrorSchema = z.object({
     message: z.string(),
-    inputType: z.enum(["username", "password", "root"])
+    inputType: z.enum(["username", "password", "root", USER_PROFILE_IMG_FILE_KEY])
 });
 
 export type ISignInError = z.infer<typeof SignInErrorSchema>;

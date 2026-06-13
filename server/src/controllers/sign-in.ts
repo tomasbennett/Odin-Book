@@ -1,16 +1,14 @@
 import { Prisma, User } from "@prisma/client";
 import { NextFunction, Router } from "express";
 import { Request, Response } from "express";
-import passport from "passport";
 import { prisma } from "../db/prisma";
 
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"
 import crypto from "crypto";
 
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomSuccessMessage } from "../../../shared/features/api/models/APISuccessResponse";
-import { ILoginForm, ISignInError, usernamePasswordSchema } from "../../../shared/features/auth/models/ILoginSchema";
+import { ILoginForm, ISignInError, ISuccessResSignIn, usernamePasswordSchema } from "../../../shared/features/auth/models/ILoginSchema";
 import { environment } from "../../../shared/constants";
 import { issueSignedInResponse } from "../auth/IssueSignedInResponse";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
@@ -18,13 +16,15 @@ import { refreshTokenCookieKey } from "../constants/constants";
 import upload from "../supabase/multer";
 import { supabase } from "../supabase/client";
 import { USER_PROFILE_IMG_FILE_KEY } from "../../../shared/features/auth/constants";
+import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
+import { allowedImgTypes } from "../../../shared/features/files/constants";
 
 
 
 export const router = Router();
 
 
-router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | ILoginRegisterSuccessUserInfoSchema>, next: NextFunction) => {
+router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | ISuccessResSignIn>, next: NextFunction) => {
     const { username, password } = req.body;
 
     const usernameResult = usernamePasswordSchema.safeParse(username);
@@ -46,7 +46,7 @@ router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISi
 
 
     try {
-        const user: AuthUser | null = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 username
             },
@@ -76,20 +76,40 @@ router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISi
             };
             return res.status(400).json(errorResponse);
         }
+
+        if (user.profileImg?.supabaseFileId) {
+            const generatedUrlResult = await GenerateSupabasePublicURL([user.profileImg.supabaseFileId]);
+
+            if (!generatedUrlResult.ok) {
+                return res.status(500).json({
+                    message: generatedUrlResult.error,
+                    inputType: "root"
+                });
+            }
+
+            user.profileImg.supabaseFileId = generatedUrlResult.supabasePublicURLs[0];
+
+        }
+
         
-        return await issueSignedInResponse(user, res);
+        return await issueSignedInResponse({
+            userId: user.id,
+            username: user.username,
+            userProfileImgUrl: user.profileImg?.supabaseFileId
+        }, res);
 
 
 
 
     } catch (error) {
         return next(error);
+
     }
 
 });
 
 
-router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: Request<{}, {}, Omit<ILoginForm, typeof USER_PROFILE_IMG_FILE_KEY>>, res: Response<ISignInError | ILoginRegisterSuccessUserInfoSchema>, next: NextFunction) => {
+router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | ISuccessResSignIn>, next: NextFunction) => {
     const { username, password } = req.body;
     const file = req.file;
 
@@ -116,8 +136,18 @@ router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: R
 
 
         let profileImgId: string | undefined = undefined;
+        let generatedProfileImgUrl: string | undefined = undefined;
 
         if (file) {
+
+            if (!allowedImgTypes.includes(file.mimetype)) {
+                return res.status(400).json({
+                    message: "Invalid file type!!!",
+                    inputType: USER_PROFILE_IMG_FILE_KEY
+                });
+
+            }
+
 
             const { originalname, mimetype, size, buffer } = file;
 
@@ -133,15 +163,25 @@ router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: R
 
             if (error) throw error;
 
-            const prismaFile = await prisma.file.create({
+            const prismaFile = await prisma.files.create({
                 data: {
                     filename: originalname,
                     filesize: size,
-                    filetype: mimetype,
+                    mimetype: mimetype,
                     supabaseFileId: storagePath,
                 }
             });
 
+            const generatedUrlResult = await GenerateSupabasePublicURL([storagePath]);
+
+            if (!generatedUrlResult.ok) {
+                return res.status(500).json({
+                    message: generatedUrlResult.error,
+                    inputType: "root"
+                });
+            }
+
+            generatedProfileImgUrl = generatedUrlResult.supabasePublicURLs[0];
             profileImgId = prismaFile.id;
 
         }
@@ -153,16 +193,15 @@ router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: R
                 password: hashedPassword,
                 profileImgId
             },
-            include: {
-                profileImg: {
-                    select: {
-                        supabaseFileId: true,
-                    }
-                }
-            }
         });
+        
 
-        await issueSignedInResponse(user, res);
+
+        await issueSignedInResponse({
+            userId: user.id,
+            username: user.username,
+            userProfileImgUrl: generatedProfileImgUrl
+        }, res);
 
         
 
@@ -204,7 +243,7 @@ router.delete("/logout", ensureJWTAuthentication, async (req: Request, res: Resp
 
         const deletedRefreshToken = await prisma.refreshToken.delete({
             where: {
-                token: tokenHash
+                hashedToken: tokenHash
             }
         });
 

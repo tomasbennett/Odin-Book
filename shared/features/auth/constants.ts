@@ -11,3 +11,7 @@ export const invalidRefreshTokenStatus: number = 401;
 
 
 export const SOCKET_INVALID_ACCESS_TOKEN_MESSAGE: string = "Invalid access token. Please log in again.";
+
+
+
+export const USER_PROFILE_IMG_FILE_KEY: string = "userProfileImgKey";

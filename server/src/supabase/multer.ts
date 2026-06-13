@@ -1,5 +1,5 @@
 import multer from "multer";
-import { maxFileSizeInBytes, allowedTypes } from "../../../shared/features/files/constants";
+import { maxFileSizeInBytes, allowedAllFileTypes } from "../../../shared/features/files/constants";
 
 
 
@@ -13,7 +13,7 @@ const upload = multer({
 
   fileFilter: (req, file, cb) => {
 
-    if (allowedTypes.includes(file.mimetype)) {
+    if (allowedAllFileTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(new Error("Unsupported file type"));
