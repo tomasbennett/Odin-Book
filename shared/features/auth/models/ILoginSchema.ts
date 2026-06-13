@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { maxUsernamePasswordLength, minUsernamePasswordLength, usernamePasswordRegex } from "../constants";
+import { APISuccessSchema } from "../../api/models/APISuccessResponse";
+import { AuthUserInfoSchema } from "./IAuthUserInfo";
 
 
 export const usernamePasswordSchema = z.string()
@@ -26,3 +28,14 @@ export const SignInErrorSchema = z.object({
 });
 
 export type ISignInError = z.infer<typeof SignInErrorSchema>;
+
+
+
+
+
+export const SuccessResSignInSchema = APISuccessSchema.merge(AuthUserInfoSchema).extend({
+    accessToken: z.string()
+});
+
+
+export type ISuccessResSignIn = z.infer<typeof SuccessResSignInSchema>;

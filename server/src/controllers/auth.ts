@@ -5,10 +5,10 @@ import { ICustomSuccessMessage } from "../../../shared/features/api/models/APISu
 import crypto from "crypto"
 import { prisma } from "../db/prisma";
 import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
-import { CreateAccessToken } from "../services/CreateAccessToken";
 import { invalidRefreshTokenStatus } from "../../../shared/features/auth/constants";
-import { ensureAuthentication as ensureJWTAuthentication } from "../auth/ensureAuthentication";
 import { ISuccessResAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";
+import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
+import { CreateAccessToken } from "../auth/CreateAccessToken";
 
 
 
@@ -58,8 +58,12 @@ router.get("/grantNewAccessToken", async (req: Request, res: Response<ICustomErr
             where: {
                 hashedToken: tokenHash
             },
-            include: {
-                user: true
+            select: {
+                user: {
+                    select: {
+                        id: true
+                    }
+                }
             }
         });
 
@@ -90,7 +94,7 @@ router.get("/grantNewAccessToken", async (req: Request, res: Response<ICustomErr
 
 
 
-        const accessToken = CreateAccessToken(dbRefreshToken.user);
+        const accessToken = CreateAccessToken(dbRefreshToken.user.id);
 
         return res.status(200).json({
             ok: true,

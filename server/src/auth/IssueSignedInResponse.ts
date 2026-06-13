@@ -4,14 +4,16 @@ import { Response } from "express";
 import crypto from "crypto";
 import { environment } from "../../../shared/constants";
 import { prisma } from "../db/prisma";
-import { ISignInError } from "../../../shared/features/auth/models/ILoginSchema";
+import { ISignInError, ISuccessResSignIn } from "../../../shared/features/auth/models/ILoginSchema";
 import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
 import { CreateAccessToken } from "./CreateAccessToken";
 import { refreshTokenCookieKey } from "../constants/constants";
+import { IAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";
 
-export async function issueSignedInResponse(user: User, res: Response<ISignInError | IAccessTokenResponse>) {
+
+export async function issueSignedInResponse(user: IAuthUserInfo, res: Response<ISignInError | ISuccessResSignIn>) {
     try {
-        const accessToken = CreateAccessToken(user);
+        const accessToken = CreateAccessToken(user.userId);
     
         const refreshToken = crypto.randomBytes(64).toString('hex');
         const refreshTokenHash = crypto
@@ -26,8 +28,8 @@ export async function issueSignedInResponse(user: User, res: Response<ISignInErr
         await prisma.refreshToken.create({
             data: {
                 hashedToken: refreshTokenHash,
-                userId: user.id,
-                expiresAt: new Date(Date.now() + expiry)
+                userId: user.userId,
+                // expiresAt: new Date(Date.now() + expiry)
             }
         });
     
@@ -36,19 +38,21 @@ export async function issueSignedInResponse(user: User, res: Response<ISignInErr
                 httpOnly: true,
                 secure: environment === "PROD",
                 sameSite: environment === "PROD" ? "none" : "lax",
-                maxAge: expiry
+                // maxAge: expiry
             })
             .status(200)
             .json({
                 message: "Login successful",
                 ok: true,
                 status: 200,
-                accessToken
+                accessToken,
+                userId: user.userId,
+                username: user.username,
+                userProfileImgUrl: user?.userProfileImgUrl
             });
 
 
-    } catch (error) {
-        console.error("Error issuing signed-in response:", error);
+    } catch (error: unknown) {
         if (error instanceof Error) {
             return res.status(500).json({
                 message: error.message,

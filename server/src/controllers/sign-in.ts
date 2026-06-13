@@ -8,21 +8,23 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import crypto from "crypto";
 
-import { ensureAuthentication } from "../auth/ensureAuthentication";
+import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomSuccessMessage } from "../../../shared/features/api/models/APISuccessResponse";
 import { ILoginForm, ISignInError, usernamePasswordSchema } from "../../../shared/features/auth/models/ILoginSchema";
 import { environment } from "../../../shared/constants";
-import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
-import { issueSignedInResponse } from "../services/IssueSignedInResponse";
+import { issueSignedInResponse } from "../auth/IssueSignedInResponse";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { refreshTokenCookieKey } from "../constants/constants";
+import upload from "../supabase/multer";
+import { supabase } from "../supabase/client";
+import { USER_PROFILE_IMG_FILE_KEY } from "../../../shared/features/auth/constants";
 
 
 
 export const router = Router();
 
 
-router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | IAccessTokenResponse>, next: NextFunction) => {
+router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | ILoginRegisterSuccessUserInfoSchema>, next: NextFunction) => {
     const { username, password } = req.body;
 
     const usernameResult = usernamePasswordSchema.safeParse(username);
@@ -44,9 +46,16 @@ router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISi
 
 
     try {
-        const user: User | null = await prisma.user.findUnique({
+        const user: AuthUser | null = await prisma.user.findUnique({
             where: {
                 username
+            },
+            include: {
+                profileImg: {
+                    select: {
+                        supabaseFileId: true,
+                    }
+                }
             }
         });
 
@@ -67,8 +76,6 @@ router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISi
             };
             return res.status(400).json(errorResponse);
         }
-
-        // WE WANT TO CREATE AN ACCESS TOKEN AND A REFRESH TOKEN FOR THE USER SENDING THE REFRESH TOKEN AS A COOKIE AND THE ACCESS TOKEN IN THE RESPONSE BODY
         
         return await issueSignedInResponse(user, res);
 
@@ -82,8 +89,9 @@ router.post("/login", async (req: Request<{}, {}, ILoginForm>, res: Response<ISi
 });
 
 
-router.post("/register", async (req: Request<{}, {}, ILoginForm>, res: Response<ISignInError | IAccessTokenResponse>, next: NextFunction) => {
+router.post("/register", upload.single(USER_PROFILE_IMG_FILE_KEY), async (req: Request<{}, {}, Omit<ILoginForm, typeof USER_PROFILE_IMG_FILE_KEY>>, res: Response<ISignInError | ILoginRegisterSuccessUserInfoSchema>, next: NextFunction) => {
     const { username, password } = req.body;
+    const file = req.file;
 
     const usernameResult = usernamePasswordSchema.safeParse(username);
     if (!usernameResult.success) {
@@ -102,15 +110,55 @@ router.post("/register", async (req: Request<{}, {}, ILoginForm>, res: Response<
         });
     }
 
-
     try {
 
         const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10);
 
+
+        let profileImgId: string | undefined = undefined;
+
+        if (file) {
+
+            const { originalname, mimetype, size, buffer } = file;
+
+            const fileExt = originalname.split(".").pop();
+            const storagePath = `${crypto.randomUUID()}.${fileExt}`;
+
+            const { error } = await supabase.storage
+                .from(process.env.SUPABASE_BUCKET_NAME || "uploads")
+                .upload(storagePath, buffer, {
+                    contentType: mimetype,
+                    upsert: false
+                });
+
+            if (error) throw error;
+
+            const prismaFile = await prisma.file.create({
+                data: {
+                    filename: originalname,
+                    filesize: size,
+                    filetype: mimetype,
+                    supabaseFileId: storagePath,
+                }
+            });
+
+            profileImgId = prismaFile.id;
+
+        }
+
+
         const user = await prisma.user.create({
             data: {
                 username,
-                password: hashedPassword
+                password: hashedPassword,
+                profileImgId
+            },
+            include: {
+                profileImg: {
+                    select: {
+                        supabaseFileId: true,
+                    }
+                }
             }
         });
 
@@ -136,7 +184,7 @@ router.post("/register", async (req: Request<{}, {}, ILoginForm>, res: Response<
 });
 
 
-router.delete("/logout", ensureAuthentication, async (req: Request, res: Response<ICustomErrorResponse | ICustomSuccessMessage>, next: NextFunction) => {
+router.delete("/logout", ensureJWTAuthentication, async (req: Request, res: Response<ICustomErrorResponse | ICustomSuccessMessage>, next: NextFunction) => {
     const refreshToken: string | undefined = req.cookies?.refreshToken;
 
     if (!refreshToken) {
@@ -156,7 +204,7 @@ router.delete("/logout", ensureAuthentication, async (req: Request, res: Respons
 
         const deletedRefreshToken = await prisma.refreshToken.delete({
             where: {
-                hashedToken: tokenHash
+                token: tokenHash
             }
         });
 
@@ -190,12 +238,3 @@ router.delete("/logout", ensureAuthentication, async (req: Request, res: Respons
 
 
 });
-
-
-
-
-
-
-
-
-
