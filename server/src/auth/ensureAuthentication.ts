@@ -33,7 +33,9 @@ export async function ensureAuthentication(req: Request, res: Response<ICustomEr
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: payload.sub }
+            where: { 
+                id: payload.sub 
+            }
         });
 
         if (!user) {

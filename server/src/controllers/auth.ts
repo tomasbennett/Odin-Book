@@ -7,21 +7,26 @@ import { prisma } from "../db/prisma";
 import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
 import { CreateAccessToken } from "../services/CreateAccessToken";
 import { invalidRefreshTokenStatus } from "../../../shared/features/auth/constants";
-import { ensureAuthentication } from "../auth/ensureAuthentication";
+import { ensureAuthentication as ensureJWTAuthentication } from "../auth/ensureAuthentication";
+import { ISuccessResAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";
+
 
 
 export const router = Router();
 
-
-router.get("/auth/checkAccessToken", ensureAuthentication, (req: Request, res: Response<ICustomErrorResponse | ICustomSuccessMessage>, next: NextFunction) => {
+router.get("/checkAuthLevel", ensureJWTAuthentication, (req: Request, res: Response<ICustomErrorResponse | ISuccessResAuthUserInfo>, next: NextFunction) => {
     if (req.user) {
         return res.status(200).json({
             ok: true,
             status: 200,
-            message: "User is authenticated with access token"
+            message: "User is authenticated with access token",
+            userId: req.user.userId,
+            username: req.user.username,
+            userProfileImgUrl: req.user.userProfileImgUrl
         });
     }
 
+    //DONT REMEMBER WHY THIS IS HERE BUT I THINK IT IS IN CASE THE MIDDLEWARE DOESNT THROW AN ERROR BUT ALSO DOESNT AUTHENTICATE THE USER FOR SOME REASON
     return res.status(401).json({
         ok: false,
         status: 401,
@@ -30,7 +35,8 @@ router.get("/auth/checkAccessToken", ensureAuthentication, (req: Request, res: R
 
 });
 
-router.get("/auth/refreshToken", async (req: Request, res: Response<ICustomErrorResponse | IAccessTokenResponse>, next: NextFunction) => {
+
+router.get("/grantNewAccessToken", async (req: Request, res: Response<ICustomErrorResponse | IAccessTokenResponse>, next: NextFunction) => {
     const refreshToken: string | undefined = req.cookies?.refreshToken;
 
     if (!refreshToken) {
@@ -66,21 +72,21 @@ router.get("/auth/refreshToken", async (req: Request, res: Response<ICustomError
             });
         }
 
-        if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
-            const delRefreshToken = await prisma.refreshToken.delete({
-                where: {
-                    id: dbRefreshToken.id
-                }
-            });
+        // if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
+        //     const delRefreshToken = await prisma.refreshToken.delete({
+        //         where: {
+        //             id: dbRefreshToken.id
+        //         }
+        //     });
 
             
 
-            return res.status(invalidRefreshTokenStatus).json({
-                ok: false,
-                status: invalidRefreshTokenStatus,
-                message: "Refresh token expired!!!"
-            });
-        }
+        //     return res.status(invalidRefreshTokenStatus).json({
+        //         ok: false,
+        //         status: invalidRefreshTokenStatus,
+        //         message: "Refresh token expired!!!"
+        //     });
+        // }
 
 
 
@@ -97,9 +103,7 @@ router.get("/auth/refreshToken", async (req: Request, res: Response<ICustomError
 
 
     } catch (error) {
-
         return next(error);
-
 
     }
 });
