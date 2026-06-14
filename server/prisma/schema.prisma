@@ -25,10 +25,16 @@ model User {
 
   // role     Role   @default(USER)
 
+  aboutMe String?
+
   createdAt DateTime @default(now())
 
   profileImgId String? @db.Uuid
   profileImg   Files?  @relation("UserProfileImage", fields: [profileImgId], references: [id])
+
+  accountBackgroundImgId String? @db.Uuid
+  accountBackgroundImg   Files?  @relation("UserAccountBackgroundImage", fields: [accountBackgroundImgId], references: [id])
+
 
   refreshTokens RefreshToken[]
 
@@ -62,6 +68,7 @@ model Files {
 
   commentContentFor Comment[] @relation("CommentContentFiles")
   postContentFor    Post[]    @relation("PostFileContent")
+  accountBackgroundImgFor User[] @relation("UserAccountBackgroundImage")
 }
 
 model Comment {
