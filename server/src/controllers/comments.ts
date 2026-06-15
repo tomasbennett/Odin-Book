@@ -13,6 +13,7 @@ import { ICommentsThreadAPIResponse } from "../../../shared/features/commentsThr
 import { IComment } from "../../../shared/features/comments/models/IComment";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generateCommentContentAndProfileImage } from "../services/GenerateCommentContentAndProfileImage";
+import { IPostFileMapping } from "../models/IPostFileMapping";
 
 
 export const router = Router();
@@ -220,7 +221,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                                 }
                             },
                             likes: true,
-                            file: true
+                            files: true
                         }
                     },
                     likes: true,
@@ -244,10 +245,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
         }
 
 
-
-
-
-        const repliesAPI: IComment[] = await Promise.all(
+        const buildReplies = Promise.all(
             replies.map(async (reply): Promise<IComment> => {
 
                 const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(reply);
@@ -268,8 +266,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
             })
         );
 
-        
-        const parentCommentsAPI: IComment[] = await Promise.all(
+        const buildParentComments = Promise.all(
             parentComments.map(async (parentComment): Promise<IComment> => {
 
                 const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(parentComment);
@@ -289,43 +286,103 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
             })
         );
 
+        const buildComment = async () => {
+            const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(comment);
+
+            const commentAPI: IComment = {
+                id: comment.id,
+                postId: comment.postId,
+                userId: comment.userId,
+                username: comment.user.username,
+                userProfileImgUrl: userProfileImgUrl,
+                createdAt: comment.createdAt,
+                parentCommentId: comment.parentCommentId || undefined,
+                likeCount: comment.likes.length,
+                text: comment.textContent || undefined,
+                imgOrGifDetails: imgOrGifDetails
+            };
+
+            return commentAPI;
+        }
+
+        const buildPost = async () => {
+            const post = comment.post;
+
+            //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
+
+            let postUserProfileImgUrl: string | undefined;
+            let fileDetails: IFileDetails[] | undefined;
+
+            const filesToGeneratePublicUrlsFor: string[] = [];
+            const mapping: IPostFileMapping = {};
+
+            if (post.user.profileImg) {
+                mapping.postUserProfileImg = filesToGeneratePublicUrlsFor.length;
+
+                filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
+            }
+
+            if (post.files.length > 0) {
+                mapping.postContentFiles = {
+                    start: filesToGeneratePublicUrlsFor.length,
+                    count: post.files.length
+                };
+
+                post.files.forEach((file) => {
+                    filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
+                });
+            }
+
+            const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
+
+            if (!generatedPublicUrlResult.ok) {
+                throw new Error("Failed to generate public URLs for post or post user profile image!!!");
+            }
+
+            if (mapping.postUserProfileImg !== undefined) {
+                postUserProfileImgUrl = generatedPublicUrlResult.supabasePublicURLs[
+                    mapping.postUserProfileImg
+                ];
+            }
+
+            if (mapping.postContentFiles) {
+                const { start, count } = mapping.postContentFiles;
+
+                fileDetails = post.files.map((file, i) => ({
+                    id: file.id,
+                    publicUrl:
+                        generatedPublicUrlResult.supabasePublicURLs[start + i],
+                    name: file.filename,
+                    size: file.filesize,
+                    mimetype: file.mimetype,
+                    createdAt: file.uploadedAt
+                }));
+            }
 
 
-        const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(comment);
+
+            const postAPI: IPost = {
+                id: post.id,
+                userId: post.userId,
+                username: post.user.username,
+                title: post.title || undefined,
+                content: post.textContent || undefined,
+                createdAt: post.createdAt,
+                likeCount: post.likes.length,
+                userProfileImgUrl: postUserProfileImgUrl,
+                fileDetails: fileDetails,
+            };
+
+            return postAPI;
+        }
 
 
-        const commentAPI: IComment = {
-            id: comment.id,
-            postId: comment.postId,
-            userId: comment.userId,
-            username: comment.user.username,
-            userProfileImgUrl: userProfileImgUrl,
-            createdAt: comment.createdAt,
-            parentCommentId: comment.parentCommentId || undefined,
-            likeCount: comment.likes.length,
-            text: comment.textContent || undefined,
-            imgOrGifDetails: imgOrGifDetails
-        };
-
-
-
-
-
-        const post = comment.post;
-
-        //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
-
-        const postAPI: IPost = {
-            id: post.id,
-            userId: post.userId,
-            username: post.user.username,
-            title: post.title || undefined,
-            content: post.textContent || undefined,
-            createdAt: post.createdAt,
-            likeCount: post.likes.length,
-            userProfileImgUrl: ,
-            fileDetails: ,
-        };
+        const [repliesAPI, parentCommentsAPI, commentAPI, postAPI] = await Promise.all([
+            buildReplies,
+            buildParentComments,
+            buildComment(),
+            buildPost()
+        ]);
 
 
 
