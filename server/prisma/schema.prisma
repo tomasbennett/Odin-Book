@@ -67,8 +67,11 @@ model Files {
   profileImgFor User[] @relation("UserProfileImage")
 
   commentContentFor Comment[] @relation("CommentContentFiles")
-  postContentFor    Post[]    @relation("PostFileContent")
   accountBackgroundImgFor User[] @relation("UserAccountBackgroundImage")
+
+
+  postContentForId String? @db.Uuid
+  postContentFor    Post?    @relation("PostFileContent", fields: [postContentForId], references: [id])
 }
 
 model Comment {
@@ -99,8 +102,8 @@ model Post {
 
   title       String?
   textContent String?
-  fileId      String? @db.Uuid
-  file        Files?  @relation("PostFileContent", fields: [fileId], references: [id])
+  
+  files        Files[]  @relation("PostFileContent")
 
   likes UserLikes[]
 

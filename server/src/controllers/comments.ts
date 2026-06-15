@@ -12,6 +12,7 @@ import { getParentComments } from "../services/GetParentCommentsRecursive";
 import { ICommentsThreadAPIResponse } from "../../../shared/features/commentsThread/models/ICommentsThreadAPI";
 import { IComment } from "../../../shared/features/comments/models/IComment";
 import { IPost } from "../../../shared/features/posts/models/IPost";
+import { generateCommentContentAndProfileImage } from "../services/GenerateCommentContentAndProfileImage";
 
 
 export const router = Router();
@@ -150,7 +151,7 @@ router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: st
             })
         );
 
-    
+
 
 
 
@@ -185,7 +186,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
 
 
     try {
-        
+
         //MAKE SURE TO GET BOTH THE REPLIES AND THE UPPER PARENT COMMENTS/ORIGINAL POST FOR THIS ONE!!!
 
         const [replies, comment, parentComments] = await Promise.all([
@@ -211,7 +212,17 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     id: commentId
                 },
                 include: {
-                    post: true,
+                    post: {
+                        include: {
+                            user: {
+                                include: {
+                                    profileImg: true
+                                }
+                            },
+                            likes: true,
+                            file: true
+                        }
+                    },
                     likes: true,
                     singleGifOrImg: true,
                     user: {
@@ -235,11 +246,86 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
 
 
 
+
+        const repliesAPI: IComment[] = await Promise.all(
+            replies.map(async (reply): Promise<IComment> => {
+
+                const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(reply);
+
+
+                return {
+                    id: reply.id,
+                    postId: reply.postId,
+                    userId: reply.userId,
+                    username: reply.user.username,
+                    userProfileImgUrl: userProfileImgUrl,
+                    createdAt: reply.createdAt,
+                    parentCommentId: commentId,
+                    likeCount: reply.likes.length,
+                    text: reply.textContent || undefined,
+                    imgOrGifDetails: imgOrGifDetails
+                }
+            })
+        );
+
         
-        const repliesAPI: IComment[] = ;
-        const commentAPI: IComment = {};
-        const parentCommentsAPI: IComment[] = ;
-        const postAPI: IPost = {};
+        const parentCommentsAPI: IComment[] = await Promise.all(
+            parentComments.map(async (parentComment): Promise<IComment> => {
+
+                const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(parentComment);
+
+                return {
+                    id: parentComment.id,
+                    postId: parentComment.postId,
+                    userId: parentComment.userId,
+                    username: parentComment.user.username,
+                    userProfileImgUrl: userProfileImgUrl,
+                    createdAt: parentComment.createdAt,
+                    parentCommentId: parentComment.parentCommentId || undefined,
+                    likeCount: parentComment.likes.length,
+                    text: parentComment.textContent || undefined,
+                    imgOrGifDetails: imgOrGifDetails
+                }
+            })
+        );
+
+
+
+        const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(comment);
+
+
+        const commentAPI: IComment = {
+            id: comment.id,
+            postId: comment.postId,
+            userId: comment.userId,
+            username: comment.user.username,
+            userProfileImgUrl: userProfileImgUrl,
+            createdAt: comment.createdAt,
+            parentCommentId: comment.parentCommentId || undefined,
+            likeCount: comment.likes.length,
+            text: comment.textContent || undefined,
+            imgOrGifDetails: imgOrGifDetails
+        };
+
+
+
+
+
+        const post = comment.post;
+
+        //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
+
+        const postAPI: IPost = {
+            id: post.id,
+            userId: post.userId,
+            username: post.user.username,
+            title: post.title || undefined,
+            content: post.textContent || undefined,
+            createdAt: post.createdAt,
+            likeCount: post.likes.length,
+            userProfileImgUrl: ,
+            fileDetails: ,
+        };
 
 
 
