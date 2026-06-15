@@ -8,6 +8,10 @@ import { prisma } from "../db/prisma";
 import { IProfileComments, IProfileCommentsAPI } from "../../../shared/features/profiles/models/IProfileComments";
 import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
+import { getParentComments } from "../services/GetParentCommentsRecursive";
+import { ICommentsThreadAPIResponse } from "../../../shared/features/commentsThread/models/ICommentsThreadAPI";
+import { IComment } from "../../../shared/features/comments/models/IComment";
+import { IPost } from "../../../shared/features/posts/models/IPost";
 
 
 export const router = Router();
@@ -175,7 +179,90 @@ router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: st
 
 
 
-router.get("/:commentId/replies", ensureJWTAuthentication, (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response<ICommentsThreadAPIResponse | ICustomErrorResponse>, next: NextFunction) => {
+    const user = req.user!;
+    const { commentId } = req.params;
+
+
+    try {
+        
+        //MAKE SURE TO GET BOTH THE REPLIES AND THE UPPER PARENT COMMENTS/ORIGINAL POST FOR THIS ONE!!!
+
+        const [replies, comment, parentComments] = await Promise.all([
+            prisma.comment.findMany({
+                where: {
+                    parentCommentId: commentId
+                },
+                orderBy: {
+                    createdAt: "asc"
+                },
+                include: {
+                    likes: true,
+                    singleGifOrImg: true,
+                    user: {
+                        include: {
+                            profileImg: true
+                        }
+                    }
+                }
+            }),
+            prisma.comment.findUnique({
+                where: {
+                    id: commentId
+                },
+                include: {
+                    post: true,
+                    likes: true,
+                    singleGifOrImg: true,
+                    user: {
+                        include: {
+                            profileImg: true
+                        }
+                    }
+                }
+            }),
+            getParentComments(commentId)
+        ]);
+
+        if (!comment || !comment.post) {
+            return res.status(404).json({
+                ok: false,
+                status: 404,
+                message: "Comment or post not found!!!"
+            });
+        }
+
+
+
+
+        
+        const repliesAPI: IComment[] = ;
+        const commentAPI: IComment = {};
+        const parentCommentsAPI: IComment[] = ;
+        const postAPI: IPost = {};
+
+
+
+        return res.status(200).json({
+            ok: true,
+            status: 200,
+            message: "Replies and parent comments fetched successfully!!!",
+            replies: repliesAPI,
+            comment: commentAPI,
+            post: postAPI,
+            parentComments: parentCommentsAPI
+        });
+
+
+
+
+
+
+    } catch (error) {
+        next(error);
+
+    }
+
 
 });
 
