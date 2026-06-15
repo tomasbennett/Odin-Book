@@ -1,14 +1,15 @@
 import z from "zod";
+import { DateFromStringSchema } from "../../util/models/IDateFromStringSchema";
 
 
 
 export const FileDetailsSchema = z.object({
     id: z.string(),
+    publicUrl: z.string(),
     name: z.string(),
     size: z.number().int().positive(),
-    type: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date().optional()
+    mimetype: z.string(),
+    createdAt: DateFromStringSchema,
 });
 
 
