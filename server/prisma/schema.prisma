@@ -138,4 +138,7 @@ model UserLikes {
   commentId String? @db.Uuid
 
   createdAt DateTime @default(now())
+
+  @@unique([userId, commentId], name: "unique_user_comment")
+  @@unique([userId, postId], name: "unique_user_post")
 }

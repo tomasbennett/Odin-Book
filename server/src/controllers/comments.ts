@@ -23,6 +23,9 @@ import { io } from "../app";
 import { SOCKET_COMMENT_THREAD_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 import { IDeleteComment } from "../../../shared/features/comments/models/IDeleteComment";
 import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/models/IDeleteCommentSuccessAPI";
+import { ISendLikeComment } from "../../../shared/features/likes/models/ISendLikeComment";
+import { Prisma } from "@prisma/client";
+import { SOCKET_LIKE_EVENT } from "../../../shared/features/likes/constants";
 
 
 export const router = Router();
@@ -542,8 +545,8 @@ router.post("/",
     });
 
 
-router.delete("/:commentId", 
-    ensureJWTAuthentication, 
+router.delete("/:commentId",
+    ensureJWTAuthentication,
     async (req: Request<{ commentId: string }, {}, IDeleteComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
 
         const user = req.user!;
@@ -552,7 +555,7 @@ router.delete("/:commentId",
 
 
         try {
-            
+
             const deletedComment = await prisma.comment.delete({
                 where: {
                     id: commentId,
@@ -590,17 +593,86 @@ router.delete("/:commentId",
 
         } catch (error) {
             next(error);
-            
+
         }
 
 
-});
+    });
 
 
 
-router.post("/:commentId/like", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+router.post("/:commentId/like",
+    ensureJWTAuthentication,
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+        const user = req.user!;
+        const { commentId } = req.params;
+        const { senderSocketId } = req.body;
 
-});
+        try {
+
+            const existingLike = await prisma.userLikes.findUnique({
+                where: {
+                    unique_user_comment: {
+                        userId: user.userId,
+                        commentId: commentId
+                    }
+                }
+            });
+
+            if (existingLike) {
+                return res.status(409).json({
+                    ok: false,
+                    status: 409,
+                    message: "You have already liked this comment!!!"
+                });
+            }
+
+
+            const newLike = await prisma.userLikes.create({
+                data: {
+                    userId: user.userId,
+                    commentId: commentId
+                },
+                include: {
+                    comment: true
+                }
+            });
+
+
+
+            //SO THE BASIC THOUGHT PROCESS HERE IS THAT WHENEVER COMMENTS ARE OPEN IT WILL EITHER BE SHOWING A PAGE WITH THE CENTER POINT BEING:
+            // SOME PARENT COMMENT, THE POST OR IT WILL BE THE PARENT COMMENT ITSELF
+
+            //NOPE WON'T WORK BECAUSE ADDING A COMMENT ONLY CARES ABOUT SOCKET_COMMENT_THREAD_ROOM_PREFIX BUT THIS DOESN'T WORK BECAUSE
+            //WHAT IF A PARENT COMMENT GETS LIKED OR CHANGED WHILST WE ARE ON ONE OF ITS CHILD COMMENTS THEN WE WANT THAT UPDATED TOO
+
+            //MIGHT NEED TO JUST HAVE IT FOR THE POST IF WE ARE IN THE COMMENTS SECTION BUT THIS WILL LOOK FOR AN UPDATE ON COMMENTS THAT MIGHT NOT EVEN BE ON SCREEN
+            //BECAUSE IT WILL CALL TO THAT EVENT FOR LIKES ON COMMENTS THAT AREN'T PART OF THAT COMMENTS THREAD!!!
+
+
+            io
+                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${newLike.comment?.parentCommentId || newLike.comment!.postId}`)
+                .except(senderSocketId)
+                .emit(SOCKET_LIKE_EVENT, )
+
+
+
+            
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                return res.status(409).json({
+                    ok: false,
+                    status: 409,
+                    message: "Already liked this comment!!!"
+                });
+            }
+
+
+            next(error);
+            
+        }
+
+    });
 
 router.post("/:commentId/unlike", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
 

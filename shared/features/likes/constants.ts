@@ -1,0 +1,1 @@
+export const SOCKET_LIKE_EVENT: string = 'like_event';
