@@ -1,14 +1,15 @@
 import z from "zod";
 import { FileDetailsSchema, IFileDetails } from "../../files/models/IFileDetails";
+import { COMMENT_IMG_GIF_KEY } from "../constants";
 
 
 
 export const CommentContentSchema = z.object({
     text: z.string().optional(),
-    imgOrGifDetails: FileDetailsSchema.optional()
+    [COMMENT_IMG_GIF_KEY]: FileDetailsSchema.optional()
 }).superRefine((data, ctx) => {
     const hasTextContent = !!data.text && data.text.trim() !== "";
-    const hasFiles = !!data.imgOrGifDetails;
+    const hasFiles = !!data[COMMENT_IMG_GIF_KEY];
 
     if (hasTextContent) {
         return;

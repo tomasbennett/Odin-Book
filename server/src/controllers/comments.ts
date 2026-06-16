@@ -14,6 +14,10 @@ import { IComment } from "../../../shared/features/comments/models/IComment";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generateCommentContentAndProfileImage } from "../services/GenerateCommentContentAndProfileImage";
 import { IPostFileMapping } from "../models/IPostFileMapping";
+import { allowedImgTypes } from "../../../shared/features/files/constants";
+import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
+import { ICreateComment } from "../../../shared/features/comments/models/ICreateComment";
+import { CreateCommentBackendSchema, ICreateCommentBackend } from "../models/ICreateCommentBackend";
 
 
 export const router = Router();
@@ -261,7 +265,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     parentCommentId: commentId,
                     likeCount: reply.likes.length,
                     text: reply.textContent || undefined,
-                    imgOrGifDetails: imgOrGifDetails
+                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
                 }
             })
         );
@@ -281,7 +285,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     parentCommentId: parentComment.parentCommentId || undefined,
                     likeCount: parentComment.likes.length,
                     text: parentComment.textContent || undefined,
-                    imgOrGifDetails: imgOrGifDetails
+                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
                 }
             })
         );
@@ -299,7 +303,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                 parentCommentId: comment.parentCommentId || undefined,
                 likeCount: comment.likes.length,
                 text: comment.textContent || undefined,
-                imgOrGifDetails: imgOrGifDetails
+                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
             };
 
             return commentAPI;
@@ -410,9 +414,83 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
 });
 
 
-router.post("/", ensureJWTAuthentication, upload.single(COMMENT_IMG_GIF_KEY), async (req: Request, res: Response, next: NextFunction) => {
+router.post(
+    "/",
+    ensureJWTAuthentication,
+    upload.single(COMMENT_IMG_GIF_KEY),
+    async (req: Request<{}, {}, ICreateComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
 
-});
+        const user = req.user!;
+        const file = req.file;
+        const body = {
+            ...req.body,
+            [COMMENT_IMG_GIF_KEY]: file || undefined
+        };
+
+        const commentBodyResult = CreateCommentBackendSchema.safeParse(body);
+
+        if (!commentBodyResult.success) {
+            const errorMessages = commentBodyResult.error.issues.map((err) => err.message).join(", ");
+
+            return res.status(400).json({
+                ok: false,
+                status: 400,
+                message: errorMessages
+            });
+        }
+
+        try {
+            const createdAt = new Date();
+
+
+            let singleImgOrGifFileId: string | undefined;
+
+            if (file) {
+                const fileResult = await uploadFileToSupabase(file);
+
+                if (!fileResult.ok) {
+                    return res.status(fileResult.status).json(fileResult);
+                }
+
+                const prismaFile = await prisma.files.create({
+                    data: {
+                        filename: file.filename,
+                        filesize: file.size,
+                        mimetype: file.mimetype,
+                        supabaseFileId: fileResult.supabaseFileId,
+                        uploadedAt: createdAt
+                    }
+                });
+
+                singleImgOrGifFileId = prismaFile.id;
+
+            }
+
+            const uploadedComment = await prisma.comment.create({
+                data: {
+                    userId: user.userId,
+                    textContent: req.body.content || undefined,
+                    parentCommentId: req.body.parentCommentId || undefined,
+                    postId: req.body.postId,
+                    createdAt: createdAt,
+                    singleGifOrImgId: singleImgOrGifFileId || undefined
+                }
+            });
+
+            //NEED TO SEE ABOUT GETTING PUBLIC URL IF NECESSARY FOR ANYTHING TO SEND OUT TO THE SOCKETS, CHECK MESSAGING APP
+
+
+
+
+        } catch (error) {
+            next(error);
+
+        }
+
+
+
+
+    });
 
 
 router.delete("/:commentId", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
