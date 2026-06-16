@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import upload from "../supabase/multer";
-import { COMMENT_IMG_GIF_KEY, SOCKET_EVENT_COMMENT_CREATED } from "../../../shared/features/comments/constants";
+import { COMMENT_IMG_GIF_KEY, SOCKET_EVENT_COMMENT_CREATED, SOCKET_EVENT_COMMENT_DELETED } from "../../../shared/features/comments/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { prisma } from "../db/prisma";
@@ -21,6 +21,8 @@ import { CreateCommentBackendSchema, ICreateCommentBackend } from "../models/ICr
 import { IUploadCommentSuccessAPI } from "../../../shared/features/comments/models/IUploadCommentSuccessAPI";
 import { io } from "../app";
 import { SOCKET_COMMENT_THREAD_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
+import { IDeleteComment } from "../../../shared/features/comments/models/IDeleteComment";
+import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/models/IDeleteCommentSuccessAPI";
 
 
 export const router = Router();
@@ -417,8 +419,7 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
 });
 
 
-router.post(
-    "/",
+router.post("/",
     ensureJWTAuthentication,
     upload.single(COMMENT_IMG_GIF_KEY),
     async (req: Request<{}, {}, ICreateComment>, res: Response<IUploadCommentSuccessAPI | ICustomErrorResponse>, next: NextFunction) => {
@@ -541,7 +542,57 @@ router.post(
     });
 
 
-router.delete("/:commentId", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+router.delete("/:commentId", 
+    ensureJWTAuthentication, 
+    async (req: Request<{ commentId: string }, {}, IDeleteComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+
+        const user = req.user!;
+        const { commentId } = req.params;
+        const { senderSocketId } = req.body;
+
+
+        try {
+            
+            const deletedComment = await prisma.comment.delete({
+                where: {
+                    id: commentId,
+                    userId: user.userId
+                }
+            });
+
+
+            if (!deletedComment) {
+                return res.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "Comment not found or you are not authorized to delete this comment!!!"
+                });
+            }
+
+
+
+
+            const deleteCommentSuccess: IDeleteCommentSuccessAPI = {
+                commentId: deletedComment.id
+            }
+
+            io
+                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${deletedComment.parentCommentId}`)
+                .except(senderSocketId)
+                .emit(`${SOCKET_EVENT_COMMENT_DELETED}`, deleteCommentSuccess);
+
+
+
+
+
+            return res.sendStatus(204);
+
+
+        } catch (error) {
+            next(error);
+            
+        }
+
 
 });
 
