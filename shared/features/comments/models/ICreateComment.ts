@@ -9,6 +9,7 @@ export const CreateCommentSchema = z.object({
     content: z.string().optional(),
     parentCommentId: z.string().optional(),
     postId: z.string(),
+    senderSocketId: z.string(),
 });
 
 

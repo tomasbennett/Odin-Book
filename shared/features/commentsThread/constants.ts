@@ -1,0 +1,1 @@
+export const SOCKET_COMMENT_THREAD_ROOM_PREFIX = "commentThreadRoom_";

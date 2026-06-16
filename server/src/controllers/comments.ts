@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import upload from "../supabase/multer";
-import { COMMENT_IMG_GIF_KEY } from "../../../shared/features/comments/constants";
+import { COMMENT_IMG_GIF_KEY, SOCKET_EVENT_COMMENT_CREATED } from "../../../shared/features/comments/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { prisma } from "../db/prisma";
@@ -18,6 +18,9 @@ import { allowedImgTypes } from "../../../shared/features/files/constants";
 import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { ICreateComment } from "../../../shared/features/comments/models/ICreateComment";
 import { CreateCommentBackendSchema, ICreateCommentBackend } from "../models/ICreateCommentBackend";
+import { IUploadCommentSuccessAPI } from "../../../shared/features/comments/models/IUploadCommentSuccessAPI";
+import { io } from "../app";
+import { SOCKET_COMMENT_THREAD_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 
 
 export const router = Router();
@@ -418,7 +421,7 @@ router.post(
     "/",
     ensureJWTAuthentication,
     upload.single(COMMENT_IMG_GIF_KEY),
-    async (req: Request<{}, {}, ICreateComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{}, {}, ICreateComment>, res: Response<IUploadCommentSuccessAPI | ICustomErrorResponse>, next: NextFunction) => {
 
         const user = req.user!;
         const file = req.file;
@@ -443,7 +446,8 @@ router.post(
             const createdAt = new Date();
 
 
-            let singleImgOrGifFileId: string | undefined;
+            let prismaSingleImgOrGifFileId: string | undefined;
+            let supabaseSingleImgOrGifFileId: string | undefined;
 
             if (file) {
                 const fileResult = await uploadFileToSupabase(file);
@@ -462,7 +466,9 @@ router.post(
                     }
                 });
 
-                singleImgOrGifFileId = prismaFile.id;
+                prismaSingleImgOrGifFileId = prismaFile.id;
+
+                supabaseSingleImgOrGifFileId = fileResult.supabaseFileId;
 
             }
 
@@ -473,13 +479,55 @@ router.post(
                     parentCommentId: req.body.parentCommentId || undefined,
                     postId: req.body.postId,
                     createdAt: createdAt,
-                    singleGifOrImgId: singleImgOrGifFileId || undefined
+                    singleGifOrImgId: prismaSingleImgOrGifFileId || undefined
+                },
+                include: {
+                    singleGifOrImg: true,
+                    user: {
+                        include: {
+                            profileImg: true
+                        }
+                    },
                 }
             });
 
             //NEED TO SEE ABOUT GETTING PUBLIC URL IF NECESSARY FOR ANYTHING TO SEND OUT TO THE SOCKETS, CHECK MESSAGING APP
 
+            const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(uploadedComment);
 
+
+
+            //NEED TO FIND A WAY TO SEND THIS TO EVERYONE IN THE ROOM EXCEPT THIS CURRENT USER!!!
+
+            const apiComment: IComment = {
+                id: uploadedComment.id,
+                postId: uploadedComment.postId,
+                userId: uploadedComment.userId,
+                username: uploadedComment.user.username,
+                userProfileImgUrl: userProfileImgUrl,
+                createdAt: uploadedComment.createdAt,
+                parentCommentId: uploadedComment.parentCommentId || undefined,
+                likeCount: 0,
+                text: uploadedComment.textContent || undefined,
+                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
+            };
+
+            io
+                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${apiComment.parentCommentId}`)
+                .except(body.senderSocketId)
+                .emit(`${SOCKET_EVENT_COMMENT_CREATED}`, apiComment);
+
+
+
+
+
+
+            return res.status(201).json({
+                ok: true,
+                status: 201,
+                message: "Comment uploaded successfully!!!",
+                comment: apiComment
+            });
 
 
         } catch (error) {
