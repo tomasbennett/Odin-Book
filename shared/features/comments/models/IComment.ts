@@ -14,6 +14,7 @@ export const CommentSchema = z.object({
     createdAt: DateFromStringSchema,
     parentCommentId: z.string().optional(),
     likeCount: NumberFromStringSchema,
+    commentCount: NumberFromStringSchema,
 }).merge(CommentContentSchema);
 
 

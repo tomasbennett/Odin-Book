@@ -13,7 +13,9 @@ export const PostSchema = z.object({
     userProfileImgUrl: z.string().optional(),
     title: z.string().optional(),
     createdAt: DateFromStringSchema,
-    likeCount: NumberFromStringSchema
+    likeCount: NumberFromStringSchema,
+    commentCount: NumberFromStringSchema,
+    repliesCount: NumberFromStringSchema,
 }).merge(PostContentSchema);
 
 

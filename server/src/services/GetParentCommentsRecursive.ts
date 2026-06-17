@@ -22,7 +22,8 @@ export async function getParentComments(commentId: string) {
                     include: {
                         profileImg: true
                     }
-                }
+                },
+                replies: true
             }
         });
 

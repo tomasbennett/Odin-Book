@@ -20,12 +20,15 @@ import { ICreateComment } from "../../../shared/features/comments/models/ICreate
 import { CreateCommentBackendSchema, ICreateCommentBackend } from "../models/ICreateCommentBackend";
 import { IUploadCommentSuccessAPI } from "../../../shared/features/comments/models/IUploadCommentSuccessAPI";
 import { io } from "../app";
-import { SOCKET_COMMENT_THREAD_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
+import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 import { IDeleteComment } from "../../../shared/features/comments/models/IDeleteComment";
 import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/models/IDeleteCommentSuccessAPI";
 import { ISendLikeComment } from "../../../shared/features/likes/models/ISendLikeComment";
 import { Prisma } from "@prisma/client";
-import { SOCKET_LIKE_EVENT } from "../../../shared/features/likes/constants";
+import { SOCKET_LIKE_EVENT, SOCKET_UNLIKE_EVENT } from "../../../shared/features/likes/constants";
+import { ISuccessUploadLikeComment } from "../../../shared/features/likes/models/ISuccessUploadLikeComment";
+import { ILikeCommentAPISuccess } from "../../../shared/features/likes/models/ILikeCommentAPISuccess";
+import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 
 
 export const router = Router();
@@ -33,12 +36,12 @@ export const router = Router();
 router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: string }>, res: Response<IProfileCommentsAPI | ICustomErrorResponse>, next: NextFunction) => {
     //SO WHILST YOU'LL GET THE ORIGINAL BULK FROM /USERS/:USERID, THIS ENDPOINT WILL BE USED TO GET ANY ADDITIONAL comments THAT THE USER HAS MADE, AND WILL BE USED FOR INFINITE SCROLLING BUT NOT HAVING TO LOAD IT ALL IN ONE GO!!!
 
-    const { limit, offset } = SearchQuerySchema.parse(req.query);
-
+    
     const { userId } = req.params;
     const user = req.user!;
-
+    
     try {
+        const { limit, offset } = SearchQuerySchema.parse(req.query);
         //GET COMMENTS OUT INCLUDING THEIR LIKES AND CONTENT AND ID
 
         const usersComments = await prisma.comment.findMany({
@@ -66,7 +69,8 @@ router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: st
                             }
                         }
                     }
-                }
+                },
+                replies: true
             }
         });
 
@@ -159,7 +163,8 @@ router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: st
                     postUsername: postUser.username,
                     postTitle: post.title || undefined,
                     postUserId: postUser.id,
-                    postUserProfileImageUrl: postUserProfileImageUrl
+                    postUserProfileImageUrl: postUserProfileImageUrl,
+                    commentCount: comment.replies.length
                 };
             })
         );
@@ -217,7 +222,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                         include: {
                             profileImg: true
                         }
-                    }
+                    },
+                    replies: true
                 }
             }),
             prisma.comment.findUnique({
@@ -233,7 +239,9 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                                 }
                             },
                             likes: true,
-                            files: true
+                            files: true,
+                            replies: true,
+                            comments: true
                         }
                     },
                     likes: true,
@@ -242,7 +250,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                         include: {
                             profileImg: true
                         }
-                    }
+                    },
+                    replies: true
                 }
             }),
             getParentComments(commentId)
@@ -273,7 +282,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     parentCommentId: commentId,
                     likeCount: reply.likes.length,
                     text: reply.textContent || undefined,
-                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
+                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                    commentCount: reply.replies.length
                 }
             })
         );
@@ -293,7 +303,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     parentCommentId: parentComment.parentCommentId || undefined,
                     likeCount: parentComment.likes.length,
                     text: parentComment.textContent || undefined,
-                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
+                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                    commentCount: parentComment.replies.length
                 }
             })
         );
@@ -311,7 +322,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                 parentCommentId: comment.parentCommentId || undefined,
                 likeCount: comment.likes.length,
                 text: comment.textContent || undefined,
-                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
+                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                commentCount: comment.replies.length
             };
 
             return commentAPI;
@@ -322,54 +334,57 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
 
             //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
 
-            let postUserProfileImgUrl: string | undefined;
-            let fileDetails: IFileDetails[] | undefined;
+            // let postUserProfileImgUrl: string | undefined;
+            // let fileDetails: IFileDetails[] | undefined;
 
-            const filesToGeneratePublicUrlsFor: string[] = [];
-            const mapping: IPostFileMapping = {};
+            // const filesToGeneratePublicUrlsFor: string[] = [];
+            // const mapping: IPostFileMapping = {};
 
-            if (post.user.profileImg) {
-                mapping.postUserProfileImg = filesToGeneratePublicUrlsFor.length;
+            // if (post.user.profileImg) {
+            //     mapping.postUserProfileImg = filesToGeneratePublicUrlsFor.length;
 
-                filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
-            }
+            //     filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
+            // }
 
-            if (post.files.length > 0) {
-                mapping.postContentFiles = {
-                    start: filesToGeneratePublicUrlsFor.length,
-                    count: post.files.length
-                };
+            // if (post.files.length > 0) {
+            //     mapping.postContentFiles = {
+            //         start: filesToGeneratePublicUrlsFor.length,
+            //         count: post.files.length
+            //     };
 
-                post.files.forEach((file) => {
-                    filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
-                });
-            }
+            //     post.files.forEach((file) => {
+            //         filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
+            //     });
+            // }
 
-            const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
+            // const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
 
-            if (!generatedPublicUrlResult.ok) {
-                throw new Error("Failed to generate public URLs for post or post user profile image!!!");
-            }
+            // if (!generatedPublicUrlResult.ok) {
+            //     throw new Error("Failed to generate public URLs for post or post user profile image!!!");
+            // }
 
-            if (mapping.postUserProfileImg !== undefined) {
-                postUserProfileImgUrl = generatedPublicUrlResult.supabasePublicURLs[
-                    mapping.postUserProfileImg
-                ];
-            }
+            // if (mapping.postUserProfileImg !== undefined) {
+            //     postUserProfileImgUrl = generatedPublicUrlResult.supabasePublicURLs[
+            //         mapping.postUserProfileImg
+            //     ];
+            // }
 
-            if (mapping.postContentFiles) {
-                const { start, count } = mapping.postContentFiles;
+            // if (mapping.postContentFiles) {
+            //     const { start, count } = mapping.postContentFiles;
 
-                fileDetails = post.files.map((file, i) => ({
-                    id: file.id,
-                    publicUrl:
-                        generatedPublicUrlResult.supabasePublicURLs[start + i],
-                    name: file.filename,
-                    size: file.filesize,
-                    mimetype: file.mimetype,
-                    createdAt: file.uploadedAt
-                }));
-            }
+            //     fileDetails = post.files.map((file, i) => ({
+            //         id: file.id,
+            //         publicUrl:
+            //             generatedPublicUrlResult.supabasePublicURLs[start + i],
+            //         name: file.filename,
+            //         size: file.filesize,
+            //         mimetype: file.mimetype,
+            //         createdAt: file.uploadedAt
+            //     }));
+            // }
+
+
+            const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
 
 
 
@@ -381,8 +396,10 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                 content: post.textContent || undefined,
                 createdAt: post.createdAt,
                 likeCount: post.likes.length,
-                userProfileImgUrl: postUserProfileImgUrl,
+                userProfileImgUrl: userProfileImgUrl,
                 fileDetails: fileDetails,
+                commentCount: post.comments.length,
+                repliesCount: post.replies.length
             };
 
             return postAPI;
@@ -513,11 +530,16 @@ router.post("/",
                 parentCommentId: uploadedComment.parentCommentId || undefined,
                 likeCount: 0,
                 text: uploadedComment.textContent || undefined,
-                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails
+                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                commentCount: 0
             };
 
+
+
+            //SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX IS NECESSARY BECAUSE WHEN A COMMENT IS CREATED WE NEED TO CHECK IS THAT POST CURRENTLY VISIBLE
+
             io
-                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${apiComment.parentCommentId}`)
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${apiComment.id}`)
                 .except(body.senderSocketId)
                 .emit(`${SOCKET_EVENT_COMMENT_CREATED}`, apiComment);
 
@@ -576,11 +598,13 @@ router.delete("/:commentId",
 
 
             const deleteCommentSuccess: IDeleteCommentSuccessAPI = {
-                commentId: deletedComment.id
+                commentId: deletedComment.id,
+                parentCommentId: deletedComment.parentCommentId || undefined,
+                postId: deletedComment.postId
             }
 
             io
-                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${deletedComment.parentCommentId}`)
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${deletedComment.id}`)
                 .except(senderSocketId)
                 .emit(`${SOCKET_EVENT_COMMENT_DELETED}`, deleteCommentSuccess);
 
@@ -603,7 +627,7 @@ router.delete("/:commentId",
 
 router.post("/:commentId/like",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeCommentAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;
@@ -633,9 +657,6 @@ router.post("/:commentId/like",
                     userId: user.userId,
                     commentId: commentId
                 },
-                include: {
-                    comment: true
-                }
             });
 
 
@@ -649,15 +670,26 @@ router.post("/:commentId/like",
             //MIGHT NEED TO JUST HAVE IT FOR THE POST IF WE ARE IN THE COMMENTS SECTION BUT THIS WILL LOOK FOR AN UPDATE ON COMMENTS THAT MIGHT NOT EVEN BE ON SCREEN
             //BECAUSE IT WILL CALL TO THAT EVENT FOR LIKES ON COMMENTS THAT AREN'T PART OF THAT COMMENTS THREAD!!!
 
+            const likeEventPayload: ISuccessUploadLikeComment = {
+                commentId: commentId
+            };
 
             io
-                .to(`${SOCKET_COMMENT_THREAD_ROOM_PREFIX}:${newLike.comment?.parentCommentId || newLike.comment!.postId}`)
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${commentId}`)
                 .except(senderSocketId)
-                .emit(SOCKET_LIKE_EVENT, )
+                .emit(SOCKET_LIKE_EVENT, likeEventPayload);
+
+
+            return res.status(201).json({
+                ok: true,
+                status: 201,
+                message: "Comment liked successfully!!!",
+                commentId: commentId
+            });
 
 
 
-            
+
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
                 return res.status(409).json({
@@ -669,11 +701,91 @@ router.post("/:commentId/like",
 
 
             next(error);
-            
+
         }
 
     });
 
-router.post("/:commentId/unlike", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+router.patch("/:commentId/unlike",
+    ensureJWTAuthentication,
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response, next: NextFunction) => {
+        const user = req.user!;
+        const { commentId } = req.params;
+        const { senderSocketId } = req.body;
 
-});
+        try {
+
+            const existingLike = await prisma.userLikes.findUnique({
+                where: {
+                    unique_user_comment: {
+                        userId: user.userId,
+                        commentId: commentId
+                    }
+                }
+            });
+
+            if (!existingLike) {
+                return res.status(409).json({
+                    ok: false,
+                    status: 409,
+                    message: "You haven't liked this comment!!!"
+                });
+            }
+
+
+            const removeLike = await prisma.userLikes.delete({
+                where: {
+                    unique_user_comment: {
+                        userId: user.userId,
+                        commentId: commentId
+                    }
+                },
+            });
+
+
+
+            //SO THE BASIC THOUGHT PROCESS HERE IS THAT WHENEVER COMMENTS ARE OPEN IT WILL EITHER BE SHOWING A PAGE WITH THE CENTER POINT BEING:
+            // SOME PARENT COMMENT, THE POST OR IT WILL BE THE PARENT COMMENT ITSELF
+
+            //NOPE WON'T WORK BECAUSE ADDING A COMMENT ONLY CARES ABOUT SOCKET_COMMENT_THREAD_ROOM_PREFIX BUT THIS DOESN'T WORK BECAUSE
+            //WHAT IF A PARENT COMMENT GETS LIKED OR CHANGED WHILST WE ARE ON ONE OF ITS CHILD COMMENTS THEN WE WANT THAT UPDATED TOO
+
+            //MIGHT NEED TO JUST HAVE IT FOR THE POST IF WE ARE IN THE COMMENTS SECTION BUT THIS WILL LOOK FOR AN UPDATE ON COMMENTS THAT MIGHT NOT EVEN BE ON SCREEN
+            //BECAUSE IT WILL CALL TO THAT EVENT FOR LIKES ON COMMENTS THAT AREN'T PART OF THAT COMMENTS THREAD!!!
+
+            const likeEventPayload: ISuccessUploadLikeComment = {
+                commentId: commentId
+            };
+
+            io
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${commentId}`)
+                .except(senderSocketId)
+                .emit(SOCKET_UNLIKE_EVENT, likeEventPayload);
+
+
+            return res.status(201).json({
+                ok: true,
+                status: 201,
+                message: "Like removed from comment successfully!!!",
+                commentId: commentId
+            });
+
+
+
+
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                return res.status(409).json({
+                    ok: false,
+                    status: 409,
+                    message: "You haven't liked this comment!!!"
+                });
+            }
+
+
+            next(error);
+
+        }
+
+
+    });

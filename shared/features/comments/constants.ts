@@ -10,3 +10,5 @@ export const COMMENT_CONTENT_KEY = "commentContentKey" as const;
 
 export const SOCKET_EVENT_COMMENT_DELETED: string = "commentDeleted";
 export const SOCKET_EVENT_COMMENT_CREATED: string = "commentCreated";
+
+
