@@ -18,6 +18,9 @@ import { ICreatePost } from "../../../shared/features/posts/models/ICreatePost";
 import { io } from "../app";
 import { IUploadCommentSuccessAPI } from "../../../shared/features/comments/models/IUploadCommentSuccessAPI";
 import { IUploadPostSuccessAPI } from "../../../shared/features/posts/models/IUploadPostSuccessAPI";
+import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
+import { Files, Prisma } from "@prisma/client";
+import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 
 
 export const router = Router();
@@ -257,7 +260,7 @@ router.post("/",
         //DONT FORGET TO ALLOW IN THE BODY FOR THIS TO BE A REPLY
 
         const user = req.user!;
-        const files = req.files;
+        const files = req.files as Express.Multer.File[] | undefined;
         const body = {
             ...req.body,
             [POST_FILE_ARRAY_KEY]: files
@@ -283,23 +286,73 @@ router.post("/",
             const createdAt = new Date();
 
 
-            
-            
+
+
             const newPost = await prisma.post.create({
                 data: {
                     textContent: body.content,
                     createdAt: createdAt,
                     userId: user.userId,
                     title: body.title
+                },
+                include: {
+                    user: {
+                        include: {
+                            profileImg: true
+                        }
+                    }
                 }
             })
-            
+
+
+
+
+            let userProfileImgUrl: string | undefined;
+            let fileDetails: IFileDetails[] | undefined;
+
             if (files) {
 
-                
-                
+                const uploadedResult = await Promise.all(
+                    files.map(async (file) => {
+
+                        const uploadResult = await uploadFileToSupabase(file);
+
+                        if (!uploadResult.ok) {
+                            throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
+                        }
 
 
+                        
+
+                        return {
+                            // id: newPrismaFile.id,
+                            mimetype: file.mimetype,
+                            filename: file.filename,
+                            filesize: file.size,
+                            uploadedAt: createdAt,
+                            postContentForId: newPost.id,
+                            supabaseFileId: uploadResult.supabaseFileId
+                        }
+
+
+                    })
+                );
+
+                const newPrismaFiles = await prisma.files.createManyAndReturn({
+                    data: uploadedResult,
+                });
+
+
+                const dbFilesArr = newPrismaFiles;
+
+                const { userProfileImgUrl: userUrl, fileDetails: newPostFileDetails } = await generatePostContentAndProfileImage({
+                    ...newPost,
+                    files: dbFilesArr
+                });
+
+
+                userProfileImgUrl = userUrl;
+                fileDetails = newPostFileDetails;
 
             }
 
@@ -316,8 +369,8 @@ router.post("/",
                 repliesCount: 0,
                 title: newPost.title || undefined,
                 content: newPost.textContent || undefined,
-                userProfileImgUrl: ,
-                fileDetails: ,
+                userProfileImgUrl: userProfileImgUrl,
+                fileDetails: fileDetails,
             }
 
 
@@ -336,7 +389,7 @@ router.post("/",
 
 
 
-            
+
         } catch (error) {
             next(error);
 
