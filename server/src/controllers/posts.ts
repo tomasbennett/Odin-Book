@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import upload from "../supabase/multer";
-import { POST_FILE_ARRAY_KEY, SOCKET_EVENT_POST_CREATED, SOCKET_NEW_POST_ROOM_PREFIX } from "../../../shared/features/posts/constants";
+import { POST_FILE_ARRAY_KEY, SOCKET_EVENT_POST_CREATED, SOCKET_EVENT_POST_DELETED, SOCKET_NEW_POST_ROOM_PREFIX } from "../../../shared/features/posts/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { prisma } from "../db/prisma";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
@@ -21,6 +21,9 @@ import { IUploadPostSuccessAPI } from "../../../shared/features/posts/models/IUp
 import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
 import { Files, Prisma } from "@prisma/client";
 import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
+import { IDeletePost } from "../../../shared/features/posts/models/IDeletePost";
+import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
+import { IDeletePostSuccessAPI } from "../../../shared/features/posts/models/IDeletePostSuccessAPI";
 
 
 export const router = Router();
@@ -400,7 +403,59 @@ router.post("/",
     });
 
 
-router.delete("/:postId", ensureJWTAuthentication, async (req: Request<{ postId: string }>, res: Response, next: NextFunction) => {
+router.delete("/:postId", 
+    ensureJWTAuthentication, 
+    async (req: Request<{ postId: string }, {}, IDeletePost>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+        const user = req.user!;
+        const { postId } = req.params;
+        const { senderSocketId } = req.body;
+
+
+        try {
+
+            const postToBeDeleted = await prisma.post.findUnique({
+                where: {
+                    id: postId,
+                    userId: user.userId
+                },
+            });
+
+            if (!postToBeDeleted) {
+                return res.status(400).json({
+                    ok: false,
+                    status: 400,
+                    message: "Could not find post with this ID or is not your post to delete!!!"
+                });
+            }
+
+            const deletedPost = await prisma.post.delete({
+                where: {
+                    id: postId
+                }
+            });
+
+            const deletedPostAPI: IDeletePostSuccessAPI = {
+                postId
+            }
+
+            io
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${postId}`)
+                .except(senderSocketId)
+                .emit(`${SOCKET_EVENT_POST_DELETED}`, deletedPostAPI);
+
+
+
+            return res.sendStatus(204);
+
+
+            
+        } catch (error) {
+            next(error);
+
+        }
+
+
+
 
 });
 

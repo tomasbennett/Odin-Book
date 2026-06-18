@@ -8,7 +8,7 @@ export const POST_FILE_ARRAY_KEY = "postFileArrayKey" as const;
 
 
 export const SOCKET_EVENT_POST_CREATED: string = "postcreatedeventsocket";
-
+export const SOCKET_EVENT_POST_DELETED: string = "postdeletedeventsocket"
 
 
 
