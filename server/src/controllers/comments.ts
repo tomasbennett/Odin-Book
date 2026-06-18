@@ -25,7 +25,7 @@ import { IDeleteComment } from "../../../shared/features/comments/models/IDelete
 import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/models/IDeleteCommentSuccessAPI";
 import { ISendLikeComment } from "../../../shared/features/likes/models/ISendLikeComment";
 import { Prisma } from "@prisma/client";
-import { SOCKET_LIKE_EVENT, SOCKET_UNLIKE_EVENT } from "../../../shared/features/likes/constants";
+import { SOCKET_LIKE_COMMENT_EVENT as SOCKET_LIKE_EVENT, SOCKET_UNLIKE_COMMENT_EVENT as SOCKET_UNLIKE_EVENT } from "../../../shared/features/likes/constants";
 import { ISuccessUploadLikeComment } from "../../../shared/features/likes/models/ISuccessUploadLikeComment";
 import { ILikeCommentAPISuccess } from "../../../shared/features/likes/models/ILikeCommentAPISuccess";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
@@ -708,7 +708,7 @@ router.post("/:commentId/like",
 
 router.patch("/:commentId/unlike",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeCommentAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;

@@ -24,6 +24,10 @@ import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { IDeletePost } from "../../../shared/features/posts/models/IDeletePost";
 import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 import { IDeletePostSuccessAPI } from "../../../shared/features/posts/models/IDeletePostSuccessAPI";
+import { ISuccessUploadLikePost } from "../../../shared/features/likes/models/ISuccessUploadLikePost";
+import { ISendLikePost } from "../../../shared/features/likes/models/ISendLikePost";
+import { SOCKET_LIKE_POST_EVENT, SOCKET_UNLIKE_POST_EVENT } from "../../../shared/features/likes/constants";
+import { ILikePostAPISuccess } from "../../../shared/features/likes/models/ILikePostAPISuccess";
 
 
 export const router = Router();
@@ -325,7 +329,7 @@ router.post("/",
                         }
 
 
-                        
+
 
                         return {
                             // id: newPrismaFile.id,
@@ -403,8 +407,8 @@ router.post("/",
     });
 
 
-router.delete("/:postId", 
-    ensureJWTAuthentication, 
+router.delete("/:postId",
+    ensureJWTAuthentication,
     async (req: Request<{ postId: string }, {}, IDeletePost>, res: Response<ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { postId } = req.params;
@@ -448,7 +452,7 @@ router.delete("/:postId",
             return res.sendStatus(204);
 
 
-            
+
         } catch (error) {
             next(error);
 
@@ -457,13 +461,152 @@ router.delete("/:postId",
 
 
 
-});
+    });
 
 
-router.post("/:postId/like", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+router.post("/:postId/like",
+    ensureJWTAuthentication,
+    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikePostAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+        const user = req.user!;
+        const { postId } = req.params;
+        const { senderSocketId } = req.body;
 
-});
+        try {
 
-router.post("/:postId/unlike", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response, next: NextFunction) => {
+            const hasUserLikedPost = await prisma.userLikes.findUnique({
+                where: {
+                    unique_user_post: {
+                        userId: user.userId,
+                        postId: postId
+                    }
+                }
+            });
 
-});
+
+            if (hasUserLikedPost) {
+                return res.status(401).json({
+                    ok: false,
+                    status: 400,
+                    message: "You have already liked this post!!!"
+                });
+            }
+
+            const createdAt = new Date();
+
+            const likePost = await prisma.userLikes.create({
+                data: {
+                    userId: user.userId,
+                    postId,
+                    createdAt
+                }
+            });
+
+
+            const successResponse: ISuccessUploadLikePost = {
+                postId: postId
+            }
+
+            io
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${postId}`)
+                .except(senderSocketId)
+                .emit(`${SOCKET_LIKE_POST_EVENT}`, successResponse);
+
+
+
+            return res.status(201).json({
+                ok: true,
+                status: 201,
+                message: "Successfully liked post!!!",
+                postId
+            });
+
+
+
+
+
+
+
+
+
+        } catch (error) {
+            next(error);
+
+        }
+
+
+
+    });
+
+
+
+    
+router.patch("/:postId/unlike",
+    ensureJWTAuthentication,
+    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikePostAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+        const user = req.user!;
+        const { postId } = req.params;
+        const { senderSocketId } = req.body;
+
+
+        try {
+
+            const hasUserLikedPost = await prisma.userLikes.findUnique({
+                where: {
+                    unique_user_post: {
+                        userId: user.userId,
+                        postId: postId
+                    }
+                }
+            });
+
+
+            if (!hasUserLikedPost) {
+                return res.status(401).json({
+                    ok: false,
+                    status: 400,
+                    message: "You haven't liked this post!!!"
+                });
+            }
+
+            const likePost = await prisma.userLikes.delete({
+                where: {
+                    unique_user_post: {
+                        userId: user.userId,
+                        postId,
+                    }
+                }
+            });
+
+
+            const successResponse: ISuccessUploadLikePost = {
+                postId: postId
+            }
+
+            io
+                .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${postId}`)
+                .except(senderSocketId)
+                .emit(`${SOCKET_UNLIKE_POST_EVENT}`, successResponse);
+
+
+
+            return res.status(201).json({
+                ok: true,
+                status: 201,
+                message: "Successfully removed like from post!!!",
+                postId
+            });
+
+
+
+
+
+        } catch (error) {
+            next(error);
+
+
+        }
+
+
+
+
+    });
