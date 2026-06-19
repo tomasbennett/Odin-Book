@@ -2,6 +2,7 @@ import z from "zod";
 import { PostContentSchema } from "./IPostContent";
 import { DateFromStringSchema } from "../../util/models/IDateFromStringSchema";
 import { NumberFromStringSchema } from "../../util/models/INumber";
+import { ProfileRepliesParentPostSchema } from "../../profiles/models/IProfileReplies";
 
 
 
@@ -16,6 +17,7 @@ export const PostSchema = z.object({
     likeCount: NumberFromStringSchema,
     commentCount: NumberFromStringSchema,
     repliesCount: NumberFromStringSchema,
+    parentPost: ProfileRepliesParentPostSchema.optional()
 }).merge(PostContentSchema);
 
 

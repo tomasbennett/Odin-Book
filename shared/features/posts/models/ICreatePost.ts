@@ -6,7 +6,8 @@ import { SocketSchema } from "../../socket/models/ISocketSchema";
 
 export const CreatePostSchema = z.object({
     content: z.string().optional(),
-    title: z.string().optional()
+    title: z.string().optional(),
+    parentPostId: z.string().optional()
 }).merge(SocketSchema);
 
 

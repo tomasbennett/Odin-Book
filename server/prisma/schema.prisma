@@ -47,7 +47,7 @@ model RefreshToken {
   id          String @id @default(uuid()) @db.Uuid
   hashedToken String @unique
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
   // createdAt DateTime @default(now())
@@ -85,14 +85,14 @@ model Comment {
 
   createdAt DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
-  post   Post   @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.Uuid
 
   parentCommentId String?  @db.Uuid
-  parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
 
   replies Comment[] @relation("CommentReplies")
 }
@@ -109,14 +109,14 @@ model Post {
 
   createdAt DateTime @default(now())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
   comments Comment[]
 
 
   parentPostId String? @db.Uuid
-  parentPost   Post?  @relation("PostReplies", fields: [parentPostId], references: [id])
+  parentPost   Post?  @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
 
   replies Post[] @relation("PostReplies")
 
@@ -128,13 +128,13 @@ model Post {
 model UserLikes {
   id String @id @default(uuid()) @db.Uuid
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
-  post   Post?   @relation(fields: [postId], references: [id])
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String? @db.Uuid
 
-  comment   Comment?   @relation(fields: [commentId], references: [id])
+  comment   Comment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String? @db.Uuid
 
   createdAt DateTime @default(now())

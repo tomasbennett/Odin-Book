@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import upload from "../supabase/multer";
-import { POST_FILE_ARRAY_KEY, SOCKET_EVENT_POST_CREATED, SOCKET_EVENT_POST_DELETED, SOCKET_NEW_POST_ROOM_PREFIX } from "../../../shared/features/posts/constants";
+import { POST_FILE_ARRAY_KEY, SOCKET_EVENT_POST_OR_REPLY_CREATED, SOCKET_EVENT_POST_OR_REPLY_DELETED, SOCKET_NEW_POST_OR_REPLY_ROOM_PREFIX } from "../../../shared/features/posts/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { prisma } from "../db/prisma";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
@@ -28,6 +28,7 @@ import { ISuccessUploadLikePost } from "../../../shared/features/likes/models/IS
 import { ISendLikePost } from "../../../shared/features/likes/models/ISendLikePost";
 import { SOCKET_LIKE_POST_EVENT, SOCKET_UNLIKE_POST_EVENT } from "../../../shared/features/likes/constants";
 import { ILikePostAPISuccess } from "../../../shared/features/likes/models/ILikePostAPISuccess";
+import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IProfileReplies";
 
 
 export const router = Router();
@@ -300,98 +301,152 @@ router.post("/",
                     textContent: body.content,
                     createdAt: createdAt,
                     userId: user.userId,
-                    title: body.title
+                    title: body.title,
+                    parentPostId: body.parentPostId
                 },
                 include: {
                     user: {
                         include: {
                             profileImg: true
                         }
+                    },
+                    parentPost: {
+                        include: {
+                            user: {
+                                include: {
+                                    profileImg: true
+                                }
+                            },
+                            files: true
+                        }
                     }
                 }
-            })
+            });
 
 
 
 
-            let userProfileImgUrl: string | undefined;
-            let fileDetails: IFileDetails[] | undefined;
-
-            if (files) {
-
-                const uploadedResult = await Promise.all(
-                    files.map(async (file) => {
-
-                        const uploadResult = await uploadFileToSupabase(file);
-
-                        if (!uploadResult.ok) {
-                            throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
-                        }
 
 
+            const buildPost = async () => {
+
+                let userProfileImgUrl: string | undefined;
+                let fileDetails: IFileDetails[] | undefined;
+    
+                if (files) {
+    
+                    const uploadedResult = await Promise.all(
+                        files.map(async (file) => {
+    
+                            const uploadResult = await uploadFileToSupabase(file);
+    
+                            if (!uploadResult.ok) {
+                                throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
+                            }
+    
+    
+    
+    
+                            return {
+                                // id: newPrismaFile.id,
+                                mimetype: file.mimetype,
+                                filename: file.filename,
+                                filesize: file.size,
+                                uploadedAt: createdAt,
+                                postContentForId: newPost.id,
+                                supabaseFileId: uploadResult.supabaseFileId
+                            }
+    
+    
+                        })
+                    );
+    
+                    const newPrismaFiles = await prisma.files.createManyAndReturn({
+                        data: uploadedResult,
+                    });
+    
+    
+                    const dbFilesArr = newPrismaFiles;
+    
+                    const { userProfileImgUrl: userUrl, fileDetails: newPostFileDetails } = await generatePostContentAndProfileImage({
+                        ...newPost,
+                        files: dbFilesArr
+                    });
+    
+    
+                    userProfileImgUrl = userUrl;
+                    fileDetails = newPostFileDetails;
+    
+                }
+    
+    
+                
+    
+                const post: IPost = {
+                    id: newPost.id,
+                    userId: user.userId,
+                    username: user.username,
+                    createdAt,
+                    likeCount: 0,
+                    commentCount: 0,
+                    repliesCount: 0,
+                    title: newPost.title || undefined,
+                    content: newPost.textContent || undefined,
+                    userProfileImgUrl: userProfileImgUrl,
+                    fileDetails: fileDetails,
+                }
 
 
-                        return {
-                            // id: newPrismaFile.id,
-                            mimetype: file.mimetype,
-                            filename: file.filename,
-                            filesize: file.size,
-                            uploadedAt: createdAt,
-                            postContentForId: newPost.id,
-                            supabaseFileId: uploadResult.supabaseFileId
-                        }
+                return post;
+            }
 
+            const buildParentPost = async () => {
+                if (!newPost.parentPost) {
+                    return undefined;
+                }
 
-                    })
-                );
+                const parentPost = newPost.parentPost;
 
-                const newPrismaFiles = await prisma.files.createManyAndReturn({
-                    data: uploadedResult,
-                });
+                const { userProfileImgUrl: parentPostUserProfileImgUrl, fileDetails: parentPostFileDetails } = await generatePostContentAndProfileImage(newPost.parentPost);
 
+                const parentPostDetails: IProfileRepliesParentPost = {
+                    parentPostId: parentPost.id,
+                    parentPostUserId: parentPost.userId,
+                    parentPostUsername: parentPost.user.username,
+                    parentPostTitle: parentPost.title || undefined,
+                    content: parentPost.textContent || undefined,
+                    parentPostUserImgUrl: parentPostUserProfileImgUrl,
+                    fileDetails: parentPostFileDetails
+                }
 
-                const dbFilesArr = newPrismaFiles;
-
-                const { userProfileImgUrl: userUrl, fileDetails: newPostFileDetails } = await generatePostContentAndProfileImage({
-                    ...newPost,
-                    files: dbFilesArr
-                });
-
-
-                userProfileImgUrl = userUrl;
-                fileDetails = newPostFileDetails;
+                return parentPostDetails;
 
             }
 
 
+            const [post, parentPost] = await Promise.all([
+                buildPost(),
+                buildParentPost()
+            ]);
 
 
-            const post: IPost = {
-                id: newPost.id,
-                userId: user.userId,
-                username: user.username,
-                createdAt,
-                likeCount: 0,
-                commentCount: 0,
-                repliesCount: 0,
-                title: newPost.title || undefined,
-                content: newPost.textContent || undefined,
-                userProfileImgUrl: userProfileImgUrl,
-                fileDetails: fileDetails,
+            const successfulPostResponse: IPost = {
+                ...post,
+                parentPost: parentPost
             }
 
 
             io
-                .to(`${SOCKET_NEW_POST_ROOM_PREFIX}:${user.userId}`)
+                .to(`${SOCKET_NEW_POST_OR_REPLY_ROOM_PREFIX}:${user.userId}`)
                 .except(body.senderSocketId)
-                .emit(`${SOCKET_EVENT_POST_CREATED}`, post);
+                .emit(`${SOCKET_EVENT_POST_OR_REPLY_CREATED}`, successfulPostResponse);
 
 
             return res.status(201).json({
                 ok: true,
                 status: 201,
                 message: "Post successfully created!!!",
-                post: post
+                post: successfulPostResponse
             });
 
 
@@ -445,7 +500,7 @@ router.delete("/:postId",
             io
                 .to(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${postId}`)
                 .except(senderSocketId)
-                .emit(`${SOCKET_EVENT_POST_DELETED}`, deletedPostAPI);
+                .emit(`${SOCKET_EVENT_POST_OR_REPLY_DELETED}`, deletedPostAPI);
 
 
 
