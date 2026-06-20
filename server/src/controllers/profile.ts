@@ -11,6 +11,17 @@ import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
 import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
+import { IUserSearchedAPISuccess } from "../../../shared/features/users/models/ISearchUserAPISuccess";
+import upload from "../supabase/multer";
+import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY, SOCKET_EVENT_USER_PATCH_PROFILE_INFO, SOCKET_USER_PROFILE_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/users/constants";
+import { IPatchUserProfile } from "../../../shared/features/users/models/IPatchUserProfile";
+import { IPatchUserProfileRequest } from "../../../shared/features/users/models/IRequestPatchUserProfile";
+import { ISuccessPatchUserProfileAPI } from "../../../shared/features/users/models/ISuccessPatchUserProfileAPI";
+import { PatchUserProfileBackendRequestSchema } from "../models/IPatchUserProfileBackend";
+import { IUserImgIds } from "../models/IUserImgIds";
+import { Prisma } from "@prisma/client";
+import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
+import { io } from "../app";
 
 
 
@@ -148,47 +159,47 @@ router.get("/:userId",
                     userProfileImg?: number | undefined;
                     backgroundImg?: number | undefined
                 } = {}
-    
+
                 if (userHeaderInfoDb.profileImg) {
-    
+
                     mapping.userProfileImg = filesToGeneratePublicUrlsFor.length;
-    
-    
+
+
                     filesToGeneratePublicUrlsFor.push(userHeaderInfoDb.profileImg.supabaseFileId);
                 }
-    
+
                 if (userHeaderInfoDb.accountBackgroundImg) {
                     mapping.userProfileImg = filesToGeneratePublicUrlsFor.length;
-    
-    
+
+
                     filesToGeneratePublicUrlsFor.push(userHeaderInfoDb.accountBackgroundImg.supabaseFileId);
                 }
-    
+
                 const generatedResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
-    
+
                 if (!generatedResult.ok) {
                     throw new Error(generatedResult.error);
                 }
-    
-    
-    
+
+
+
                 let publicUserProfileImg: string | undefined;
-    
+
                 if (mapping.userProfileImg !== undefined) {
                     publicUserProfileImg = generatedResult.supabasePublicURLs[mapping.userProfileImg];
-    
+
                 }
-    
-    
+
+
                 let publicBackgroundImg: string | undefined;
-    
+
                 if (mapping.backgroundImg !== undefined) {
                     publicBackgroundImg = generatedResult.supabasePublicURLs[mapping.backgroundImg];
-    
+
                 }
-    
-    
-    
+
+
+
                 const userHeaderInfoAPI: IProfileHeader = {
                     userId,
                     username: userHeaderInfoDb.username,
@@ -197,19 +208,19 @@ router.get("/:userId",
                     userProfileImg: publicUserProfileImg,
                     accountBackgroundImg: publicBackgroundImg,
                 }
-    
+
                 return userHeaderInfoAPI;
-                
+
             }
 
             const buildingPosts = async () => {
                 const postsAPI: IProfilePosts = await Promise.all(
                     postsDb.map(async (post): Promise<IPost> => {
-    
+
                         const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
-    
-    
-    
+
+
+
                         return {
                             id: post.id,
                             userId: post.userId,
@@ -223,8 +234,8 @@ router.get("/:userId",
                             title: post.title || undefined,
                             content: post.textContent || undefined
                         }
-    
-    
+
+
                     })
                 );
 
@@ -238,10 +249,10 @@ router.get("/:userId",
                     repliesDb.map(async (reply) => {
                         const buildParenPostDetails = async (): Promise<IProfileRepliesParentPost> => {
                             const parentPostDb = reply.parentPost!;
-    
+
                             const { userProfileImgUrl: parentUserProfileImgUrl, fileDetails: parentFileDetails } =
                                 await generatePostContentAndProfileImage(parentPostDb); //THIS IS DONE BECAUSE WE SHOULD ONLY BE SELECTING REPLIES WITH PARENT POSTS!!!
-    
+
                             const parentPost: IProfileRepliesParentPost = {
                                 parentPostId: parentPostDb.id,
                                 parentPostUserId: parentPostDb.userId,
@@ -251,14 +262,14 @@ router.get("/:userId",
                                 fileDetails: parentFileDetails,
                                 content: parentPostDb.textContent || undefined
                             }
-    
+
                             return parentPost
                         }
-    
+
                         const buildReplyDetails = async (): Promise<IPost> => {
                             const { userProfileImgUrl: replyUserProfileImg, fileDetails: replyFileDetails } =
                                 await generatePostContentAndProfileImage(reply);
-    
+
                             const profileReply: IPost = {
                                 id: reply.id,
                                 userId: reply.userId,
@@ -272,18 +283,18 @@ router.get("/:userId",
                                 content: reply.textContent || undefined,
                                 fileDetails: replyFileDetails
                             }
-    
+
                             return profileReply;
                         }
-    
-    
-    
+
+
+
                         const [parentPost, profileReply]: [IProfileRepliesParentPost, IPost] = await Promise.all([
                             buildParenPostDetails(),
                             buildReplyDetails()
                         ]);
-    
-    
+
+
                         return {
                             ...parentPost,
                             ...profileReply
@@ -293,55 +304,55 @@ router.get("/:userId",
 
                 return repliesAPI;
             }
-            
+
 
             const buildingComments = async () => {
                 const commentsAPI: IProfileComments = await Promise.all(
                     commentsDb.map(async (comment) => {
                         const post = comment.post;
                         const postUser = post.user;
-    
-    
+
+
                         let imgOrGifDetails: IFileDetails | undefined;
                         let postUserProfileImageUrl: string | undefined;
                         let userProfileImgUrl: string | undefined;
-    
+
                         const filesToGeneratePublicUrlsForObjMapping: Record<"imgOrGifContent" | "postUserProfileImg" | "userProfileImg", boolean> = {
                             "imgOrGifContent": !!comment.singleGifOrImg,
                             "postUserProfileImg": !!postUser.profileImg,
                             "userProfileImg": !!comment.user.profileImg
                         };
-    
-    
-    
+
+
+
                         const filesToGeneratePublicUrlsFor: string[] = [];
-    
+
                         if (comment.singleGifOrImg) {
                             filesToGeneratePublicUrlsFor.push(comment.singleGifOrImg.supabaseFileId);
                         }
-    
+
                         if (postUser.profileImg) {
                             filesToGeneratePublicUrlsFor.push(postUser.profileImg.supabaseFileId);
                         }
-    
-    
+
+
                         const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
-    
-    
+
+
                         if (!generatedPublicUrlResult.ok) {
                             throw new Error("Failed to generate public URLs for comment or post user profile image!!!");
                         }
-    
-    
+
+
                         let indx = 0;
-    
+
                         const urlsMapping = Object.entries(filesToGeneratePublicUrlsForObjMapping).reduce(
                             (acc, [key, exists]) => {
                                 acc[key as keyof typeof filesToGeneratePublicUrlsForObjMapping] =
                                     exists
                                         ? generatedPublicUrlResult.supabasePublicURLs[indx++]
                                         : undefined;
-    
+
                                 return acc;
                             },
                             {} as Record<
@@ -349,7 +360,7 @@ router.get("/:userId",
                                 string | undefined
                             >
                         );
-    
+
                         if (comment.singleGifOrImg && urlsMapping["imgOrGifContent"]) {
                             imgOrGifDetails = {
                                 id: comment.singleGifOrImg.id,
@@ -360,14 +371,14 @@ router.get("/:userId",
                                 createdAt: comment.singleGifOrImg.uploadedAt
                             };
                         }
-    
+
                         postUserProfileImageUrl = urlsMapping["postUserProfileImg"];
-    
+
                         userProfileImgUrl = urlsMapping["userProfileImg"];
-    
-    
-    
-    
+
+
+
+
                         return {
                             id: comment.id,
                             postId: post.id,
@@ -426,22 +437,238 @@ router.get("/:userId",
 
 
 
-router.patch("/", 
+router.patch("/",
     ensureJWTAuthentication,
-    async (req: Request<{}, {}, >, res: Response<ICustomErrorResponse>, next: NextFunction) => {
-        
-        const user = req.user!;
+    upload.fields([
+        { name: PATCH_USER_PROFILE_IMG_KEY, maxCount: 1 },
+        { name: PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, maxCount: 1 }
+    ]),
+    async (req: Request<{}, {}, IPatchUserProfileRequest>, res: Response<ISuccessPatchUserProfileAPI | ICustomErrorResponse>, next: NextFunction) => {
 
+        const user = req.user!;
+        const body = req.body;
 
         try {
 
+            const files = req.files as {
+                [PATCH_USER_PROFILE_IMG_KEY]: Express.Multer.File[] | undefined;
+                [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]: Express.Multer.File[] | undefined;
+            }
+
+            const profileImgFile = files[PATCH_USER_PROFILE_IMG_KEY]?.[0];
+            const accountBackgroundFile = files[PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]?.[0];
+
+            const patchReqData = {
+                ...body,
+                [PATCH_USER_PROFILE_IMG_KEY]: profileImgFile,
+                [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]: accountBackgroundFile
+            }
+
+            const patchReqResult = PatchUserProfileBackendRequestSchema.safeParse(patchReqData);
+            if (!patchReqResult.success) {
+                const errMessage: string = patchReqResult.error.issues.join(", ");
+
+                return res.status(400).json({
+                    ok: false,
+                    status: 400,
+                    message: errMessage
+                })
+            }
+
+            const createdAt = new Date();
 
 
 
 
 
 
-            
+
+            const updatedData: Prisma.UserUpdateInput = {};
+
+            const patchUserProfileImg = async () => {
+                const userProfileImgInfo: IUserImgIds = {};
+
+                if (profileImgFile) {
+                    const { filename, size, mimetype } = profileImgFile;
+
+                    const uploadedFileResult = await uploadFileToSupabase(profileImgFile);
+
+                    if (!uploadedFileResult.ok) {
+                        throw new Error(uploadedFileResult.message);
+                    }
+
+
+
+                    const buildPublicUrl = async () => {
+                        const generatedPublicUrlResult = await GenerateSupabasePublicURL([uploadedFileResult.supabaseFileId])
+
+                        if (!generatedPublicUrlResult.ok) {
+                            throw new Error(generatedPublicUrlResult.error);
+                        }
+
+                        return generatedPublicUrlResult.supabasePublicURLs[0];
+
+
+                    }
+
+                    const buildPrismaFile = async () => {
+                        const newFile = await prisma.files.create({
+                            data: {
+                                filename,
+                                filesize: size,
+                                mimetype,
+                                supabaseFileId: uploadedFileResult.supabaseFileId,
+                                uploadedAt: createdAt
+                            }
+                        });
+
+                        return newFile.id;
+
+
+                    }
+
+
+                    const [publicUrl, prismaId] = await Promise.all([
+                        buildPublicUrl(),
+                        buildPrismaFile()
+                    ]);
+
+
+
+                    userProfileImgInfo.supabaseFileId = publicUrl;
+                    userProfileImgInfo.prismaFileId = prismaId;
+
+
+
+                }
+
+                return userProfileImgInfo;
+
+            }
+
+            const patchAccountBackgroundBanner = async () => {
+                const accountBannerBackgroundInfo: IUserImgIds = {};
+
+                if (accountBackgroundFile) {
+                    const { filename, size, mimetype } = accountBackgroundFile;
+
+                    const uploadedFileResult = await uploadFileToSupabase(accountBackgroundFile);
+
+                    if (!uploadedFileResult.ok) {
+                        throw new Error(uploadedFileResult.message);
+                    }
+
+
+
+                    const buildPublicUrl = async () => {
+                        const generatedPublicUrlResult = await GenerateSupabasePublicURL([uploadedFileResult.supabaseFileId])
+
+                        if (!generatedPublicUrlResult.ok) {
+                            throw new Error(generatedPublicUrlResult.error);
+                        }
+
+                        return generatedPublicUrlResult.supabasePublicURLs[0];
+
+
+                    }
+
+                    const buildPrismaFile = async () => {
+                        const newFile = await prisma.files.create({
+                            data: {
+                                filename,
+                                filesize: size,
+                                mimetype,
+                                supabaseFileId: uploadedFileResult.supabaseFileId,
+                                uploadedAt: createdAt
+                            }
+                        });
+
+                        return newFile.id;
+
+
+                    }
+
+
+                    const [publicUrl, prismaId] = await Promise.all([
+                        buildPublicUrl(),
+                        buildPrismaFile()
+                    ]);
+
+
+
+                    accountBannerBackgroundInfo.supabaseFileId = publicUrl;
+                    accountBannerBackgroundInfo.prismaFileId = prismaId;
+
+
+
+                }
+
+                return accountBannerBackgroundInfo;
+
+            }
+
+
+            const [userProfileImgInfo, accountBannerBackgroundInfo] = await Promise.all([
+                patchUserProfileImg(),
+                patchAccountBackgroundBanner(),
+            ]);
+
+            if (userProfileImgInfo.prismaFileId) {
+                updatedData.profileImg = {
+                    connect: {
+                        id: userProfileImgInfo.prismaFileId
+                    }
+                };
+            }
+
+            if (accountBannerBackgroundInfo.prismaFileId) {
+                updatedData.accountBackgroundImg = {
+                    connect: {
+                        id: accountBannerBackgroundInfo.prismaFileId
+                    }
+                };
+            }
+
+
+
+
+            if (body.aboutUser !== undefined) {
+                updatedData.aboutMe = body.aboutUser
+            }
+
+            const updatedUser = await prisma.user.update({
+                where: {
+                    id: user.userId
+                },
+                data: updatedData
+            });
+
+
+
+
+            const successfulPatchResult: IPatchUserProfile = {
+                accountBackgroundImgUrl: accountBannerBackgroundInfo.supabaseFileId,
+                userProfileImgUrl: userProfileImgInfo.supabaseFileId,
+                aboutMe: body.aboutUser,
+            }
+
+
+            io
+                .to(`${SOCKET_USER_PROFILE_IS_VISIBLE_ROOM_PREFIX}:${user.userId}`)
+                .except(body.senderSocketId)
+                .emit(`${SOCKET_EVENT_USER_PATCH_PROFILE_INFO}`, successfulPatchResult);
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Successfully patched user account with given details!!!",
+                ...successfulPatchResult
+            });
+
+
+
         } catch (error) {
 
             next(error);
