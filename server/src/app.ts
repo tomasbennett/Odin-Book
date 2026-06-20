@@ -18,6 +18,9 @@ import { User } from "@prisma/client";
 import { CheckAccessTokenPayload } from "./auth/CheckAccessTokenPayload";
 import { Server, Socket } from "socket.io";
 import { connectedUsers } from "./sockets/UserSocketMapping";
+import { SOCKET_SET_VISIBLE_ROOMS_LISTENER_KEY } from "../../shared/features/socket/constants";
+import { watchedRooms } from "./sockets/WatchedRooms";
+import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../shared/features/commentsThread/constants";
 
 
 
@@ -85,7 +88,7 @@ app.use((err: Error, req: Request, res: Response<ICustomErrorResponse>, next: Ne
     status: 501,
     message: "An unknown error occurred on the backend!!!"
   }
-  
+
   return res.status(error.status).json(error);
 });
 
@@ -133,8 +136,6 @@ io.on("connection", (socket: Socket) => {
   }
 
 
-
-
   socket.on("disconnect", () => {
     console.log("A user disconnected: " + socket.id);
 
@@ -147,6 +148,29 @@ io.on("connection", (socket: Socket) => {
     }
 
     return;
+
+  });
+
+
+
+  socket.on(SOCKET_SET_VISIBLE_ROOMS_LISTENER_KEY, (postIds: string[]) => {
+    const previous = watchedRooms.get(socket.id) ?? new Set();
+    const next = new Set(postIds);
+
+    for (const oldPost of previous) {
+      if (!next.has(oldPost)) {
+        socket.leave(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${oldPost}`);
+      }
+    }
+
+    for (const newPost of next) {
+      if (!previous.has(newPost)) {
+        socket.join(`${SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX}:${newPost}`);
+      }
+    }
+
+    watchedRooms.set(socket.id, next);
+
 
   });
 

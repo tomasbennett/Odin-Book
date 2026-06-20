@@ -1,0 +1,1 @@
+export const SOCKET_SET_VISIBLE_ROOMS_LISTENER_KEY: string = "set_visible_rooms";

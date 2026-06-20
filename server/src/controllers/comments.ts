@@ -29,16 +29,23 @@ import { SOCKET_LIKE_COMMENT_EVENT as SOCKET_LIKE_EVENT, SOCKET_UNLIKE_COMMENT_E
 import { ISuccessUploadLikeComment } from "../../../shared/features/likes/models/ISuccessUploadLikeComment";
 import { ILikeCommentAPISuccess } from "../../../shared/features/likes/models/ILikeCommentAPISuccess";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
+import { ISocketSchema } from "../../../shared/features/socket/models/ISocketSchema";
+import { GetUsersSockets } from "../sockets/GetUsersSockets";
+import { Socket } from "socket.io";
 
 
 export const router = Router();
 
-router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: string }>, res: Response<IProfileCommentsAPI | ICustomErrorResponse>, next: NextFunction) => {
+router.get("/:userId", 
+    ensureJWTAuthentication, 
+    async (req: Request<{ userId: string }, {}, ISocketSchema>, res: Response<IProfileCommentsAPI | ICustomErrorResponse>, next: NextFunction) => {
     //SO WHILST YOU'LL GET THE ORIGINAL BULK FROM /USERS/:USERID, THIS ENDPOINT WILL BE USED TO GET ANY ADDITIONAL comments THAT THE USER HAS MADE, AND WILL BE USED FOR INFINITE SCROLLING BUT NOT HAVING TO LOAD IT ALL IN ONE GO!!!
 
     
     const { userId } = req.params;
     const user = req.user!;
+    const { senderSocketId } = req.body;
+        
     
     try {
         const { limit, offset } = SearchQuerySchema.parse(req.query);
@@ -168,9 +175,6 @@ router.get("/:userId", ensureJWTAuthentication, async (req: Request<{ userId: st
                 };
             })
         );
-
-
-
 
 
         return res.status(200).json({

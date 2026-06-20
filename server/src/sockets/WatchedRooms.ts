@@ -1,0 +1,1 @@
+export const watchedRooms: Map<string, Set<string>> = new Map();
