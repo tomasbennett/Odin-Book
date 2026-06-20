@@ -421,4 +421,38 @@ router.get("/:userId",
         }
 
 
-    })
+    });
+
+
+
+
+router.patch("/", 
+    ensureJWTAuthentication,
+    async (req: Request<{}, {}, >, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+        
+        const user = req.user!;
+
+
+        try {
+
+
+
+
+
+
+
+            
+        } catch (error) {
+
+            next(error);
+
+
+        }
+
+
+
+
+
+
+
+    });
