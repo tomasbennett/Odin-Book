@@ -10,7 +10,7 @@ export function ErrorPageLayout() {
 
     console.log(errorState);
 
-    useEffect(() => { 
+    useEffect(() => {
         if (errorState) {
             window.history.replaceState({}, document.title);
         }

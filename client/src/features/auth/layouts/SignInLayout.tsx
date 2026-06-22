@@ -10,11 +10,8 @@ import { logInPageRoute, signUpPageRoute } from "../../../constants/routes";
 import { useAuth } from "../contexts/AuthContext";
 import { useMediaQuery } from "react-responsive";
 import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
-import { USER_PROFILE_IMG_FILE_KEY } from "../../../../../shared/features/auth/constants";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import loginImg from "../../../assets/github-profile-img.jpg";
-import signupImg from "../../../assets/DEFAULT_USER_IMG.png";
-import { useImageUpload } from "../../../hooks/useImageUpload";
 import { accessTokenLocalStorageKey } from "../../../constants/accessTokenLocalStorageKey";
 
 
@@ -112,8 +109,8 @@ export function SignInLayout() {
         formData.append("username", data.username);
         formData.append("password", data.password);
 
-        
-        
+
+
         abortControllerRef.current = new AbortController();
 
         const fetchBody: RequestInit = {
@@ -206,11 +203,6 @@ export function SignInLayout() {
     }, [isThinScreen, isMediumScreen]);
 
 
-    const {
-        preview,
-        handleFileChange,
-        file
-    } = useImageUpload();
 
     return (
         <>
@@ -231,35 +223,15 @@ export function SignInLayout() {
 
 
                         <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
-                            {
-                                submitUrl === "login" ?
 
-                                    <div className={styles.loginImgContainer}>
-                                        <img
-                                            src={`${loginImg}`}
-                                            alt="Login Illustration"
-                                            className={`${styles.loginImg} ${screenWidthClassName}`}
-                                        />
-                                    </div>
+                            <div className={styles.loginImgContainer}>
+                                <img
+                                    src={`${loginImg}`}
+                                    alt="Login Illustration"
+                                    className={`${styles.loginImg} ${screenWidthClassName}`}
+                                />
+                            </div>
 
-                                    :
-
-                                    <>
-
-                                        <div className={`${styles.signupImgContainer} ${screenWidthClassName}`}>
-
-                                            <img
-                                                src={`${preview ?? signupImg}`}
-                                                alt="Sign Up Profile Image"
-                                                className={`${styles.signupImg} ${screenWidthClassName}`}
-                                            />
-
-                                        </div>
-
-                                    </>
-
-
-                            }
                         </div>
 
 

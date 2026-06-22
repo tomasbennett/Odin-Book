@@ -1,37 +1,34 @@
 
-import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { GeneralHomeLayout } from './layouts/GeneralHomeLayout'
 import { SignInLayout } from './features/auth/layouts/SignInLayout'
+import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/components/ProtectedRoute'
 import { ErrorElement } from './features/error/services/ErrorElement'
 import { ErrorPageLayout } from './features/error/layouts/ErrorLayout'
-import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/components/ProtectedRoute'
+import { AuthProvider } from './features/auth/contexts/AuthContext'
+import { accountPageRoute, conversationPageRoute, invitesPageRoute, myAccountPageRoute, newConversationPageRoute, singleConversationPageRoute } from './constants/routes'
+import { ErrorProvider } from './features/error/contexts/ErrorContext'
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <GeneralHomeLayout />,
+    element:
+      <AuthProvider>
+        <GeneralHomeLayout />
+      </AuthProvider>,
     errorElement: <ErrorElement />,
     children: [
-      {
-        index: true,
-        element: <Navigate to="about" replace />
-      },
       {
         path: "error",
         element: <ErrorPageLayout />,
       },
       {
-        element: <ProtectedRoute />,
+        element: <NotAuthenticatedRoute />,
         children: [
           {
-            path: "sign-in",
             element: <SignInLayout />,
             children: [
-              {
-                index: true,
-                element: <Navigate to="login" replace />,
-              },
               {
                 path: "login",
                 handle: {
@@ -49,8 +46,9 @@ const router = createBrowserRouter([
         ]
       },
       {
-        element: <NotAuthenticatedRoute />,
+        element: <ProtectedRoute />,
         children: [
+          
         ]
       }
     ]
@@ -64,10 +62,19 @@ const router = createBrowserRouter([
 
 function App() {
 
+
+
   return (
     <>
+      <ErrorProvider>
 
-      <RouterProvider router={router} />
+        {/* <AuthProvider> */}
+
+        <RouterProvider router={router} />
+
+        {/* </AuthProvider> */}
+
+      </ErrorProvider>
 
     </>
   )
