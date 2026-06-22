@@ -2,11 +2,9 @@
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { GeneralHomeLayout } from './layouts/GeneralHomeLayout'
 import { SignInLayout } from './features/auth/layouts/SignInLayout'
-import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/services/ProtectedRoute'
 import { ErrorElement } from './features/error/services/ErrorElement'
 import { ErrorPageLayout } from './features/error/layouts/ErrorLayout'
-import { AboutPage } from './components/AboutPage'
-import { ContactsPage } from './components/ContactsPage'
+import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/components/ProtectedRoute'
 
 
 const router = createBrowserRouter([
@@ -53,14 +51,6 @@ const router = createBrowserRouter([
       {
         element: <NotAuthenticatedRoute />,
         children: [
-          {
-            path: "about",
-            element: <AboutPage />
-          },
-          {
-            path: "contacts",
-            element: <ContactsPage />
-          }
         ]
       }
     ]

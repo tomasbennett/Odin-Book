@@ -4,13 +4,22 @@ import styles from "./SignInLayout.module.css";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { domain } from "../../../constants/EnvironmentAPI";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ISignInError, SignInErrorSchema, ILoginForm, loginFormSchema } from "../../../../../shared/features/auth/models/ILoginSchema";
 import { ISignInContext } from "../models/ISignInContext";
-import { BackgroundVideoContainer } from "../../../components/BackgroundVideoContainer";
-import { AccessTokenResponseSchema } from "../../../../../shared/features/auth/models/IAccessTokenResponse";
-import { accessTokenLocalStorageKey, mediumScreenMaxWidth, thinScreenMaxWidth, wideScreenMINWidth } from "../../../constants/constants";
+import { homePageRoute, logInPageRoute, signUpPageRoute } from "../../../constants/routes";
+import { LoginRegisterSuccessUserInfoSchema } from "../../../../../shared/features/auth/models/ILoginSuccessUserInfo";
+import { useAuth } from "../contexts/AuthContext";
 import { useMediaQuery } from "react-responsive";
+import { mediumScreenMaxWidth, thinScreenMaxWidth, wideScreenMINWidth } from "../../../constants/screenDimensions";
+import { USER_PROFILE_IMG_FILE_KEY } from "../../../../../shared/features/auth/constants";
+import { LoadingCircle } from "../../../components/LoadingCircle";
+
+import loginImg from "../../../assets/github-profile-img.jpg";
+import signupImg from "../../../assets/DEFAULT_USER_IMG.png";
+import { useImageUpload } from "../../../hooks/useImageUpload";
+import { accessTokenLocalStorageKey } from "../../../constants/accessTokenLocalStorageKey";
+
 
 
 export function SignInLayout() {
@@ -80,149 +89,314 @@ export function SignInLayout() {
     }, [location.pathname, clearErrors]);
 
 
+    const {
+        setAuthLevel
+    } = useAuth();
 
 
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, []);
 
 
     const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
+
+        const file = data[USER_PROFILE_IMG_FILE_KEY]?.[0];
+        const formData = new FormData();
+
+        formData.append("username", data.username);
+        formData.append("password", data.password);
+
+        if (file) {
+            console.log("Appending file to formData:", file);
+            formData.append(USER_PROFILE_IMG_FILE_KEY, file); 
+        }
+
+        
+        
+        abortControllerRef.current = new AbortController();
+
+        const fetchBody: RequestInit = {
+            method: "POST",
+            signal: abortControllerRef.current.signal,
+            credentials: "include",
+        }
+
+        if (submitUrl === "login") {
+            fetchBody.headers = {
+                "Content-Type": "application/json"
+            };
+            fetchBody.body = JSON.stringify(data);
+        }
+
+        if (submitUrl === "register") {
+            fetchBody.body = formData;
+        }
+
         try {
-            const response = await fetch(`${domain}/api/${submitUrl}`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data),
-                // credentials: "include"
-            });
+            setIsLoading(true);
 
+            const response = await fetch(`${domain}/api/sign-in/${submitUrl}`, fetchBody);
 
-            const responseData = await response.json();
-            
-            const accessTokenResult = AccessTokenResponseSchema.safeParse(responseData);
-            if (accessTokenResult.success) {
-                localStorage.setItem(accessTokenLocalStorageKey, accessTokenResult.data.accessToken);
-                navigate("/");
+            if (abortControllerRef.current.signal.aborted) {
+                console.log("Request was aborted, not processing response!!!");
                 return;
             }
-            
-            
-            const errorResult = SignInErrorSchema.safeParse(responseData);
-            if (errorResult.success) {
-                setError(errorResult.data.inputType, { type: "server", message: errorResult.data.message });
 
-            } else {
-                setError("root", { type: "server", message: "An unknown error occurred." }); //PLEASE DON'T FORGET FOR LATER PROJECTS THAT root CAN HAVE ADDITIONAL PROPERTIES ATTACHED TO IT FOR CUSTOM ERRORS IF YOU HAVE A SERVER ERROR UNRELATED TO THE USER INPUTS LIKE root.serverError
+            const responseData = await response.json();
+            const responseDataResult = LoginRegisterSuccessUserInfoSchema.safeParse(responseData);
 
+            if (responseDataResult.success && response.ok) {
+
+                localStorage.setItem(accessTokenLocalStorageKey, responseDataResult.data.accessToken);
+                await setAuthLevel({
+                    userType: "user",
+                    userId: responseDataResult.data.userId,
+                    username: responseDataResult.data.username,
+                    userProfileImgUrl: responseDataResult.data.userProfileImgUrl
+                });
+                console.log("Successful sign in, navigating to home page...");
+                console.dir(responseDataResult.data);
+                return;
             }
 
 
+            const errorResult = SignInErrorSchema.safeParse(responseData);
+            if (errorResult.success) {
+                setError(errorResult.data.inputType, {
+                    type: "server",
+                    message: errorResult.data.message
+                });
 
-        } catch (error) {
-            setError("root", { type: "server", message: "Failed to connect to the server." });
+            } else {
+                setError("root", {
+                    type: "server",
+                    message: "An unknown error occurred."
+                }); //PLEASE DON'T FORGET FOR LATER PROJECTS THAT root CAN HAVE ADDITIONAL PROPERTIES ATTACHED TO IT FOR CUSTOM ERRORS IF YOU HAVE A SERVER ERROR UNRELATED TO THE USER INPUTS LIKE root.serverError
+
+            }
+
+        } catch (error: unknown) {
+
+            if (error instanceof Error) {
+                setError("root", {
+                    type: "server",
+                    message: error.message || "An error occurred while connecting to the server."
+                });
+                return;
+            }
+
+            setError("root", {
+                type: "server",
+                message: "Failed to connect to the server."
+            });
+
+        } finally {
+            setIsLoading(false);
 
         }
     }
 
-
     const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
     const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
-    const isWideScreen: boolean = useMediaQuery({ minWidth: wideScreenMINWidth + 1 });
 
-    const signInContainerClassNames: string = useMemo(() => {
+    const screenWidthClassName = useMemo<string>(() => {
 
-        if (isThinScreen) {
-            return`${styles.thinOuterContainer}`;
-        } else if (isMediumScreen) {
-            return `${styles.mediumOuterContainer}`;
-        } else {
-            return `${styles.wideOuterContainer}`;
-        }
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
 
-    }, [isThinScreen, isMediumScreen, isWideScreen]);
+
+    const {
+        preview,
+        handleFileChange,
+        file
+    } = useImageUpload();
+
+    const fileInput = register(USER_PROFILE_IMG_FILE_KEY);
 
     return (
         <>
-            <Outlet />
 
-            <div className={`${signInContainerClassNames} ${styles.signinOuterContainer}`}>
+            <div className={styles.outerContainer}>
 
-                <div className={styles.backgroundVideoSection}>
-
-                    <BackgroundVideoContainer>
-                        <div className={styles.welcomeMessageContainer}>
-                            <h1>Welcome to my Blog API Project</h1>
-                            <p>Please log in here, or if you don't have an account register by clicking on Sign up here!</p>
-                        </div>
-                    </BackgroundVideoContainer>
-
-                </div>
+                <div className={styles.innerContainer}>
 
 
-                <div className={styles.loginSection}>
+                    <form className={`${styles.form} ${screenWidthClassName}`} onSubmit={handleSubmit(onSubmit)}>
 
-                    <h2>{title}</h2>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+
                         {
-                            errors.root && (
-                                <p className={styles.errorMessage}>{errors.root.message}</p>
+                            isThinScreen && (
+                                <h1 className={`${styles.title} ${screenWidthClassName}`}>{title}</h1>
                             )
                         }
-                        <div className={styles.inputGroup}>
+
+
+                        <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
                             {
-                                errors.username && (
-                                    <p className={styles.errorMessage}>{errors.username.message}</p>
-                                )
+                                submitUrl === "login" ?
+
+                                    <div className={styles.loginImgContainer}>
+                                        <img
+                                            src={`${loginImg}`}
+                                            alt="Login Illustration"
+                                            className={`${styles.loginImg} ${screenWidthClassName}`}
+                                        />
+                                    </div>
+
+                                    :
+
+                                    <>
+
+                                        <div className={`${styles.signupImgContainer} ${screenWidthClassName}`}>
+
+                                            <img
+                                                src={`${preview ?? signupImg}`}
+                                                alt="Sign Up Profile Image"
+                                                className={`${styles.signupImg} ${screenWidthClassName}`}
+                                            />
+
+                                        </div>
+
+                                        <div className={`${styles.uploadBtnContainer} ${screenWidthClassName}`}>
+
+                                            <label className={`${styles.uploadBtn} ${screenWidthClassName}`}>
+                                                +
+                                                <input
+                                                    hidden
+                                                    className={styles.inputProfileImg}
+                                                    type="file"
+                                                    {...fileInput}
+                                                    onChange={(e) => {
+                                                        fileInput.onChange(e);
+                                                        handleFileChange(e);
+                                                    }}
+                                                />
+                                            </label>
+
+                                        </div>
+
+                                    </>
+
+
                             }
-                            <label htmlFor="username">Username</label>
-                            <input
-                                {...register("username")}
-                                type="text"
-                                id="username"
-                                name="username"
-                                placeholder="Enter your username..."
-                            />
                         </div>
 
-                        <div className={styles.inputGroup}>
+
+                        <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
                             {
-                                errors.password && (
-                                    <p className={styles.errorMessage}>{errors.password.message}</p>
+                                !isThinScreen && (
+                                    <h1 className={styles.title}>{title}</h1>
                                 )
                             }
-                            <label htmlFor="password">Password</label>
-                            <input
-                                {...register("password")}
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Enter your password..."
-                            />
+
+                            <div className={`${styles.errorsContainer} ${screenWidthClassName}`}>
+
+                                {
+                                    errors.root && (
+                                        <p className={styles.errorMessage}>{`Root error: ${errors.root.message}`}</p>
+                                    )
+                                }
+
+                                {
+                                    errors[USER_PROFILE_IMG_FILE_KEY] && (
+                                        <p className={styles.errorMessage}>{`File error: ${errors[USER_PROFILE_IMG_FILE_KEY].message}`}</p>
+                                    )
+                                }
+                                {
+                                    errors.username && (
+                                        <p className={styles.errorMessage}>{`Username error: ${errors.username.message}`}</p>
+                                    )
+                                }
+                                {
+                                    errors.password && (
+                                        <p className={styles.errorMessage}>{`Password error: ${errors.password.message}`}</p>
+                                    )
+                                }
+
+                            </div>
+
+                            <div className={`${styles.inputGroupContainer} ${screenWidthClassName}`}>
+
+                                <div className={styles.inputGroup}>
+                                    <label htmlFor="username">Username</label>
+                                    <input
+                                        {...register("username")}
+                                        type="text"
+                                        id="username"
+                                        name="username"
+                                        placeholder="Enter your username..."
+                                    />
+                                </div>
+
+                                <div className={styles.inputGroup}>
+                                    <label htmlFor="password">Password</label>
+                                    <input
+                                        {...register("password")}
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Enter your password..."
+                                    />
+                                </div>
+
+                                <div className={`${styles.submitBtnContainer} ${screenWidthClassName}`}>
+
+                                    {
+                                        isLoading ?
+
+                                            <LoadingCircle height="60%" />
+
+                                            :
+
+                                            <button className={styles.submitButton} type="submit">
+                                                Submit
+                                            </button>
+                                    }
+
+
+                                </div>
+
+                            </div>
+
+                            <div className={`${styles.bottomContainer} ${screenWidthClassName}`}>
+
+                                {
+                                    submitUrl === "login" ?
+
+                                        <p className={styles.switchSignInParagraph}>
+                                            Don't have an account?
+                                            <Link to={signUpPageRoute}>Sign up here</Link>
+                                        </p>
+                                        :
+                                        <p className={styles.switchSignInParagraph}>
+                                            Already have an account?
+                                            <Link to={logInPageRoute}>Log in here</Link>
+                                        </p>
+
+                                }
+
+                            </div>
                         </div>
 
-                        <button className={styles.submitButton} type="submit">Submit</button>
+
                     </form>
-                    {
-                        submitUrl === "login" ?
 
-                            <p className={styles.switchSignInParagraph}>
-                                Don't have an account?
-                                <Link to="/sign-in/register">Sign up here</Link>
-                            </p>
-                            :
-                            <p className={styles.switchSignInParagraph}>
-                                Already have an account?
-                                <Link to="/sign-in/login">Log in here</Link>
-                            </p>
 
-                    }
                 </div>
 
-
-
             </div>
+
+
+            <Outlet />
         </>
     )
 }
-

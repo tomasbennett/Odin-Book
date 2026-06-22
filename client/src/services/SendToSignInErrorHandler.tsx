@@ -1,6 +1,7 @@
 import { NavigateFunction } from "react-router-dom";
 import { ISignInError } from "../../../shared/features/auth/models/ILoginSchema";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
+import { errorPageRoute } from "../constants/routes";
 
 export function SendToSignInErrorHandler(
     error: unknown,
@@ -12,13 +13,11 @@ export function SendToSignInErrorHandler(
             status: 0,
             message: error.message
         }
-        navigate("/error", {
+        navigate(errorPageRoute, {
             state: {
                 error: signInError
             }
         });
-
-        return;
     }
 
 
@@ -27,7 +26,7 @@ export function SendToSignInErrorHandler(
         status: 0,
         message: "An unknown error occurred."
     }
-    navigate("/error", {
+    navigate(errorPageRoute, {
         state: {
             error: signInError
         }

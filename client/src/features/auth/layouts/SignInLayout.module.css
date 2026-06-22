@@ -1,84 +1,418 @@
-.signinOuterContainer {
+.outerContainer{
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    /* align-items: center;
+    justify-content: center; */
+
+    overflow-y: auto;
+
+    padding: 2rem;
+
+}
+
+.innerContainer {
+    
+    
+
+    
+
+    --padding: 2rem;
+
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+    flex: 1 1 0;
+
+    height: 100%;
+
+    display: flex;
+
+    margin: auto;
+
+    width: 94%;
+    max-width: 155rem;
+    min-height: 85rem;
+    /* min-height: calc(100% - 2rem); */
+    max-height: 90rem;
+
+    /* overflow-y: auto; */
+
+
+
+    background-color: var(--light-black-colour);
+
+
+    padding: var(--padding);
+
+    
+
+
+    border-radius: 3rem;
+
+    & *{
+        /* outline: .1rem orange solid; */
+    }
+}
+
+
+.form {
+    flex: 1 1 0;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 2rem;
+
+
+}
+
+
+.form.thinScreen{
+    flex-direction: column;
+    row-gap: 2rem;
+
+    min-width: 0;
+}
+
+.imgContainer {
+    --img-container-padding: 4rem;
+    --padding: 0rem;
+
+    --img-max-width: 50rem;
+
+    position: relative;
+
+
+    flex: 1 1 0;
+    height: 100%;
+
+    padding: var(--img-container-padding);
+    /* padding-left: calc(var(--img-container-padding) + var(--padding));
+    padding-top: calc(var(--img-container-padding) + var(--padding));
+    padding-bottom: calc(var(--img-container-padding) + var(--padding)); */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* background-image: url("../../../assets/i-like-food.svg");
+    background-repeat: repeat;
+    background-size: 180px; */
+
+    overflow: hidden;
+
+    /* img {
+        width: 100%;
+        height: auto;
+
+        object-fit: contain;
+    } */
+}
+
+.imgContainer.thinScreen {
+    --img-max-width: 17rem;
+
+    img {
+        /* max-width: 20rem; */
+        /* max-height: 20rem; */
+    }
+}
+
+
+.uploadBtnContainer{
     position: absolute;
+
     top: 50%;
     left: 50%;
-
     transform: translate(-50%, -50%);
-    transition: transform 0.4s ease;
 
-    /* will-change: transform; */
+    aspect-ratio: 1;
 
-    width: 92%;
-    height: 92%;
-    display: flex;
-    overflow: hidden;
-    box-shadow: 0rem 0rem 3rem rgba(0, 0, 0, .5);
-    border-radius: 1rem;
+    border-radius: 50%;
+
+    width: min(calc(100% - var(--img-container-padding) * 2), var(--img-max-width));
+
+    overflow: visible;
+}
+
+.uploadBtnContainer.thinScreen{
+
 }
 
 
+.signupImgContainer {
 
-
-
-
-
-
-
-.signinOuterContainer>.backgroundVideoSection {
-    flex: 1 1 0;
     position: relative;
-    
-    height: 100%;
-    
-    overflow: hidden;
-}
-
-.signinOuterContainer>.loginSection {
-    position: relative;
-    
-    z-index: 2;
-    
-    flex-shrink: 0;
-
-    height: 100%;
-    width: 30%;
-    min-width: min(40rem, 100%);
-    
-    box-shadow: -1rem 0rem 2rem rgba(24, 24, 24, 0.4);
-    /* border-left: rgb(65, 2, 148) .2rem solid; */
-    
-    background: linear-gradient(135deg, #e2e2e2 0%, #eac9ff 100%);
-    
-    background-color: #e2e2e2;
-    color: black;
-    
+    /* display: inline-block; container sizes to image */
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    overflow: hidden;
+
     
-    
+
+    border-radius: 50%;
+
+    /* padding: var(--padding); */
+
+    width: min(100%, var(--img-max-width));
+    /* height: min(100%, 50rem); */
+
+    aspect-ratio: 1;
+
+    /* max-width: 50rem;
+    max-height: 50rem; */
+
+}
+
+.signupImgContainer.thinScreen{
+    /* max-width: 17rem;
+    max-height: 17rem; */
+
+    /* width: min(100%, var(--img-max-width)); */
 }
 
 
-.loginSection>h2 {
-    font-size: 3.4rem;
-    margin-bottom: 3rem;
+.loginImgContainer{
+    position: relative;
+    /* display: inline-block; container sizes to image */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+
+
+    
+
+    border-radius: .8rem;
+
+    padding: var(--padding);
+
+    max-height: 100%;
+    max-width: 100%;
 }
 
 
-
-
-.signinOuterContainer form {
-    
+.signupImg {
+    /* display: block; */
     width: 100%;
-    /* height: 100%; */
+    height: 100%;
+
     
+
+    object-fit: cover;
+}
+
+.signupImg.thinScreen {
+    
+}
+
+.loginImg{
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    max-width: 50rem;
+    max-height: 50rem;
+
+    object-fit: cover;
+    /* border-radius: 50%; */
+}
+
+.loginImg.thinScreen{
+    max-width: 17rem;
+    max-height: 17rem;
+}
+
+
+.uploadBtn input {
+    display: none;
+}
+
+
+.uploadBtn {
+    position: absolute;
+    bottom: var(--padding);
+    right: var(--padding);
+
+    width: 8rem;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+    background: var(--dark-pink-btn-bcg);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 5rem;
+    font-weight: bold;
+    color: white;
+
+    cursor: pointer;
+
+    transition: transform 0.25s linear;
+}
+
+.uploadBtn.wideScreen{
+    width: 10rem;
+    font-size: 6rem;
+}
+
+.uploadBtn.thinScreen{
+    width: 6rem;
+    font-size: 3.5rem;
+}
+
+.uploadBtn:hover {
+    transform: scale(1.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.textInputsContainer {
+    flex: 1 1 0;
+    height: 100%;
+
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    row-gap: 1.6rem;
+
+    /* padding: var(--padding);
+    padding-left: 0; */
+
 }
 
+
+.textInputsContainer.thinScreen{
+    flex-grow: 2;
+    flex-shrink: 1;
+    flex-basis: 0;
+
+    width: min(100%, 50rem);
+}
+
+
+.title {
+    flex: 1 1 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+
+    font-size: 2.8rem;
+    font-weight: bold;
+}
+
+.title.thinScreen{
+    flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+
+
+}
+
+.errorsContainer {
+    width: 100%;
+    flex: 1 1 0;
+
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: auto;
+
+
+
+    .errorMessage {
+        width: 100%;
+        max-height: 10rem;
+
+        padding: 2rem 1rem;
+
+        background-color: var(--dark-transparent-red-error-bcg);
+
+        border-radius: 1rem;
+
+        font-style: italic;
+
+        overflow: auto;
+
+
+
+
+
+        color: var(--light-red-error-colour);
+
+        margin-bottom: .5rem;
+    }
+}
+
+.errorsContainer.thinScreen{
+    min-height: 7.5rem;
+}
+
+.inputGroupContainer {
+    width: 90%;
+    min-width: 30rem;
+    max-width: 50rem;
+    flex: 1 1 0;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+
+}
+
+.inputGroupContainer.thinScreen {
+    width: 100%;
+    max-width: none;
+    min-width: 0;    
+}
+
+.bottomContainer {
+    width: 100%;
+    flex: 2 1 0;
+
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    row-gap: 1rem;
+}
+
+.bottomContainer.thinScreen {
+    flex: 1 1 0;
+}
 
 
 
@@ -88,45 +422,66 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 1.5rem;
-    
+
     width: 100%;
-    max-width: 30rem;
+    
 }
 
 .inputGroup label {
-    font-size: 1.4rem;
-    margin-bottom: .6rem;
+    margin-bottom: 1rem;
 }
 
 .inputGroup input {
-    padding: .9rem 0;
-    padding-left: .6rem;
-    
-    font-size: 1.5rem;
-    border-radius: .4rem;
-    border: .1rem solid #333;
-    background: #fff;
-    color: #000;
-    transition: 0.25s;
+    padding: 1.8rem 0;
+    padding-left: 1.6rem;
+
+    font-size: 1.6rem;
+
+
+
+    border-radius: 3rem;
+
+    background-color: var(--dark-grey);
+
+
 }
 
-.inputGroup input:focus {
-    border-color: #3d3bc5;
-    outline: none;
-    box-shadow: 0 0 .5rem rgba(255, 255, 255, 0.4);
+.inputGroup input::placeholder {
+    color: white;
+    font-size: 1.4rem;
+}
+
+
+.submitBtnContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 3rem;
+
+    overflow: hidden;
+    
+    margin-top: 2rem;
+    
+    background: var(--dark-blue);
+
+    height: 4.3rem;
+}
+
+
+.submitBtnContainer.thinScreen{
+    margin-top: 0rem;
 }
 
 .submitButton {
-    /* width: 100%;
-    max-width: 30rem; */
-    
-    padding: 1.2rem 8rem;
-    
-    background: var(--blue-selected-button-colour);
+    width: 100%;
+    height: 100%;
+
+    background-color: transparent;
+
     color: white;
     border: none;
-    border-radius: 6rem;
-    margin-top: 2rem;
+    
     font-size: 1.6rem;
     cursor: pointer;
     font-weight: bold;
@@ -134,24 +489,29 @@
 }
 
 .submitButton:hover {
-    background: blue;
+    background: rgb(0, 166, 221);
 }
 
+
+
+
+
+
 .switchSignInParagraph {
-    margin-top: 3rem;
+    margin-top: auto;
     margin-bottom: 2rem;
-    
+
     display: flex;
     column-gap: .3rem;
-    
-    
+
+
     text-align: center;
     font-size: 1.4rem;
     color: #727272;
 }
 
 .switchSignInParagraph a {
-    color: blue;
+    color: var(--dark-blue);
     text-decoration: none;
     font-weight: bold;
     transition: 0.25s;
@@ -159,84 +519,5 @@
 }
 
 .switchSignInParagraph a:hover {
-    color: var(--blue-selected-button-colour);
-}
-
-
-
-
-
-.errorMessage {
-    color: red;
-    
-    margin-bottom: .5rem;
-}
-
-
-
-.welcomeMessageContainer {
-    
-    display: flex;
-    flex-direction: column;
-    
-    /* max-width: 80rem; */
-    
-    background-color: rgba(0, 0, 0, 0.151);
-    border-radius: 1rem;
-    backdrop-filter: blur(.5rem);
-    
-    margin-top: 10rem;
-    
-    
-    padding: 4rem 3rem;
-}
-
-
-.welcomeMessageContainer h1 {
-    font-size: 6rem;
-    margin-bottom: 1.5rem;
-}
-
-
-.welcomeMessageContainer p {
-    font-size: 2rem;
-    line-height: 1.4;
-}
-
-
-
-.thinOuterContainer{
-    flex-direction: column;
-
-    .loginSection{
-        flex: 1 1 0;
-
-        min-height: 37rem;
-        width: 100%;
-    }
-
-    .backgroundVideoSection{
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: auto;
-
-        height: 25rem;
-    }
-
-
-
-    .welcomeMessageContainer{
-        margin-top: 2rem;
-
-        padding: 2rem 1.5rem;
-
-        h1{
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        p{
-            font-size: 1.6rem;
-        }
-    }
+    color: rgb(0, 170, 226);
 }
