@@ -14,4 +14,4 @@ export const SOCKET_INVALID_ACCESS_TOKEN_MESSAGE: string = "Invalid access token
 
 
 
-export const USER_PROFILE_IMG_FILE_KEY: string = "userProfileImgKey";
+export const USER_PROFILE_IMG_FILE_KEY = "userProfileImgKey" as const;

@@ -1,20 +1,17 @@
 import { Link, Outlet, useLocation, useMatches, useNavigate } from "react-router-dom";
 import styles from "./SignInLayout.module.css";
-
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { domain } from "../../../constants/EnvironmentAPI";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ISignInError, SignInErrorSchema, ILoginForm, loginFormSchema } from "../../../../../shared/features/auth/models/ILoginSchema";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ISignInError, SignInErrorSchema, ILoginForm, loginFormSchema, SuccessResSignInSchema } from "../../../../../shared/features/auth/models/ILoginSchema";
 import { ISignInContext } from "../models/ISignInContext";
-import { homePageRoute, logInPageRoute, signUpPageRoute } from "../../../constants/routes";
-import { LoginRegisterSuccessUserInfoSchema } from "../../../../../shared/features/auth/models/ILoginSuccessUserInfo";
+import { logInPageRoute, signUpPageRoute } from "../../../constants/routes";
 import { useAuth } from "../contexts/AuthContext";
 import { useMediaQuery } from "react-responsive";
-import { mediumScreenMaxWidth, thinScreenMaxWidth, wideScreenMINWidth } from "../../../constants/screenDimensions";
+import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
 import { USER_PROFILE_IMG_FILE_KEY } from "../../../../../shared/features/auth/constants";
 import { LoadingCircle } from "../../../components/LoadingCircle";
-
 import loginImg from "../../../assets/github-profile-img.jpg";
 import signupImg from "../../../assets/DEFAULT_USER_IMG.png";
 import { useImageUpload } from "../../../hooks/useImageUpload";
@@ -109,16 +106,11 @@ export function SignInLayout() {
 
     const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
 
-        const file = data[USER_PROFILE_IMG_FILE_KEY]?.[0];
+
         const formData = new FormData();
 
         formData.append("username", data.username);
         formData.append("password", data.password);
-
-        if (file) {
-            console.log("Appending file to formData:", file);
-            formData.append(USER_PROFILE_IMG_FILE_KEY, file); 
-        }
 
         
         
@@ -152,7 +144,7 @@ export function SignInLayout() {
             }
 
             const responseData = await response.json();
-            const responseDataResult = LoginRegisterSuccessUserInfoSchema.safeParse(responseData);
+            const responseDataResult = SuccessResSignInSchema.safeParse(responseData);
 
             if (responseDataResult.success && response.ok) {
 
@@ -220,8 +212,6 @@ export function SignInLayout() {
         file
     } = useImageUpload();
 
-    const fileInput = register(USER_PROFILE_IMG_FILE_KEY);
-
     return (
         <>
 
@@ -266,24 +256,6 @@ export function SignInLayout() {
 
                                         </div>
 
-                                        <div className={`${styles.uploadBtnContainer} ${screenWidthClassName}`}>
-
-                                            <label className={`${styles.uploadBtn} ${screenWidthClassName}`}>
-                                                +
-                                                <input
-                                                    hidden
-                                                    className={styles.inputProfileImg}
-                                                    type="file"
-                                                    {...fileInput}
-                                                    onChange={(e) => {
-                                                        fileInput.onChange(e);
-                                                        handleFileChange(e);
-                                                    }}
-                                                />
-                                            </label>
-
-                                        </div>
-
                                     </>
 
 
@@ -303,12 +275,6 @@ export function SignInLayout() {
                                 {
                                     errors.root && (
                                         <p className={styles.errorMessage}>{`Root error: ${errors.root.message}`}</p>
-                                    )
-                                }
-
-                                {
-                                    errors[USER_PROFILE_IMG_FILE_KEY] && (
-                                        <p className={styles.errorMessage}>{`File error: ${errors[USER_PROFILE_IMG_FILE_KEY].message}`}</p>
                                     )
                                 }
                                 {

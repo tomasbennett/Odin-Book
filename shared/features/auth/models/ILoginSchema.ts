@@ -24,7 +24,7 @@ export type ILoginForm = z.infer<typeof loginFormSchema>;
 
 export const SignInErrorSchema = z.object({
     message: z.string(),
-    inputType: z.enum(["username", "password", "root", USER_PROFILE_IMG_FILE_KEY])
+    inputType: z.enum(["username", "password", "root"])
 });
 
 export type ISignInError = z.infer<typeof SignInErrorSchema>;
