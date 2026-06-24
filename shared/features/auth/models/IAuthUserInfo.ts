@@ -1,6 +1,7 @@
 import z from "zod";
-import { usernamePasswordSchema } from "./ILoginSchema";
+
 import { APISuccessSchema } from "../../api/models/APISuccessResponse";
+import { usernamePasswordSchema } from "./IUsernamePassword";
 
 
 //BASE OBJECTS

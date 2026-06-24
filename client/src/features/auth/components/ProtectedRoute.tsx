@@ -8,7 +8,11 @@ import styles from "./ProtectedRoute.module.css";
 
 
 
-export function ProtectedRoute() {
+export function ProtectedRoute({
+    children
+}: {
+    children: React.ReactNode
+}) {
     const { authLevel: userAuth, isLoading } = useAuth();
 
 
@@ -21,12 +25,12 @@ export function ProtectedRoute() {
                     <LoadingCircle height="4rem" />
 
                 </div>
-                
+
             </div>
         )
 
     }
-    
+
     if (userAuth.userType === "none" || userAuth.userType === "unknown") {
         return <Navigate to={logInPageRoute} replace />;
 
@@ -36,33 +40,39 @@ export function ProtectedRoute() {
     return (
 
 
-        <SocketProvider>
+        <>
 
-            <Outlet />
+            {
+                children
+            }
 
-        </SocketProvider>
+        </>
 
-        
+
     );
 
 }
 
 
 
-export function NotAuthenticatedRoute() {
+export function NotAuthenticatedRoute({
+    children
+}: {
+    children: React.ReactNode
+}) {
     const { authLevel: userAuth, isLoading } = useAuth();
 
 
     if (isLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', flex: '1 1 0' }}>
-                
+
                 <div className={styles.loadingContainer} >
 
                     <LoadingCircle height="4rem" />
 
                 </div>
-                
+
             </div>
         )
     }
@@ -71,5 +81,11 @@ export function NotAuthenticatedRoute() {
         return <Navigate to={homePageRoute} replace />;
     }
 
-    return <Outlet />;
+    return (
+        <>
+            {
+                children
+            }
+        </>
+    )
 }

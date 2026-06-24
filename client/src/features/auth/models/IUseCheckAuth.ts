@@ -1,8 +1,8 @@
-import { IUserAuthContextInfoSchema } from "../../../../../shared/features/auth/models/ILoginSuccessUserInfo";
+import { IAuthUserInfo } from "../../../../../shared/features/auth/models/IAuthUserInfo";
 
 export type IAuthLevel = 
     | { userType: "none"}
-    | ({ userType: "user" } & IUserAuthContextInfoSchema)
+    | ({ userType: "user" } & IAuthUserInfo)
     | { userType: "unknown" };
 
 

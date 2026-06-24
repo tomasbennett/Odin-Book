@@ -8,7 +8,7 @@ import crypto from "crypto";
 
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomSuccessMessage } from "../../../shared/features/api/models/APISuccessResponse";
-import { ILoginForm, ISignInError, ISuccessResSignIn, usernamePasswordSchema } from "../../../shared/features/auth/models/ILoginSchema";
+import { ILoginForm, ISignInError, ISuccessResSignIn } from "../../../shared/features/auth/models/ILoginSchema";
 import { environment } from "../../../shared/constants";
 import { issueSignedInResponse } from "../auth/IssueSignedInResponse";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
@@ -18,6 +18,7 @@ import { supabase } from "../supabase/client";
 import { USER_PROFILE_IMG_FILE_KEY } from "../../../shared/features/auth/constants";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
 import { allowedImgTypes } from "../../../shared/features/files/constants";
+import { usernamePasswordSchema } from "../../../shared/features/auth/models/IUsernamePassword";
 
 
 

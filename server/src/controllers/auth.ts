@@ -14,100 +14,103 @@ import { CreateAccessToken } from "../auth/CreateAccessToken";
 
 export const router = Router();
 
-router.get("/checkAuthLevel", ensureJWTAuthentication, (req: Request, res: Response<ICustomErrorResponse | ISuccessResAuthUserInfo>, next: NextFunction) => {
-    if (req.user) {
-        return res.status(200).json({
-            ok: true,
-            status: 200,
-            message: "User is authenticated with access token",
-            userId: req.user.userId,
-            username: req.user.username,
-            userProfileImgUrl: req.user.userProfileImgUrl
-        });
-    }
+router.get("/checkAuthLevel",
+    ensureJWTAuthentication,
+    (req: Request, res: Response<ICustomErrorResponse | ISuccessResAuthUserInfo>, next: NextFunction) => {
+        if (req.user) {
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "User is authenticated with access token",
+                userId: req.user.userId,
+                username: req.user.username,
+                userProfileImgUrl: req.user.userProfileImgUrl
+            });
+        }
 
-    //DONT REMEMBER WHY THIS IS HERE BUT I THINK IT IS IN CASE THE MIDDLEWARE DOESNT THROW AN ERROR BUT ALSO DOESNT AUTHENTICATE THE USER FOR SOME REASON
-    return res.status(401).json({
-        ok: false,
-        status: 401,
-        message: "User is not authenticated with their access token"
+        //DONT REMEMBER WHY THIS IS HERE BUT I THINK IT IS IN CASE THE MIDDLEWARE DOESNT THROW AN ERROR BUT ALSO DOESNT AUTHENTICATE THE USER FOR SOME REASON
+        return res.status(401).json({
+            ok: false,
+            status: 401,
+            message: "User is not authenticated with their access token"
+        });
+
     });
 
-});
 
+router.get("/grantNewAccessToken",
+    async (req: Request, res: Response<ICustomErrorResponse | IAccessTokenResponse>, next: NextFunction) => {
+        const refreshToken: string | undefined = req.cookies?.refreshToken;
 
-router.get("/grantNewAccessToken", async (req: Request, res: Response<ICustomErrorResponse | IAccessTokenResponse>, next: NextFunction) => {
-    const refreshToken: string | undefined = req.cookies?.refreshToken;
-
-    if (!refreshToken) {
-        return res.status(invalidRefreshTokenStatus).json({
-            message: "No refresh token provided!!!",
-            ok: false,
-            status: invalidRefreshTokenStatus
-        });
-    }
-
-    try {
-
-        const tokenHash = crypto
-            .createHash("sha256")
-            .update(refreshToken)
-            .digest("hex");
-
-        const dbRefreshToken = await prisma.refreshToken.findUnique({
-            where: {
-                hashedToken: tokenHash
-            },
-            select: {
-                user: {
-                    select: {
-                        id: true
-                    }
-                }
-            }
-        });
-
-
-        if (!dbRefreshToken) {
+        if (!refreshToken) {
             return res.status(invalidRefreshTokenStatus).json({
-                message: "Refresh token not found in database!!!",
+                message: "No refresh token provided!!!",
                 ok: false,
                 status: invalidRefreshTokenStatus
             });
         }
 
-        // if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
-        //     const delRefreshToken = await prisma.refreshToken.delete({
-        //         where: {
-        //             id: dbRefreshToken.id
-        //         }
-        //     });
+        try {
 
-            
+            const tokenHash = crypto
+                .createHash("sha256")
+                .update(refreshToken)
+                .digest("hex");
 
-        //     return res.status(invalidRefreshTokenStatus).json({
-        //         ok: false,
-        //         status: invalidRefreshTokenStatus,
-        //         message: "Refresh token expired!!!"
-        //     });
-        // }
-
-
-
-        const accessToken = CreateAccessToken(dbRefreshToken.user.id);
-
-        return res.status(200).json({
-            ok: true,
-            status: 200,
-            message: "New access token created from refresh token!!!",
-            accessToken
-        });
+            const dbRefreshToken = await prisma.refreshToken.findUnique({
+                where: {
+                    hashedToken: tokenHash
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true
+                        }
+                    }
+                }
+            });
 
 
+            if (!dbRefreshToken) {
+                return res.status(invalidRefreshTokenStatus).json({
+                    message: "Refresh token not found in database!!!",
+                    ok: false,
+                    status: invalidRefreshTokenStatus
+                });
+            }
+
+            // if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
+            //     const delRefreshToken = await prisma.refreshToken.delete({
+            //         where: {
+            //             id: dbRefreshToken.id
+            //         }
+            //     });
 
 
-    } catch (error) {
-        return next(error);
 
-    }
-});
+            //     return res.status(invalidRefreshTokenStatus).json({
+            //         ok: false,
+            //         status: invalidRefreshTokenStatus,
+            //         message: "Refresh token expired!!!"
+            //     });
+            // }
+
+
+
+            const accessToken = CreateAccessToken(dbRefreshToken.user.id);
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "New access token created from refresh token!!!",
+                accessToken
+            });
+
+
+
+
+        } catch (error) {
+            return next(error);
+
+        }
+    });

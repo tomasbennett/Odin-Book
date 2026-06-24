@@ -6,8 +6,8 @@ import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/component
 import { ErrorElement } from './features/error/services/ErrorElement'
 import { ErrorPageLayout } from './features/error/layouts/ErrorLayout'
 import { AuthProvider } from './features/auth/contexts/AuthContext'
-import { accountPageRoute, conversationPageRoute, invitesPageRoute, myAccountPageRoute, newConversationPageRoute, singleConversationPageRoute } from './constants/routes'
 import { ErrorProvider } from './features/error/contexts/ErrorContext'
+import { SocketProvider } from './contexts/SocketHandlerContext'
 
 
 const router = createBrowserRouter([
@@ -24,7 +24,10 @@ const router = createBrowserRouter([
         element: <ErrorPageLayout />,
       },
       {
-        element: <NotAuthenticatedRoute />,
+        element: 
+        <NotAuthenticatedRoute>
+          <Outlet />
+        </NotAuthenticatedRoute>,
         children: [
           {
             element: <SignInLayout />,
@@ -46,9 +49,17 @@ const router = createBrowserRouter([
         ]
       },
       {
-        element: <ProtectedRoute />,
+        element: 
+        <ProtectedRoute>
+          <SocketProvider>
+            <Outlet />
+          </SocketProvider>
+        </ProtectedRoute>,
         children: [
-          
+          {
+            index: true,
+            element: <h1>Home Page!!!</h1>
+          }
         ]
       }
     ]
@@ -68,11 +79,7 @@ function App() {
     <>
       <ErrorProvider>
 
-        {/* <AuthProvider> */}
-
         <RouterProvider router={router} />
-
-        {/* </AuthProvider> */}
 
       </ErrorProvider>
 

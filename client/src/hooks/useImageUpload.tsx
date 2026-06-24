@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { FileSingleSchema } from "../../../shared/features/files/models/INewFile";
 import { allowedImgTypes, maxFileSizeInBytes } from "../../../shared/features/files/constants";
 import { useError } from "../features/error/contexts/ErrorContext";
+import { FileSingleSchema } from "../../../shared/features/files/models/INewMandatoryFile";
 
 export function useImageUpload() {
 

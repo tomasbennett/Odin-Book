@@ -4,11 +4,11 @@ import { setLogoutFn } from "../services/LogoutAuthContext";
 import { useError } from "../../error/contexts/ErrorContext";
 import { useJWTFetch } from "../../../hooks/useJWTFetch";
 import { domain } from "../../../constants/EnvironmentAPI";
-import { ReceiveUserAuthContextInfoSchema } from "../../../../../shared/features/auth/models/ILoginSuccessUserInfo";
 import { APIErrorSchema } from "../../../../../shared/features/api/models/APIErrorResponse";
 import { notExpectedFormatError } from "../../../constants/errorConstants";
 import { useNavigate } from "react-router-dom";
 import { errorPageRoute } from "../../../constants/routes";
+import { SuccessResAuthUserInfoSchema } from "../../../../../shared/features/auth/models/IAuthUserInfo";
 
 
 
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             const authLevelRes = response.data;
             const authLevelJSON = await authLevelRes.json();
-            const authLevelUserResult = ReceiveUserAuthContextInfoSchema.safeParse(authLevelJSON);
+            const authLevelUserResult = SuccessResAuthUserInfoSchema.safeParse(authLevelJSON);
 
             if (authLevelRes.status === 200 && authLevelUserResult.success) {
                 await setAuthLevel({
@@ -166,7 +166,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <AuthContext.Provider value={ctx}>
-            {children}
+            {
+                children
+            }
         </AuthContext.Provider>
     );
 }
