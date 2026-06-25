@@ -9,16 +9,20 @@
 
 
 :root {
+  --inactive-input-colour: light-dark(rgb(232, 240, 254), rgba(70, 90, 126, 0.4));
+
+  --background-colour: rgb(3, 3, 3);
+  
+  
+  --active-btn-colour: rgb(0, 166, 221);
+
+  --hover-btn-colour: rgba(182, 182, 182, 0.2);
+
+
+
+
   font-size: 62.5%;
 
-  --soft-light-colour: #e0e0e0;
-  --dark-container-colour: rgb(20, 20, 20);
-
-  --blue-selected-button-colour: rgb(0, 178, 190);
-  /* --dark-consistent-bg-header-colour: rgb(29, 29, 29); */
-
-  /* --blue-button-colour: rgb(0, 89, 255);
-  --hover-button-colour: rgb(0, 65, 185); */
 }
 
 *,

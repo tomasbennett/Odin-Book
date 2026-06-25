@@ -14,3 +14,13 @@ export const SOCKET_EVENT_POST_OR_REPLY_DELETED: string = "postdeletedeventsocke
 
 export const SOCKET_POST_CHANGE_ROOM_PREFIX: string = "postchangingsuchaslikeornewcomment";
 export const SOCKET_NEW_POST_OR_REPLY_ROOM_PREFIX: string = "newpostbeinguploadedSOthiswillbewhenyouareonacertainhomepagesomewhere";
+
+
+
+export const VALID_SORT_OPTIONS = [
+    "popular",
+    "newest",
+    "oldest"
+] as const;
+
+export const sortKeyWord: string = "sort";

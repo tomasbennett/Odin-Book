@@ -119,21 +119,19 @@ export function SignInLayout() {
             credentials: "include",
         }
 
-        if (submitUrl === "login") {
-            fetchBody.headers = {
-                "Content-Type": "application/json"
-            };
-            fetchBody.body = JSON.stringify(data);
-        }
+        fetchBody.headers = {
+            "Content-Type": "application/json"
+        };
+        fetchBody.body = JSON.stringify(data);
 
-        if (submitUrl === "register") {
-            fetchBody.body = formData;
-        }
 
         try {
             setIsLoading(true);
 
-            const response = await fetch(`${domain}/api/sign-in/${submitUrl}`, fetchBody);
+            const response = await fetch(
+                `${domain}/api/sign-in/${submitUrl}`,
+                fetchBody
+            );
 
             if (abortControllerRef.current.signal.aborted) {
                 console.log("Request was aborted, not processing response!!!");
@@ -221,20 +219,6 @@ export function SignInLayout() {
                             )
                         }
 
-
-                        <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
-
-                            <div className={styles.loginImgContainer}>
-                                <img
-                                    src={`${loginImg}`}
-                                    alt="Login Illustration"
-                                    className={`${styles.loginImg} ${screenWidthClassName}`}
-                                />
-                            </div>
-
-                        </div>
-
-
                         <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
                             {
                                 !isThinScreen && (
@@ -243,7 +227,9 @@ export function SignInLayout() {
                             }
 
                             <div className={`${styles.errorsContainer} ${screenWidthClassName}`}>
-
+                                {/* <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p>
+                                <p className={styles.errorMessage}>{`Lorem ipsum dolor sit amet consectetur adipisicing elit. In tempora laboriosam praesentium impedit magni, veniam necessitatibus repellat. Assumenda quasi unde dolor aspernatur officiis commodi, nesciunt architecto blanditiis sunt distinctio eius quisquam corrupti aliquam exercitationem cum at? Reprehenderit quidem, impedit optio obcaecati nostrum facilis repudiandae, omnis illum similique ipsam aliquid accusamus.`}</p>
+                                <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p> */}
                                 {
                                     errors.root && (
                                         <p className={styles.errorMessage}>{`Root error: ${errors.root.message}`}</p>
@@ -295,7 +281,10 @@ export function SignInLayout() {
 
                                             :
 
-                                            <button className={styles.submitButton} type="submit">
+                                            <button 
+                                                disabled={isLoading} 
+                                                className={styles.submitButton} 
+                                                type="submit">
                                                 Submit
                                             </button>
                                     }
@@ -324,6 +313,20 @@ export function SignInLayout() {
 
                             </div>
                         </div>
+
+                        <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
+
+                            {/* <div className={styles.loginImgContainer}>
+                                <img
+                                    src={`${loginImg}`}
+                                    alt="Login Illustration"
+                                    className={`${styles.loginImg} ${screenWidthClassName}`}
+                                />
+                            </div> */}
+
+                        </div>
+
+
 
 
                     </form>

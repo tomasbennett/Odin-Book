@@ -8,7 +8,9 @@
 
   overflow: hidden;
 
-  background-image: url("../assets/cube-night-sky.jpg");
+  /* background-image: url("../assets/cube-night-sky.jpg");
   background-repeat: repeat;
-  background-size: 180px;
+  background-size: 180px; */
+
+  background-color: var(--background-colour);
 }

@@ -1,20 +1,17 @@
+/* * {
+    outline: .1rem solid orange;
+} */
+
 .outerContainer{
     width: 100%;
     height: 100%;
 
     display: flex;
-    /* align-items: center;
-    justify-content: center; */
-
-    overflow-y: auto;
-
-    padding: 2rem;
+    justify-content: center;
 
 }
 
 .innerContainer {
-    
-    
 
     
 
@@ -23,41 +20,16 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 
     flex: 1 1 0;
-
     height: 100%;
 
-    display: flex;
+    max-width: 100rem;
 
-    margin: auto;
-
-    width: 94%;
-    max-width: 155rem;
-    min-height: 85rem;
-    /* min-height: calc(100% - 2rem); */
-    max-height: 90rem;
-
-    /* overflow-y: auto; */
-
-
-
-    background-color: var(--light-black-colour);
-
-
-    padding: var(--padding);
-
-    
-
-
-    border-radius: 3rem;
-
-    & *{
-        /* outline: .1rem orange solid; */
-    }
+    overflow: hidden;
 }
 
 
 .form {
-    flex: 1 1 0;
+    width: 100%;
     height: 100%;
 
     display: flex;
@@ -69,18 +41,8 @@
 }
 
 
-.form.thinScreen{
-    flex-direction: column;
-    row-gap: 2rem;
-
-    min-width: 0;
-}
-
 .imgContainer {
-    --img-container-padding: 4rem;
-    --padding: 0rem;
 
-    --img-max-width: 50rem;
 
     position: relative;
 
@@ -88,199 +50,44 @@
     flex: 1 1 0;
     height: 100%;
 
-    padding: var(--img-container-padding);
-    /* padding-left: calc(var(--img-container-padding) + var(--padding));
-    padding-top: calc(var(--img-container-padding) + var(--padding));
-    padding-bottom: calc(var(--img-container-padding) + var(--padding)); */
-
     display: flex;
     align-items: center;
     justify-content: center;
 
-    /* background-image: url("../../../assets/i-like-food.svg");
-    background-repeat: repeat;
-    background-size: 180px; */
+    backdrop-filter: blur(5px);
+    
+
+
 
     overflow: hidden;
 
-    /* img {
-        width: 100%;
-        height: auto;
+    /* border: .1rem solid orange; */
 
-        object-fit: contain;
-    } */
+    padding: 2rem;
+
+    background-image: url("../../../assets/cube-night-sky.jpg");
+    background-repeat: repeat;
+    
+    animation: moveBackgroundPosition 100s linear alternate-reverse;
+
+    border-right: .1rem solid var(--inactive-input-colour);
+    border-left: .1rem solid var(--inactive-input-colour);
 }
 
-.imgContainer.thinScreen {
-    --img-max-width: 17rem;
-
-    img {
-        /* max-width: 20rem; */
-        /* max-height: 20rem; */
+@keyframes moveBackgroundPosition {
+    from{
+        background-position: 0% 0%;
+    }
+    to {
+        background-position: 100% 100%;
     }
 }
 
 
-.uploadBtnContainer{
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    aspect-ratio: 1;
-
-    border-radius: 50%;
-
-    width: min(calc(100% - var(--img-container-padding) * 2), var(--img-max-width));
-
-    overflow: visible;
-}
-
-.uploadBtnContainer.thinScreen{
+.imgContainer.thinScreen {
+    --img-max-width: 17rem;
 
 }
-
-
-.signupImgContainer {
-
-    position: relative;
-    /* display: inline-block; container sizes to image */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    overflow: hidden;
-
-    
-
-    border-radius: 50%;
-
-    /* padding: var(--padding); */
-
-    width: min(100%, var(--img-max-width));
-    /* height: min(100%, 50rem); */
-
-    aspect-ratio: 1;
-
-    /* max-width: 50rem;
-    max-height: 50rem; */
-
-}
-
-.signupImgContainer.thinScreen{
-    /* max-width: 17rem;
-    max-height: 17rem; */
-
-    /* width: min(100%, var(--img-max-width)); */
-}
-
-
-.loginImgContainer{
-    position: relative;
-    /* display: inline-block; container sizes to image */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-
-    overflow: hidden;
-
-
-    
-
-    border-radius: .8rem;
-
-    padding: var(--padding);
-
-    max-height: 100%;
-    max-width: 100%;
-}
-
-
-.signupImg {
-    /* display: block; */
-    width: 100%;
-    height: 100%;
-
-    
-
-    object-fit: cover;
-}
-
-.signupImg.thinScreen {
-    
-}
-
-.loginImg{
-    display: block;
-    width: 100%;
-    height: 100%;
-
-    max-width: 50rem;
-    max-height: 50rem;
-
-    object-fit: cover;
-    /* border-radius: 50%; */
-}
-
-.loginImg.thinScreen{
-    max-width: 17rem;
-    max-height: 17rem;
-}
-
-
-.uploadBtn input {
-    display: none;
-}
-
-
-.uploadBtn {
-    position: absolute;
-    bottom: var(--padding);
-    right: var(--padding);
-
-    width: 8rem;
-    aspect-ratio: 1;
-
-    border-radius: 50%;
-    background: var(--dark-pink-btn-bcg);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 5rem;
-    font-weight: bold;
-    color: white;
-
-    cursor: pointer;
-
-    transition: transform 0.25s linear;
-}
-
-.uploadBtn.wideScreen{
-    width: 10rem;
-    font-size: 6rem;
-}
-
-.uploadBtn.thinScreen{
-    width: 6rem;
-    font-size: 3.5rem;
-}
-
-.uploadBtn:hover {
-    transform: scale(1.1);
-}
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -304,19 +111,18 @@
 
     row-gap: 1.6rem;
 
-    /* padding: var(--padding);
-    padding-left: 0; */
+    padding: 3rem 2rem;
 
 }
 
 
-.textInputsContainer.thinScreen{
+/* .textInputsContainer.thinScreen{
     flex-grow: 2;
     flex-shrink: 1;
     flex-basis: 0;
 
     width: min(100%, 50rem);
-}
+} */
 
 
 .title {
@@ -327,17 +133,17 @@
     justify-content: center;
     align-items: flex-end;
 
-    font-size: 2.8rem;
+    font-size: 4rem;
     font-weight: bold;
 }
 
-.title.thinScreen{
+/* .title.thinScreen{
     flex-shrink: 0;
     flex-grow: 0;
     flex-basis: auto;
 
 
-}
+} */
 
 .errorsContainer {
     width: 100%;
@@ -346,6 +152,7 @@
 
     display: flex;
     flex-direction: column;
+    row-gap: .5rem;
 
     overflow: auto;
 
@@ -355,13 +162,13 @@
         width: 100%;
         max-height: 10rem;
 
-        padding: 2rem 1rem;
+        /* padding: 2rem 0; */
 
-        background-color: var(--dark-transparent-red-error-bcg);
+        line-height: 1.5;
+        min-height: 1.5em;
 
-        border-radius: 1rem;
 
-        font-style: italic;
+        /* border-radius: 1rem; */
 
         overflow: auto;
 
@@ -369,15 +176,15 @@
 
 
 
-        color: var(--light-red-error-colour);
+        color: red;
 
-        margin-bottom: .5rem;
+        /* margin-bottom: .5rem; */
     }
 }
 
-.errorsContainer.thinScreen{
+/* .errorsContainer.thinScreen{
     min-height: 7.5rem;
-}
+} */
 
 .inputGroupContainer {
     width: 90%;
@@ -392,11 +199,11 @@
 
 }
 
-.inputGroupContainer.thinScreen {
+/* .inputGroupContainer.thinScreen {
     width: 100%;
     max-width: none;
     min-width: 0;    
-}
+} */
 
 .bottomContainer {
     width: 100%;
@@ -410,9 +217,9 @@
     row-gap: 1rem;
 }
 
-.bottomContainer.thinScreen {
+/* .bottomContainer.thinScreen {
     flex: 1 1 0;
-}
+} */
 
 
 
@@ -441,14 +248,21 @@
 
     border-radius: 3rem;
 
-    background-color: var(--dark-grey);
+    background-color: var(--inactive-input-colour);
 
+    color: black;
 
+    border: .2rem solid var(--inactive-input-colour);
+
+    transition: border .2s linear;
 }
 
 .inputGroup input::placeholder {
-    color: white;
     font-size: 1.4rem;
+}
+
+.inputGroup input:focus{
+    border: .2rem solid var(--active-btn-colour);
 }
 
 
@@ -469,9 +283,9 @@
 }
 
 
-.submitBtnContainer.thinScreen{
+/* .submitBtnContainer.thinScreen{
     margin-top: 0rem;
-}
+} */
 
 .submitButton {
     width: 100%;
@@ -489,7 +303,7 @@
 }
 
 .submitButton:hover {
-    background: rgb(0, 166, 221);
+    background: var(--active-btn-colour);
 }
 
 
@@ -519,5 +333,5 @@
 }
 
 .switchSignInParagraph a:hover {
-    color: rgb(0, 170, 226);
+    color: var(--active-btn-colour);
 }
