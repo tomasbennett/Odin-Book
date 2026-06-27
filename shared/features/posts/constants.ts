@@ -23,4 +23,4 @@ export const VALID_SORT_OPTIONS = [
     "oldest"
 ] as const;
 
-export const sortKeyWord: string = "sort";
+export const sortKeyWord = "sort" as const;

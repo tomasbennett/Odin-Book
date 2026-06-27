@@ -29,6 +29,15 @@ export const unknownError: ICustomErrorResponse = {
 }
 
 
+export const knownError: (err: Error) => ICustomErrorResponse = (err) => {
+    return {
+        ok: false,
+        status: 0,
+        message: err.message
+    }
+}
+
+
 export const noSocketConnectionError: ICustomErrorResponse = {
     ok: false,
     status: 0,

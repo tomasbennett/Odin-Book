@@ -19,7 +19,11 @@ router.get("/",
 
 
 
-
+            return res.status(500).json({
+                ok: false,
+                status: 500,
+                message: "TEST!!!"
+            })
 
 
 

@@ -2,19 +2,10 @@ import z from "zod";
 import { PostContentSchema } from "../../posts/models/IPostContent";
 import { APISuccessSchema } from "../../api/models/APISuccessResponse";
 import { PostSchema } from "../../posts/models/IPost";
+import { ProfileRepliesParentPostSchema } from "./IRepliesParentPost";
 
 
 
-export const ProfileRepliesParentPostSchema = z.object({
-    parentPostId: z.string(),
-    parentPostUserId: z.string(),
-    parentPostUsername: z.string(),
-    parentPostUserImgUrl: z.string().optional(),
-    parentPostTitle: z.string().optional()
-}).merge(PostContentSchema)
-
-
-export type IProfileRepliesParentPost = z.infer<typeof ProfileRepliesParentPostSchema>;
 
 
 //CAN WE SPECIFY THAT IT IS JUST A POST WITH A PARENTID RIGHT NOW BECAUSE WE CAN SHOW A REPLY WITHOUT ITS PARENT NECESSARILY

@@ -2,8 +2,7 @@ import z from "zod";
 import { PostContentSchema } from "./IPostContent";
 import { DateFromStringSchema } from "../../util/models/IDateFromStringSchema";
 import { NumberFromStringSchema } from "../../util/models/INumber";
-import { ProfileRepliesParentPostSchema } from "../../profiles/models/IProfileReplies";
-
+import { ProfileRepliesParentPostSchema } from "../../profiles/models/IRepliesParentPost";
 
 
 

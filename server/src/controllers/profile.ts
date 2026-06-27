@@ -5,7 +5,7 @@ import { prisma } from "../db/prisma";
 import { IProfileAPISuccess } from "../../../shared/features/profiles/models/IProfileAPI";
 import { IProfileHeader } from "../../../shared/features/profiles/models/IProfileHeader";
 import { IProfilePosts } from "../../../shared/features/profiles/models/IProfilePosts";
-import { IProfileReplies, IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IProfileReplies";
+import { IProfileReplies } from "../../../shared/features/profiles/models/IProfileReplies";
 import { IProfileComments } from "../../../shared/features/profiles/models/IProfileComments";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
@@ -22,6 +22,7 @@ import { IUserImgIds } from "../models/IUserImgIds";
 import { Prisma } from "@prisma/client";
 import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { io } from "../app";
+import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 
 
 

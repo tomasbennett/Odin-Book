@@ -3,9 +3,10 @@ import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { prisma } from "../db/prisma";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
-import { IProfileReplies, IProfileRepliesAPI, IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IProfileReplies";
+import { IProfileReplies, IProfileRepliesAPI } from "../../../shared/features/profiles/models/IProfileReplies";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
+import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 
 export const router = Router();
 

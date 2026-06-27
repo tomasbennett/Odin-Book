@@ -64,7 +64,7 @@
 
     to {
         opacity: 1;
-        right: 20px;
+        right: 25px;
     }
 
 }
@@ -72,7 +72,7 @@
 @keyframes exitScreenToRight {
     from {
         opacity: 1;
-        right: 20px;
+        right: 25px;
     }
 
     to {

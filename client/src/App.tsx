@@ -8,6 +8,7 @@ import { ErrorPageLayout } from './features/error/layouts/ErrorLayout'
 import { AuthProvider } from './features/auth/contexts/AuthContext'
 import { ErrorProvider } from './features/error/contexts/ErrorContext'
 import { SocketProvider } from './contexts/SocketHandlerContext'
+import { HomeApp } from './features/home/app'
 
 
 const router = createBrowserRouter([
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <h1>Home Page!!!</h1>
+            element: <HomeApp />
           }
         ]
       }

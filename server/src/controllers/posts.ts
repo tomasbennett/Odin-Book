@@ -28,7 +28,7 @@ import { ISuccessUploadLikePost } from "../../../shared/features/likes/models/IS
 import { ISendLikePost } from "../../../shared/features/likes/models/ISendLikePost";
 import { SOCKET_LIKE_POST_EVENT, SOCKET_UNLIKE_POST_EVENT } from "../../../shared/features/likes/constants";
 import { ILikePostAPISuccess } from "../../../shared/features/likes/models/ILikePostAPISuccess";
-import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IProfileReplies";
+import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 
 
 export const router = Router();
