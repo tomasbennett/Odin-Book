@@ -139,7 +139,7 @@ export function useHomeFetch() {
     ]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
-    const limit: number = 10;
+    const limit: number = 20;
     const [offset, setOffset] = useState<number>(0);
     const hasMorePosts = useRef<boolean>(true);
 
@@ -261,7 +261,7 @@ export function useHomeFetch() {
 
     useEffect(() => {
         console.log(`This is designed to show the latest isLoading value: ${isLoading}`);
-    }, [isLoading])
+    }, [isLoading]);
 
 
     //SO WHY THIS CURRENTLY DOESN'T WORK IS BECAUSE THE FUNCTION NEEDS TO BE REATTACHED TO THE EVENT LISTENER EVERY TIME ISLOADING OR OFFSET CHANGES GIVEN THAT THEY ARE VARIABLE!!!

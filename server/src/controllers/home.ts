@@ -44,7 +44,8 @@ router.get("/",
                     postsOrderBy = {
                         likes: {
                             _count: "desc"
-                        }
+                        },
+                        createdAt: "desc"
                     };
                     break;
 
