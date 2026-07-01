@@ -30,11 +30,11 @@ export function SortDialogBox({
                         return (
                             <div key={sortOption} className={`${styles.sortOption} ${isActiveSortOption ? styles.active : styles.inactive}`}>
 
-                                <div className={styles.svgContainer}>
+                                {/* <div className={styles.svgContainer}>
                                     {
                                         sortOptionsClient[sortOption]
                                     }
-                                </div>
+                                </div> */}
 
                                 <p className={styles.text}>
                                     {
