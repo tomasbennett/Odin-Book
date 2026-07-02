@@ -3,11 +3,14 @@ import { RefObject, useEffect } from "react"
 export function useScrollToBottomContainer(
     element: RefObject<HTMLElement | null>,
     distanceFromBottomPxl: number,
-    functionality: () => Promise<void> | void
+    functionality: () => Promise<void> | void,
+    enabled: boolean = true
 ) {
 
     useEffect(() => {
         console.log("useScrollToBottomContainer useEffect hook running attaching an event listener!!!");
+
+        if (!enabled) return;
 
         const container = element.current;
         if (!container) return;
@@ -33,6 +36,6 @@ export function useScrollToBottomContainer(
             console.log("THE REMOVAL OF AN EVENT LISTENER!!!");
         };
 
-    }, [element, functionality]);
+    }, [enabled, functionality]);
 
 }

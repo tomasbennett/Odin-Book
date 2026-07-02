@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { IPost } from "../../../../../shared/features/posts/models/IPost";
 import styles from "./Post.module.css";
-import { RepostIcon } from "../../../assets/icons/Reposticon";
+import { RepostIcon } from "../../../assets/icons/RepostIcon";
 import { formatSentAtDate } from "../../../util/FormatDateMessage";
 import { allowedImgTypes, allowedTextFileTypes } from "../../../../../shared/features/files/constants";
 import { TextFileElement } from "../../../components/TextFileElement";
