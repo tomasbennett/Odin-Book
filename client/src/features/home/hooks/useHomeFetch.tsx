@@ -72,7 +72,8 @@ export function useHomeFetch() {
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
             userProfileImgUrl: undefined,
             parentPost: undefined,
-            fileDetails: undefined
+            fileDetails: undefined,
+            haveYouLiked: false
         },
         {
             id: "2",
@@ -86,6 +87,7 @@ export function useHomeFetch() {
             content: "Yo",
             userProfileImgUrl: githubProfileImg,
             parentPost: undefined,
+            haveYouLiked: true,
             fileDetails: [
                 {
                     id: "1",
@@ -125,6 +127,7 @@ export function useHomeFetch() {
             content: undefined,
             userProfileImgUrl: undefined,
             parentPost: undefined,
+            haveYouLiked: true,
             fileDetails: [
                 {
                     id: "1",

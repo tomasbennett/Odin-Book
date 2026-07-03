@@ -2,6 +2,7 @@ import z from "zod";
 import { CommentContentSchema } from "./ICommentContent";
 import { DateFromStringSchema } from "../../util/models/IDateFromStringSchema";
 import { NumberFromStringSchema } from "../../util/models/INumber";
+import { LikeableObjectSchema } from "../../likes/models/ILikeableObject";
 
 
 
@@ -15,7 +16,10 @@ export const CommentSchema = z.object({
     parentCommentId: z.string().optional(),
     likeCount: NumberFromStringSchema,
     commentCount: NumberFromStringSchema,
-}).merge(CommentContentSchema);
+    // haveYouLiked: z.boolean(),
+})
+.merge(CommentContentSchema)
+.merge(LikeableObjectSchema);
 
 
 

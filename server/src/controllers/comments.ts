@@ -88,6 +88,9 @@ router.get("/:userId",
             usersComments.map(async (comment) => {
                 const post = comment.post;
                 const postUser = post.user;
+                const likes = comment.likes;
+
+                const hasUserLiked = likes.some((like) => like.userId === user.userId);
 
 
                 let imgOrGifDetails: IFileDetails | undefined;
@@ -164,14 +167,15 @@ router.get("/:userId",
                     userProfileImgUrl: userProfileImgUrl,
                     createdAt: comment.createdAt,
                     parentCommentId: comment.parentCommentId || undefined,
-                    likeCount: comment.likes.length,
+                    likeCount: likes.length,
                     text: comment.textContent || undefined,
                     imgOrGifDetails: imgOrGifDetails,
                     postUsername: postUser.username,
                     postTitle: post.title || undefined,
                     postUserId: postUser.id,
                     postUserProfileImageUrl: postUserProfileImageUrl,
-                    commentCount: comment.replies.length
+                    commentCount: comment.replies.length,
+                    haveYouLiked: hasUserLiked
                 };
             })
         );
@@ -287,7 +291,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     likeCount: reply.likes.length,
                     text: reply.textContent || undefined,
                     [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                    commentCount: reply.replies.length
+                    commentCount: reply.replies.length,
+                    haveYouLiked: reply.likes.some((like) => like.userId === user.userId),
                 }
             })
         );
@@ -308,7 +313,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                     likeCount: parentComment.likes.length,
                     text: parentComment.textContent || undefined,
                     [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                    commentCount: parentComment.replies.length
+                    commentCount: parentComment.replies.length,
+                    haveYouLiked: parentComment.likes.some((like) => like.userId === user.userId),
                 }
             })
         );
@@ -327,7 +333,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                 likeCount: comment.likes.length,
                 text: comment.textContent || undefined,
                 [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                commentCount: comment.replies.length
+                commentCount: comment.replies.length,
+                haveYouLiked: comment.likes.some((like) => like.userId === user.userId),
             };
 
             return commentAPI;
@@ -403,7 +410,8 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                 userProfileImgUrl: userProfileImgUrl,
                 fileDetails: fileDetails,
                 commentCount: post.comments.length,
-                repliesCount: post.replies.length
+                repliesCount: post.replies.length,
+                haveYouLiked: post.likes.some((like) => like.userId === user.userId),
             };
 
             return postAPI;
@@ -535,7 +543,8 @@ router.post("/",
                 likeCount: 0,
                 text: uploadedComment.textContent || undefined,
                 [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                commentCount: 0
+                commentCount: 0,
+                haveYouLiked: false
             };
 
 

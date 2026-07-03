@@ -233,7 +233,8 @@ router.get("/:userId",
                             commentCount: post.comments.length,
                             repliesCount: post.replies.length,
                             title: post.title || undefined,
-                            content: post.textContent || undefined
+                            content: post.textContent || undefined,
+                            haveYouLiked: post.likes.some(like => like.userId === user.userId),
                         }
 
 
@@ -282,7 +283,8 @@ router.get("/:userId",
                                 repliesCount: reply.replies.length,
                                 title: reply.title || undefined,
                                 content: reply.textContent || undefined,
-                                fileDetails: replyFileDetails
+                                fileDetails: replyFileDetails,
+                                haveYouLiked: reply.likes.some(like => like.userId === user.userId),
                             }
 
                             return profileReply;
@@ -395,7 +397,8 @@ router.get("/:userId",
                             postTitle: post.title || undefined,
                             postUserId: postUser.id,
                             postUserProfileImageUrl: postUserProfileImageUrl,
-                            commentCount: comment.replies.length
+                            commentCount: comment.replies.length,
+                            haveYouLiked: comment.likes.some(like => like.userId === user.userId)
                         };
                     })
                 );

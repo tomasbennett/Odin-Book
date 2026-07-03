@@ -96,6 +96,7 @@ router.get("/",
                     userProfileImgUrl: userProfileImgUrl,
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
+                    haveYouLiked: post.likes.some(like => like.userId === user.userId),
                 }
 
             }));

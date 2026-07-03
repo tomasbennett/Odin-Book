@@ -1,6 +1,4 @@
-export function ThumbsUpIcon() {
-
-
+export function SolidThumbsUpIcon() {
 
     return (
         <>

@@ -5,11 +5,18 @@ import { RepostIcon } from "../../../assets/icons/RepostIcon";
 import { formatSentAtDate } from "../../../util/FormatDateMessage";
 import { allowedImgTypes, allowedTextFileTypes } from "../../../../../shared/features/files/constants";
 import { TextFileElement } from "../../../components/TextFileElement";
-import { CommentIcon } from "../../../assets/icons/CommentIcon";
-import { RepliesIcon } from "../../../assets/icons/RepliesIcon";
-import { ThumbsUpIcon } from "../../../assets/icons/ThumbsUpIcon";
+import { SolidThumbsUpIcon } from "../../../assets/icons/SolidThumbsUpIcon";
+import { HollowThumbsUpIcon } from "../../../assets/icons/HollowThumbsUpIcon";
+import { HollowRepliesIcon } from "../../../assets/icons/HollowRepliesIcon";
+import { HollowCommentIcon } from "../../../assets/icons/HollowCommentIcon";
+import { Like } from "../../likes/components/Like";
+import { domain } from "../../../constants/EnvironmentAPI";
+import { ILikeableObject } from "../../../../../shared/features/likes/models/ILikeableObject";
 
 
+type IPostProps = {
+    setLikesCount: React.Dispatch<React.SetStateAction<ILikeableObject>>;
+} & IPost;
 
 
 export function Post({
@@ -24,8 +31,10 @@ export function Post({
     title,
     parentPost,
     content,
-    fileDetails
-}: IPost) {
+    fileDetails,
+    haveYouLiked,
+    setLikesCount
+}: IPostProps) {
 
     const nav = useNavigate();
 
@@ -52,6 +61,8 @@ export function Post({
         nav(`/profile/${userId}`, { replace: true });
     }
 
+
+    const likeFetchUrl = `${domain}/api/posts/${id}/like`;
 
 
     return (
@@ -153,27 +164,34 @@ export function Post({
 
 
                     <div className={styles.lowerBtnsContainer}>
-                        <div className={styles.commentContainer}>
-                            <div className={styles.btnSVGContainer}>
-                                <CommentIcon />
-                            </div>
-                            <p className={styles.commentCount}>{commentCount}</p>
-                        </div>
 
                         <div className={styles.likesContainer}>
-                            <div className={styles.btnSVGContainer}>
-                                <ThumbsUpIcon />
-                            </div>
-                            <p className={styles.likeCount}>{likeCount}</p>
+
+                            <Like 
+                                likeCount={likeCount}
+                                likeFetchUrl={likeFetchUrl}
+                                hasLiked={haveYouLiked}
+                                setLikeCount={setLikesCount} />
+
                         </div>
 
                         <div className={styles.repliesContainer}>
+
                             <div className={styles.btnSVGContainer}>
-                                <RepliesIcon />
+                                <HollowRepliesIcon />
                             </div>
                             <p className={styles.repliesCount}>{repliesCount}</p>
+
                         </div>
 
+                        <div className={styles.commentContainer}>
+
+                            <div className={styles.btnSVGContainer}>
+                                <HollowCommentIcon />
+                            </div>
+                            <p className={styles.commentCount}>{commentCount}</p>
+
+                        </div>
 
                     </div>
 

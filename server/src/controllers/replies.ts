@@ -98,7 +98,8 @@ router.get("/:userId",
                             repliesCount: reply.replies.length,
                             title: reply.title || undefined,
                             content: reply.textContent || undefined,
-                            fileDetails: replyFileDetails
+                            fileDetails: replyFileDetails,
+                            haveYouLiked: reply.likes.some(like => like.userId === user.userId),
                         }
 
                         return profileReply;

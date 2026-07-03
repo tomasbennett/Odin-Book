@@ -90,6 +90,7 @@ router.get("/:userId",
                     userProfileImgUrl: userProfileImgUrl,
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
+                    haveYouLiked: post.likes.some(like => like.userId === user.userId),
                 }
 
             }));
@@ -194,7 +195,8 @@ router.get("/:postId/comments",
                     commentCount: postDb.comments.length,
                     repliesCount: postDb.replies.length,
                     title: postDb.title || undefined,
-                    content: postDb.textContent || undefined
+                    content: postDb.textContent || undefined,
+                    haveYouLiked: postDb.likes.some(like => like.userId === user.userId)
                 };
 
                 return postsApi;
@@ -219,7 +221,8 @@ router.get("/:postId/comments",
                             likeCount: comment.likes.length,
                             commentCount: comment.replies.length,
                             text: comment.textContent || undefined,
-                            parentCommentId: undefined
+                            parentCommentId: undefined,
+                            haveYouLiked: comment.likes.some(like => like.userId === user.userId)
                         }
                     })
                 );
@@ -394,6 +397,7 @@ router.post("/",
                     content: newPost.textContent || undefined,
                     userProfileImgUrl: userProfileImgUrl,
                     fileDetails: fileDetails,
+                    haveYouLiked: false
                 }
 
 

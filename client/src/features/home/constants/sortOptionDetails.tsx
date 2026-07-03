@@ -1,6 +1,6 @@
 import { HourGlassIcon } from "../../../assets/icons/HourGlassIcon";
 import { NewestIcon } from "../../../assets/icons/NewestIcon";
-import { ThumbsUpIcon } from "../../../assets/icons/ThumbsUpIcon";
+import { ThumbsUpIcon } from "../../../assets/icons/HollowThumbsUpIcon";
 import { ISortOptionsWSVG } from "../models/ISortOptionsWSVG";
 
 export const sortOptionsClient: ISortOptionsWSVG = {
