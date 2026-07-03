@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { IPost } from "../../../../../shared/features/posts/models/IPost";
 import styles from "./Post.module.css";
 import { RepostIcon } from "../../../assets/icons/RepostIcon";
@@ -12,10 +12,11 @@ import { HollowCommentIcon } from "../../../assets/icons/HollowCommentIcon";
 import { Like } from "../../likes/components/Like";
 import { domain } from "../../../constants/EnvironmentAPI";
 import { ILikeableObject } from "../../../../../shared/features/likes/models/ILikeableObject";
+import { useAuth } from "../../auth/contexts/AuthContext";
 
 
 type IPostProps = {
-    setLikesCount: React.Dispatch<React.SetStateAction<ILikeableObject>>;
+    setLikesCount: React.Dispatch<React.SetStateAction<IPost[]>>;
 } & IPost;
 
 
@@ -63,6 +64,12 @@ export function Post({
 
 
     const likeFetchUrl = `${domain}/api/posts/${id}/like`;
+
+    const { authLevel } = useAuth();
+
+    if (authLevel.userType !== "user") {
+        return <Navigate to="/" replace={true} />
+    }
 
 
     return (
@@ -170,8 +177,9 @@ export function Post({
                             <Like 
                                 likeCount={likeCount}
                                 likeFetchUrl={likeFetchUrl}
-                                hasLiked={haveYouLiked}
-                                setLikeCount={setLikesCount} />
+                                haveYouLiked={haveYouLiked}
+                                setLikeCount={setLikesCount}
+                                userId={authLevel.userId} />
 
                         </div>
 

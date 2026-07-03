@@ -314,8 +314,10 @@ export function useHomeFetch() {
     return {
         isLoading,
         posts,
+        setPosts,
         sort,
-        postsContainerRef
+        postsContainerRef,
+        
     }
 
 

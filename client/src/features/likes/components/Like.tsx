@@ -1,19 +1,23 @@
+import { ILikeableObject } from "../../../../../shared/features/likes/models/ILikeableObject";
 import { HollowThumbsUpIcon } from "../../../assets/icons/HollowThumbsUpIcon";
 import { SolidThumbsUpIcon } from "../../../assets/icons/SolidThumbsUpIcon";
 import styles from "./Like.module.css";
 
-type ILikeProps = {
+type ILikeProps<T extends ILikeableObject> = {
     likeFetchUrl: string;
-    hasLiked: boolean;
-    likeCount: number;
-}
+    // hasLiked: boolean;
+    // likeCount: number;
+    setLikeCount: React.Dispatch<React.SetStateAction<T[]>>;
+} & ILikeableObject;
 
 
-export function Like({
+export function Like<T extends ILikeableObject>({
     likeFetchUrl,
-    hasLiked: haveYouLiked,
-    likeCount
-}: ILikeProps) {
+    haveYouLiked,
+    setLikeCount,
+    likeCount,
+    userId
+}: ILikeProps<T>) {
 
 
 

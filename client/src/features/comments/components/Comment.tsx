@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { COMMENT_IMG_GIF_KEY } from '../../../../../shared/features/comments/constants';
 import { IComment } from '../../../../../shared/features/comments/models/IComment';
 import { formatSentAtDate } from '../../../util/FormatDateMessage';
@@ -14,11 +14,12 @@ import { HollowCommentIcon } from '../../../assets/icons/HollowCommentIcon';
 import { Like } from '../../likes/components/Like';
 import { domain } from '../../../constants/EnvironmentAPI';
 import { ILikeableObject } from '../../../../../shared/features/likes/models/ILikeableObject';
+import { useAuth } from '../../auth/contexts/AuthContext';
 
 
 
 type ICommentProps = {
-    setLikeCount: React.Dispatch<React.SetStateAction<ILikeableObject>>;
+    setLikeCount: React.Dispatch<React.SetStateAction<IComment[]>>;
 } & IComment;
 
 
@@ -80,6 +81,12 @@ export function Comment({
 
     const likeFetchUrl = `${domain}/api/comments/${id}/like`;
 
+    const { authLevel } = useAuth();
+
+    if (authLevel.userType !== "user") {
+        return <Navigate to="/" replace={true} />
+    }
+
 
     return (
         <>
@@ -125,9 +132,10 @@ export function Comment({
                         <div className={styles.likeContainer}>
                             <Like 
                                 likeCount={likeCount}
-                                hasLiked={haveYouLiked}
+                                haveYouLiked={haveYouLiked}
                                 likeFetchUrl={likeFetchUrl}
-                                setLikeCount={setLikeCount} />
+                                setLikeCount={setLikeCount}
+                                userId={authLevel.userId} />
                         </div>
 
 
