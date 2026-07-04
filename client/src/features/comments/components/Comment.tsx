@@ -40,40 +40,7 @@ export function Comment({
 }: ICommentProps) {
 
     const nav = useNavigate();
-    const errCtx = useError();
-    const { jwtFetchHandler } = useJWTFetch();
 
-    const onClickLike = async () => {
-
-        if (!errCtx) {
-            nav(errorPageRoute, {
-                state: {
-                    error: noErrorCtxError
-                }
-            });
-            return;
-        }
-
-
-        try {
-
-
-
-
-
-        } catch (error: unknown) {
-
-            if (error instanceof Error) {
-                errCtx.throwError(knownError(error));
-                return;
-
-            }
-
-            errCtx.throwError(unknownError);
-            return;
-
-        }
-    }
 
     const onClickComments = () => {
         nav(`posts/${postId}/comments/${id}`, { replace: true });
@@ -131,6 +98,7 @@ export function Comment({
 
                         <div className={styles.likeContainer}>
                             <Like 
+                                id={id}
                                 likeCount={likeCount}
                                 haveYouLiked={haveYouLiked}
                                 likeFetchUrl={likeFetchUrl}

@@ -39,10 +39,6 @@ export function Post({
 
     const nav = useNavigate();
 
-    const onLike = async () => {
-
-    }
-
     const onClickComment = () => {
 
     }
@@ -175,6 +171,7 @@ export function Post({
                         <div className={styles.likesContainer}>
 
                             <Like 
+                                id={id}
                                 likeCount={likeCount}
                                 likeFetchUrl={likeFetchUrl}
                                 haveYouLiked={haveYouLiked}

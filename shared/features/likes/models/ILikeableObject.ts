@@ -3,6 +3,7 @@ import { NumberFromStringSchema } from "../../util/models/INumber";
 
 
 export const LikeableObjectSchema = z.object({
+    id: z.string(),
     userId: z.string(),
     likeCount: NumberFromStringSchema,
     haveYouLiked: z.boolean(),
