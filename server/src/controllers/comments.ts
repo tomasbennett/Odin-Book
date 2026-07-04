@@ -26,12 +26,12 @@ import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/mode
 import { ISendLikeComment } from "../../../shared/features/likes/models/ISendLikeComment";
 import { Prisma } from "@prisma/client";
 import { SOCKET_LIKE_COMMENT_EVENT as SOCKET_LIKE_EVENT, SOCKET_UNLIKE_COMMENT_EVENT as SOCKET_UNLIKE_EVENT } from "../../../shared/features/likes/constants";
-import { ISuccessUploadLikeComment } from "../../../shared/features/likes/models/ISuccessUploadLikeComment";
-import { ILikeCommentAPISuccess } from "../../../shared/features/likes/models/ILikeCommentAPISuccess";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 import { ISocketSchema } from "../../../shared/features/socket/models/ISocketSchema";
 import { GetUsersSockets } from "../sockets/GetUsersSockets";
 import { Socket } from "socket.io";
+import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPISuccess";
+import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
 
 
 export const router = Router();
@@ -640,7 +640,7 @@ router.delete("/:commentId",
 
 router.post("/:commentId/like",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeCommentAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;
@@ -683,8 +683,8 @@ router.post("/:commentId/like",
             //MIGHT NEED TO JUST HAVE IT FOR THE POST IF WE ARE IN THE COMMENTS SECTION BUT THIS WILL LOOK FOR AN UPDATE ON COMMENTS THAT MIGHT NOT EVEN BE ON SCREEN
             //BECAUSE IT WILL CALL TO THAT EVENT FOR LIKES ON COMMENTS THAT AREN'T PART OF THAT COMMENTS THREAD!!!
 
-            const likeEventPayload: ISuccessUploadLikeComment = {
-                commentId: commentId
+            const likeEventPayload: ISuccessUploadLike = {
+                id: commentId
             };
 
             io
@@ -697,7 +697,7 @@ router.post("/:commentId/like",
                 ok: true,
                 status: 201,
                 message: "Comment liked successfully!!!",
-                commentId: commentId
+                ...likeEventPayload
             });
 
 
@@ -721,7 +721,7 @@ router.post("/:commentId/like",
 
 router.patch("/:commentId/unlike",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeCommentAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;
@@ -766,8 +766,8 @@ router.patch("/:commentId/unlike",
             //MIGHT NEED TO JUST HAVE IT FOR THE POST IF WE ARE IN THE COMMENTS SECTION BUT THIS WILL LOOK FOR AN UPDATE ON COMMENTS THAT MIGHT NOT EVEN BE ON SCREEN
             //BECAUSE IT WILL CALL TO THAT EVENT FOR LIKES ON COMMENTS THAT AREN'T PART OF THAT COMMENTS THREAD!!!
 
-            const likeEventPayload: ISuccessUploadLikeComment = {
-                commentId: commentId
+            const likeEventPayload: ISuccessUploadLike = {
+                id: commentId
             };
 
             io
@@ -780,7 +780,7 @@ router.patch("/:commentId/unlike",
                 ok: true,
                 status: 201,
                 message: "Like removed from comment successfully!!!",
-                commentId: commentId
+                ...likeEventPayload
             });
 
 

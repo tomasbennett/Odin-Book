@@ -24,11 +24,13 @@ import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { IDeletePost } from "../../../shared/features/posts/models/IDeletePost";
 import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 import { IDeletePostSuccessAPI } from "../../../shared/features/posts/models/IDeletePostSuccessAPI";
-import { ISuccessUploadLikePost } from "../../../shared/features/likes/models/ISuccessUploadLikePost";
+
 import { ISendLikePost } from "../../../shared/features/likes/models/ISendLikePost";
 import { SOCKET_LIKE_POST_EVENT, SOCKET_UNLIKE_POST_EVENT } from "../../../shared/features/likes/constants";
-import { ILikePostAPISuccess } from "../../../shared/features/likes/models/ILikePostAPISuccess";
+
 import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
+import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPISuccess";
+import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
 
 
 export const router = Router();
@@ -525,7 +527,7 @@ router.delete("/:postId",
 
 router.post("/:postId/like",
     ensureJWTAuthentication,
-    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikePostAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { postId } = req.params;
         const { senderSocketId } = req.body;
@@ -561,8 +563,8 @@ router.post("/:postId/like",
             });
 
 
-            const successResponse: ISuccessUploadLikePost = {
-                postId: postId
+            const successResponse: ISuccessUploadLike = {
+                id: postId
             }
 
             io
@@ -576,7 +578,7 @@ router.post("/:postId/like",
                 ok: true,
                 status: 201,
                 message: "Successfully liked post!!!",
-                postId
+                ...successResponse
             });
 
 
@@ -601,7 +603,7 @@ router.post("/:postId/like",
     
 router.patch("/:postId/unlike",
     ensureJWTAuthentication,
-    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikePostAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ postId: string }, {}, ISendLikePost>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { postId } = req.params;
         const { senderSocketId } = req.body;
@@ -637,8 +639,8 @@ router.patch("/:postId/unlike",
             });
 
 
-            const successResponse: ISuccessUploadLikePost = {
-                postId: postId
+            const successResponse: ISuccessUploadLike = {
+                id: postId
             }
 
             io
@@ -652,7 +654,7 @@ router.patch("/:postId/unlike",
                 ok: true,
                 status: 201,
                 message: "Successfully removed like from post!!!",
-                postId
+                ...successResponse
             });
 
 
