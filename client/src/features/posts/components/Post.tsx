@@ -176,7 +176,8 @@ export function Post({
                                 likeFetchUrl={likeFetchUrl}
                                 haveYouLiked={haveYouLiked}
                                 setLikeCount={setLikesCount}
-                                userId={authLevel.userId} />
+                                // userId={authLevel.userId} 
+                                />
 
                         </div>
 

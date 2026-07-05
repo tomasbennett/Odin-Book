@@ -103,7 +103,8 @@ export function Comment({
                                 haveYouLiked={haveYouLiked}
                                 likeFetchUrl={likeFetchUrl}
                                 setLikeCount={setLikeCount}
-                                userId={authLevel.userId} />
+                                // userId={authLevel.userId} 
+                                />
                         </div>
 
 

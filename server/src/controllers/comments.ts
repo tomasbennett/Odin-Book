@@ -23,7 +23,6 @@ import { io } from "../app";
 import { SOCKET_COMMENT_POST_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/commentsThread/constants";
 import { IDeleteComment } from "../../../shared/features/comments/models/IDeleteComment";
 import { IDeleteCommentSuccessAPI } from "../../../shared/features/comments/models/IDeleteCommentSuccessAPI";
-import { ISendLikeComment } from "../../../shared/features/likes/models/ISendLikeComment";
 import { Prisma } from "@prisma/client";
 import { SOCKET_LIKE_COMMENT_EVENT as SOCKET_LIKE_EVENT, SOCKET_UNLIKE_COMMENT_EVENT as SOCKET_UNLIKE_EVENT } from "../../../shared/features/likes/constants";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
@@ -32,6 +31,7 @@ import { GetUsersSockets } from "../sockets/GetUsersSockets";
 import { Socket } from "socket.io";
 import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPISuccess";
 import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
+import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
 
 
 export const router = Router();
@@ -640,7 +640,7 @@ router.delete("/:commentId",
 
 router.post("/:commentId/like",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLike>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;
@@ -721,7 +721,7 @@ router.post("/:commentId/like",
 
 router.patch("/:commentId/unlike",
     ensureJWTAuthentication,
-    async (req: Request<{ commentId: string }, {}, ISendLikeComment>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
+    async (req: Request<{ commentId: string }, {}, ISendLike>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {
         const user = req.user!;
         const { commentId } = req.params;
         const { senderSocketId } = req.body;
