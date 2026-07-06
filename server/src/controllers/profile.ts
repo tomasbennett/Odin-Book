@@ -23,6 +23,7 @@ import { Prisma } from "@prisma/client";
 import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { io } from "../app";
 import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
+import { defaultProfileCommentsLimit, defaultProfilePostsLimit, defaultProfileRepliesLimit } from "../../../shared/features/profiles/constants";
 
 
 
@@ -38,9 +39,9 @@ router.get("/:userId",
         const user = req.user!;
         const { userId } = req.params;
 
-        const limitPost: number = 10;
-        const limitReplies: number = 10;
-        const limitComments: number = 20;
+        // const limitPost: number = 10;
+        // const limitReplies: number = 10;
+        // const limitComments: number = 20;
 
 
 
@@ -61,7 +62,7 @@ router.get("/:userId",
                         userId: userId,
                         parentPostId: null
                     },
-                    take: limitPost,
+                    take: defaultProfilePostsLimit,
                     orderBy: {
                         createdAt: "desc"
                     },
@@ -84,7 +85,7 @@ router.get("/:userId",
                             parentPostId: null
                         }
                     },
-                    take: limitReplies,
+                    take: defaultProfileRepliesLimit,
                     orderBy: {
                         createdAt: "desc"
                     },
@@ -114,7 +115,7 @@ router.get("/:userId",
                     where: {
                         userId: userId
                     },
-                    take: limitComments,
+                    take: defaultProfileCommentsLimit,
                     orderBy: {
                         createdAt: "desc"
                     },
