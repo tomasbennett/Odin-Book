@@ -56,7 +56,7 @@ export function useProfileInfoFetch() {
         }
 
         nav(
-            `/profile/${userId}?${profileStateQueryKey}=${profileDefaultStateQueryValue}`,
+            `/profile/${userId}?${profileStateQueryKey}=${profileDefaultStateQueryValue.toLowerCase()}`,
             { replace: true }
         );
     }, [parsed.success, userId, nav]);
