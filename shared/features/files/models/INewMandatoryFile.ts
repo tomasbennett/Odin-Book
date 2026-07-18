@@ -1,10 +1,49 @@
 import z from "zod";
 // import { allowedAllFileTypes as allowedTypes, maxFileSizeInBytes } from "../constants";
 
+// export function FileSingleSchema(allowedFileTypes: string[], maxFileSizeInBytes: number) {
+//     return z.custom<FileList | undefined>()
+//         .superRefine((files, ctx) => {
+//             if (!files || !(files instanceof FileList)) {
+//                 ctx.addIssue({
+//                     code: z.ZodIssueCode.custom,
+//                     message: "File is required",
+//                 });
+//                 return;
+//             }
+
+//             if (files.length !== 1) {
+//                 ctx.addIssue({
+//                     code: z.ZodIssueCode.custom,
+//                     message: "Exactly one file must be uploaded.",
+//                 });
+//                 return;
+//             }
+
+//             const file = files.item(0)!;
+
+//             if (file.size > maxFileSizeInBytes) {
+//                 ctx.addIssue({
+//                     code: z.ZodIssueCode.custom,
+//                     message: `File size must be less than ${maxFileSizeInBytes / 1024 / 1024
+//                         } MB`,
+//                 });
+//             }
+
+//             if (!allowedFileTypes.includes(file.type)) {
+//                 ctx.addIssue({
+//                     code: z.ZodIssueCode.custom,
+//                     message: "File type is not allowed.",
+//                 });
+//             }
+//         });
+// }
+
+
 export function FileSingleSchema(allowedFileTypes: string[], maxFileSizeInBytes: number) {
-    return z.custom<FileList | undefined>()
+    return z.custom<File | undefined>()
         .superRefine((files, ctx) => {
-            if (!files || !(files instanceof FileList)) {
+            if (!files || !(files instanceof File)) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "File is required",
@@ -12,15 +51,8 @@ export function FileSingleSchema(allowedFileTypes: string[], maxFileSizeInBytes:
                 return;
             }
 
-            if (files.length !== 1) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "Exactly one file must be uploaded.",
-                });
-                return;
-            }
 
-            const file = files.item(0)!;
+            const file = files;
 
             if (file.size > maxFileSizeInBytes) {
                 ctx.addIssue({

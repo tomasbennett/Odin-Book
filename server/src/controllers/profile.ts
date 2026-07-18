@@ -455,6 +455,10 @@ router.patch("/",
 
         try {
 
+            
+
+
+
             const files = req.files as {
                 [PATCH_USER_PROFILE_IMG_KEY]: Express.Multer.File[] | undefined;
                 [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]: Express.Multer.File[] | undefined;
@@ -652,8 +656,8 @@ router.patch("/",
 
 
             const successfulPatchResult: IPatchUserProfile = {
-                accountBackgroundImgUrl: accountBannerBackgroundInfo.supabaseFileId,
-                userProfileImgUrl: userProfileImgInfo.supabaseFileId,
+                [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]: accountBannerBackgroundInfo.supabaseFileId,
+                [PATCH_USER_PROFILE_IMG_KEY]: userProfileImgInfo.supabaseFileId,
                 aboutMe: body.aboutUser,
             }
 

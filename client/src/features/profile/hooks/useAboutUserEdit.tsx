@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useError } from "../../error/contexts/ErrorContext";
 import { errorPageRoute } from "../../../constants/routes";
-import { noErrorCtxError, noSocketConnectionError } from "../../../constants/errorConstants";
+import { knownError, noErrorCtxError, noSocketConnectionError, notExpectedFormatError, unknownError } from "../../../constants/errorConstants";
 import { useJWTFetch } from "../../../hooks/useJWTFetch";
 import { domain } from "../../../constants/EnvironmentAPI";
 import { IPatchUserProfileRequest } from "../../../../../shared/features/users/models/IRequestPatchUserProfile";
@@ -10,6 +10,7 @@ import { useJWTSocketConnection } from "../../../hooks/useJWTSocketConnection";
 import { useSocket } from "../../../contexts/SocketHandlerContext";
 import { useAuth } from "../../auth/contexts/AuthContext";
 import { SuccessPatchUserProfileAPISchema } from "../../../../../shared/features/users/models/ISuccessPatchUserProfileAPI";
+import { APIErrorSchema, ICustomErrorResponse } from "../../../../../shared/features/api/models/APIErrorResponse";
 
 export function useAboutUserEdit(defaultAboutUser: string) {
 
@@ -27,6 +28,8 @@ export function useAboutUserEdit(defaultAboutUser: string) {
     const [aboutUserDraft, setAboutUserDraft] = useState<string>(defaultAboutUser);
     const [aboutUserServer, setAboutUserServer] = useState<string>(defaultAboutUser);
 
+
+
     const toggleAboutUserEditState = () => {
         if (isLoading) {
             return;
@@ -34,9 +37,34 @@ export function useAboutUserEdit(defaultAboutUser: string) {
         setAboutUserEditState((prevState) => !prevState);
     };
 
+    const onCancel = () => {
+        setAboutUserDraft(aboutUserServer);
+        toggleAboutUserEditState();
+        return;
+
+    }
+
+    const handleResponseError = (err: ICustomErrorResponse) => {
+        if (!errCtx) {
+            nav(errorPageRoute, {
+                replace: true,
+                state: {
+                    error: noErrorCtxError
+                }
+            });
+            return;
+        }
+
+        errCtx.throwError(err);
+        setAboutUserDraft(aboutUserServer);
+        setAboutUserEditState(false);
+        return;
+
+    }
+
     const patchAboutUser = async () => {
         if (!errCtx) {
-            nav(errorPageRoute, { 
+            nav(errorPageRoute, {
                 replace: true,
                 state: {
                     error: noErrorCtxError
@@ -47,7 +75,7 @@ export function useAboutUserEdit(defaultAboutUser: string) {
 
         if (!socket || !socket.connected || !socket.id) {
             errCtx.throwError(noSocketConnectionError);
-            nav(errorPageRoute, { 
+            nav(errorPageRoute, {
                 replace: true,
                 state: {
                     error: noSocketConnectionError
@@ -79,9 +107,7 @@ export function useAboutUserEdit(defaultAboutUser: string) {
             });
 
             if (response.returnType === "fetchError") {
-                errCtx.throwError(response.error);
-                setAboutUserDraft(aboutUserServer);
-                setAboutUserEditState(false);
+                handleResponseError(response.error);
                 return;
             }
 
@@ -102,9 +128,26 @@ export function useAboutUserEdit(defaultAboutUser: string) {
 
             }
 
-            
+            const errorResult = APIErrorSchema.safeParse(resJSON);
+            if (errorResult.success) {
+                handleResponseError(errorResult.data);
+                return;
+            }
+
+            handleResponseError(notExpectedFormatError);
+            return;
+
+
         } catch (error) {
-            
+
+            if (error instanceof Error) {
+                handleResponseError(knownError(error));
+                return;
+            }
+
+            handleResponseError(unknownError);
+            return;
+
 
         } finally {
             setIsLoading(false);
@@ -119,6 +162,7 @@ export function useAboutUserEdit(defaultAboutUser: string) {
         aboutUserDraft,
         setAboutUserDraft,
         aboutUserServer,
-        setAboutUserServer
+        setAboutUserServer,
+        onCancel
     };
 }
