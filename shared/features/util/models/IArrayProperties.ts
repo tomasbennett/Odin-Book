@@ -1,0 +1,17 @@
+export type IArrayProperties<T> = {
+    [K in keyof T]: T[K] extends readonly unknown[] ? K : never;
+}[keyof T];
+
+//THIS TAKES AN OBJECT TYPE LIKE A SCHEMA TYPE AND GIVES BACK THE TYPES
+//OF ALL PROPERTIES THAT ARE ARRAY TYPES, MEANING IT SEARCHES THROUGH
+//EACH PROPERTY IN A SCHEMA THEN SAYS WHICH OF YOU EXTENDS AN ARRAY TYPE
+//AND IF YOU DO IT ADDS THAT ARRAY TYPE SPECIFICALLY TO A UNION WITH THE
+//OTHER POSSIBLE ARRAY TYPES FROM THE OBJECT/SCHEMA
+
+
+export type IArrayPropertyReduced<
+    T,
+    K extends keyof T
+> = T[K] extends unknown[]
+    ? K
+    : never;
