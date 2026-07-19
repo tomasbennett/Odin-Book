@@ -30,6 +30,8 @@ import { domain } from "../../../constants/EnvironmentAPI";
 import { ProfileAPISuccessSchema } from "../../../../../shared/features/profiles/models/IProfileAPI";
 import { useScrollToBottomContainer } from "../../../hooks/useScrollToBottomContainer";
 import { ProfilePostsAPISuccessSchema } from "../../../../../shared/features/profiles/models/IProfilePosts";
+import { Controller } from "react-hook-form";
+import { abortInitialFetchRequest } from "../constants/abortFetchReq";
 
 
 export function useProfileInfoFetch() {
@@ -67,16 +69,16 @@ export function useProfileInfoFetch() {
     const [comments, setComments] = useState<IComment[]>([]);
     const [headerInfo, setHeaderInfo] = useState<IProfileHeader | null>(null);
 
-    const [postsOffset, setPostsOffset] = useState<number>(defaultProfilePostsLimit);
-    const [repliesOffset, setRepliesOffset] = useState<number>(defaultProfileRepliesLimit);
-    const [commentsOffset, setCommentsOffset] = useState<number>(defaultProfileCommentsLimit);
-    const limitExtraReplies: number = 10;
-    const limitExtraPosts: number = 10;
-    const limitExtraComments: number = 10;
+    // const [postsOffset, setPostsOffset] = useState<number>(defaultProfilePostsLimit);
+    // const [repliesOffset, setRepliesOffset] = useState<number>(defaultProfileRepliesLimit);
+    // const [commentsOffset, setCommentsOffset] = useState<number>(defaultProfileCommentsLimit);
+    // const limitExtraReplies: number = 10;
+    // const limitExtraPosts: number = 10;
+    // const limitExtraComments: number = 10;
 
-    const repliesContainerRef = useRef<HTMLDivElement | null>(null);
-    const postsContainerRef = useRef<HTMLDivElement | null>(null);
-    const commentsContainerRef = useRef<HTMLDivElement | null>(null);
+    // const repliesContainerRef = useRef<HTMLDivElement | null>(null);
+    // const postsContainerRef = useRef<HTMLDivElement | null>(null);
+    // const commentsContainerRef = useRef<HTMLDivElement | null>(null);
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -93,6 +95,9 @@ export function useProfileInfoFetch() {
             return;
         }
 
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         try {
 
             setIsLoading(true);
@@ -101,8 +106,13 @@ export function useProfileInfoFetch() {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                }
+                },
+                signal: controller.signal
             });
+
+            if (controller.signal.aborted && controller.signal.reason === abortInitialFetchRequest) {
+                return;
+            }
 
             if (response.returnType === "fetchError") {
                 errCtx.throwError(response.error);
@@ -141,8 +151,6 @@ export function useProfileInfoFetch() {
 
         } catch (error: unknown) {
 
-
-
             if (error instanceof Error) {
                 errCtx.throwError(knownError(error));
                 return;
@@ -161,113 +169,113 @@ export function useProfileInfoFetch() {
 
 
 
-    const fetchExtraData = async (
-        url: string,
-        fetchBody: RequestInit,
-        attemptSuccessCallback: (resJSON: unknown) => { successfulParse: boolean },
-        limit: number,
-        offset: number,
-    ) => {
-        if (!errCtx) {
-            nav(errorPageRoute, {
-                state: {
-                    error: noErrorCtxError
-                },
-                replace: true
-            });
-            return;
-        }
+    // const fetchExtraData = async (
+    //     url: string,
+    //     fetchBody: RequestInit,
+    //     attemptSuccessCallback: (resJSON: unknown) => { successfulParse: boolean },
+    //     limit: number,
+    //     offset: number,
+    // ) => {
+    //     if (!errCtx) {
+    //         nav(errorPageRoute, {
+    //             state: {
+    //                 error: noErrorCtxError
+    //             },
+    //             replace: true
+    //         });
+    //         return;
+    //     }
 
-        try {
+    //     try {
 
-            setIsLoading(true);
+    //         setIsLoading(true);
 
-            const searchQuery: ISearchQuery = {
-                limit,
-                offset,
-            }
+    //         const searchQuery: ISearchQuery = {
+    //             limit,
+    //             offset,
+    //         }
 
-            const response = await jwtFetchHandler(`${url}?${toQueryString(searchQuery)}`, fetchBody);
+    //         const response = await jwtFetchHandler(`${url}?${toQueryString(searchQuery)}`, fetchBody);
 
-            if (response.returnType === "fetchError") {
-                errCtx.throwError(response.error);
-                return;
-            }
+    //         if (response.returnType === "fetchError") {
+    //             errCtx.throwError(response.error);
+    //             return;
+    //         }
 
-            if (response.returnType === "loginError") {
-                setAuthLevel({ userType: "none" });
-                errCtx.throwError(response.error);
-                return;
+    //         if (response.returnType === "loginError") {
+    //             setAuthLevel({ userType: "none" });
+    //             errCtx.throwError(response.error);
+    //             return;
 
-            }
+    //         }
 
-            const resJSON = await response.data.json();
+    //         const resJSON = await response.data.json();
 
-            const { successfulParse } = attemptSuccessCallback(resJSON);
+    //         const { successfulParse } = attemptSuccessCallback(resJSON);
 
-            if (successfulParse) return;
+    //         if (successfulParse) return;
 
-            const errorResult = APIErrorSchema.safeParse(resJSON);
-            if (errorResult.success) {
-                errCtx.throwError(errorResult.data);
-                return;
-            }
+    //         const errorResult = APIErrorSchema.safeParse(resJSON);
+    //         if (errorResult.success) {
+    //             errCtx.throwError(errorResult.data);
+    //             return;
+    //         }
 
-            errCtx.throwError(notExpectedFormatError);
-            return;
-
-
-        } catch (error: unknown) {
+    //         errCtx.throwError(notExpectedFormatError);
+    //         return;
 
 
-
-            if (error instanceof Error) {
-                errCtx.throwError(knownError(error));
-                return;
-            }
-
-            errCtx.throwError(unknownError);
-            return;
-
-
-        } finally {
-            setIsLoading(false);
-
-        }
-
-
-    }
+    //     } catch (error: unknown) {
 
 
 
-    const postSuccessCallback = (resJSON: unknown): { successfulParse: boolean } => {
+    //         if (error instanceof Error) {
+    //             errCtx.throwError(knownError(error));
+    //             return;
+    //         }
 
-        const successResult = ProfilePostsAPISuccessSchema.safeParse(resJSON);
-        if (successResult.success) {
-            setPosts(prev => [...prev, ...successResult.data.posts]);
-            setPostsOffset(prev => prev + successResult.data.posts.length);
-            return { successfulParse: true };
-        }
+    //         errCtx.throwError(unknownError);
+    //         return;
 
-        return { successfulParse: false };
-    }
 
-    useScrollToBottomContainer(
-        postsContainerRef,
-        50,
-        () => { fetchExtraData(
-            `${domain}/api/posts/${userId}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            },
-            postSuccessCallback,
-            limitExtraPosts,
-            postsOffset
-        ) }
-    )
+    //     } finally {
+    //         setIsLoading(false);
+
+    //     }
+
+
+    // }
+
+
+
+    // const postSuccessCallback = (resJSON: unknown): { successfulParse: boolean } => {
+
+    //     const successResult = ProfilePostsAPISuccessSchema.safeParse(resJSON);
+    //     if (successResult.success) {
+    //         setPosts(prev => [...prev, ...successResult.data.posts]);
+    //         setPostsOffset(prev => prev + successResult.data.posts.length);
+    //         return { successfulParse: true };
+    //     }
+
+    //     return { successfulParse: false };
+    // }
+
+    // useScrollToBottomContainer(
+    //     postsContainerRef,
+    //     50,
+    //     () => { fetchExtraData(
+    //         `${domain}/api/posts/${userId}`,
+    //         {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json"
+    //             }
+    //         },
+    //         postSuccessCallback,
+    //         limitExtraPosts,
+    //         postsOffset
+    //     ) }
+    // )
 
 
     useEffect(() => {
@@ -275,7 +283,7 @@ export function useProfileInfoFetch() {
 
         return () => {
             if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
+                abortControllerRef.current.abort(abortInitialFetchRequest);
             }
         }
     }, []);
@@ -287,9 +295,9 @@ export function useProfileInfoFetch() {
         posts,
         comments,
         headerInfo,
-        repliesContainerRef,
-        postsContainerRef,
-        commentsContainerRef,
+        // repliesContainerRef,
+        // postsContainerRef,
+        // commentsContainerRef,
         state,
     }
 
