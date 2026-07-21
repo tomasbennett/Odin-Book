@@ -1,0 +1,87 @@
+import { CreatePostOrCommentInput } from "../../../components/CreatePostOrCommentInput";
+import { LoadingCircle } from "../../../components/LoadingCircle";
+import { Post } from "../../posts/components/Post";
+import { useRepliesThreadFetch } from "../hooks/useRepliesThreadFetch";
+import styles from "./RepliesThreadLayout.module.css";
+
+
+
+export function RepliesThreadLayout() {
+
+    const {
+        isLoading,
+        post,
+        replies,
+        parentPosts,
+        setParentPosts,
+        setPost,
+        setReplies
+    } = useRepliesThreadFetch();
+
+
+    return (
+
+        <>
+
+            <div className={styles.outerContainer}>
+
+                {
+                    isLoading ?
+                        <div className={styles.loadingContainer}>
+
+                            <LoadingCircle height="5rem" />
+
+                        </div>
+
+                        :
+
+                        <>
+                            {
+                                parentPosts.map(parentPost => {
+
+
+                                    return (
+                                        <Post
+                                            key={parentPost.id}
+                                            {...parentPost}
+                                            setLikesCount={setParentPosts}
+                                        />
+                                    )
+                                })
+                            }
+
+                            <div className={styles.mainPostContainer}>
+                                {
+                                    post === null ?
+
+                                        null
+
+                                        :
+
+                                        <Post
+                                            {...post}
+                                            setLikesCount={}
+                                        />
+                                }
+
+                                <CreatePostOrCommentInput
+                                    placeHolder="Add a reply to this post..."
+                                />
+
+                            </div>
+                        </>
+
+
+
+
+
+                }
+
+
+
+            </div>
+
+        </>
+
+    )
+}

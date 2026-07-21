@@ -1,0 +1,1 @@
+export const userIdQueryParamKey: string = "userId";

@@ -16,6 +16,7 @@ import { LikeAPISuccessSchema } from "../../../../../shared/features/likes/model
 import { ISendLike } from "../../../../../shared/features/likes/models/ISendLike";
 import { useJWTSocketConnection } from "../../../hooks/useJWTSocketConnection";
 import { useSocket } from "../../../contexts/SocketHandlerContext";
+import { isArray } from "util";
 
 
 //SO DEPENDING ON THE TOGGLE SETTING WE NEED TO ADD /like OR /unlike TO THE END AND CHANGE THE FETCH FROM A POST TO A PATCH RESPECTIVELY, IF IN FUTURE WE CHANGE PATCH TO A DELETE THIS WILL AFFECT THE HANDLING BETWEEN THE TWO AFTERWARDS!!!
@@ -80,13 +81,17 @@ export function Like<T extends ILikeableObject>({
 
 
     const updateUI = (liked: boolean, count: number) => {
-        setLikeCount(prev =>
-            prev.map(p =>
+
+
+        setLikeCount(prev => {
+            return prev.map(p =>
                 p.id === id
                     ? { ...p, haveYouLiked: liked, likeCount: count }
                     : p
             )
-        );
+
+
+        });
     };
 
 
@@ -226,7 +231,7 @@ export function Like<T extends ILikeableObject>({
 
             requestRunningRef.current = true;
 
-            
+
             let serverState: boolean = uiLikedRef.current;
 
             uiLikedRef.current = optimisticHaveYouLiked;

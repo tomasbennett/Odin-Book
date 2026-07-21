@@ -288,7 +288,7 @@ export function useProfileInfoFetch() {
                 abortControllerRef.current.abort(abortInitialFetchRequest);
             }
         }
-    }, []);
+    }, [userId]);
 
 
 
