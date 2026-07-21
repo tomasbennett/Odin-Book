@@ -13,10 +13,12 @@ import { Like } from "../../likes/components/Like";
 import { domain } from "../../../constants/EnvironmentAPI";
 import { ILikeableObject } from "../../../../../shared/features/likes/models/ILikeableObject";
 import { useAuth } from "../../auth/contexts/AuthContext";
+import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
+import { IUpdateLikeCountParams } from "../../likes/models/IUpdateLikeCountParams";
 
 
 type IPostProps = {
-    setLikesCount: React.Dispatch<React.SetStateAction<IPost[]>>;
+    setLikesCount: (params: IUpdateLikeCountParams) => void;
 } & IPost;
 
 

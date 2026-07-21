@@ -1,5 +1,7 @@
 import { CreatePostOrCommentInput } from "../../../components/CreatePostOrCommentInput";
 import { LoadingCircle } from "../../../components/LoadingCircle";
+import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
+import { createSingleLikeUpdater } from "../../likes/services/likeSingleObjects";
 import { Post } from "../../posts/components/Post";
 import { useRepliesThreadFetch } from "../hooks/useRepliesThreadFetch";
 import styles from "./RepliesThreadLayout.module.css";
@@ -44,7 +46,7 @@ export function RepliesThreadLayout() {
                                         <Post
                                             key={parentPost.id}
                                             {...parentPost}
-                                            setLikesCount={setParentPosts}
+                                            setLikesCount={createArrayLikeUpdater(parentPost.id, setParentPosts)}
                                         />
                                     )
                                 })
@@ -60,7 +62,7 @@ export function RepliesThreadLayout() {
 
                                         <Post
                                             {...post}
-                                            setLikesCount={}
+                                            setLikesCount={createSingleLikeUpdater(setPost)}
                                         />
                                 }
 

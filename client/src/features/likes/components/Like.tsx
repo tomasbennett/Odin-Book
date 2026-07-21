@@ -17,6 +17,7 @@ import { ISendLike } from "../../../../../shared/features/likes/models/ISendLike
 import { useJWTSocketConnection } from "../../../hooks/useJWTSocketConnection";
 import { useSocket } from "../../../contexts/SocketHandlerContext";
 import { isArray } from "util";
+import { IUpdateLikeCountParams } from "../models/IUpdateLikeCountParams";
 
 
 //SO DEPENDING ON THE TOGGLE SETTING WE NEED TO ADD /like OR /unlike TO THE END AND CHANGE THE FETCH FROM A POST TO A PATCH RESPECTIVELY, IF IN FUTURE WE CHANGE PATCH TO A DELETE THIS WILL AFFECT THE HANDLING BETWEEN THE TWO AFTERWARDS!!!
@@ -49,7 +50,9 @@ import { isArray } from "util";
 
 type ILikeProps<T extends ILikeableObject> = {
     likeFetchUrl: string;
-    setLikeCount: React.Dispatch<React.SetStateAction<T[]>>;
+    // setLikeCount: React.Dispatch<React.SetStateAction<T[]>>;
+    // likeableObjState: T | T[];
+    setLikeCount: (params: IUpdateLikeCountParams) => void
 } & ILikeableObject;
 
 
@@ -59,6 +62,7 @@ export function Like<T extends ILikeableObject>({
     haveYouLiked,
     setLikeCount,
     likeCount,
+    // likeableObjState
     // userId
 }: ILikeProps<T>) {
 
@@ -81,17 +85,23 @@ export function Like<T extends ILikeableObject>({
 
 
     const updateUI = (liked: boolean, count: number) => {
+        setLikeCount({ liked, count });
+
+        // setLikeCount(prev => {
+        //     // if (Array.isArray(prev)) {
+        //         return prev.map(p =>
+        //             p.id === id
+        //                 ? { ...p, haveYouLiked: liked, likeCount: count }
+        //                 : p
+        //         )
+
+        //     // }
+
+        //     // return { ...prev, haveYouLiked: liked, likeCount: count }
 
 
-        setLikeCount(prev => {
-            return prev.map(p =>
-                p.id === id
-                    ? { ...p, haveYouLiked: liked, likeCount: count }
-                    : p
-            )
 
-
-        });
+        // });
     };
 
 

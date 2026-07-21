@@ -1,3 +1,4 @@
+import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { Post } from "../../posts/components/Post";
 import { useHomeFetch } from "../hooks/useHomeFetch";
 import styles from "./PostsList.module.css";
@@ -32,7 +33,7 @@ export function PostsList() {
                             <Post 
                                 key={post.id} 
                                 {...post}
-                                setLikesCount={setPosts}
+                                setLikesCount={createArrayLikeUpdater(post.id, setPosts)}
                                 />
                         )
                     })
