@@ -11,6 +11,8 @@ import { useJWTFetch } from "../../../hooks/useJWTFetch";
 import { APIErrorSchema } from "../../../../../shared/features/api/models/APIErrorResponse";
 import { IArrayProperties } from "../../../../../shared/features/util/models/IArrayProperties";
 import { useScrollToBottomContainer } from "../../../hooks/useScrollToBottomContainer";
+import { toQueryString } from "../../../util/ToQueryString";
+import { ISearchQuery } from "../../../../../shared/features/util/models/ISearchQuery";
 
 export function useSectionScrollFetch({
     url,
@@ -54,7 +56,12 @@ export function useSectionScrollFetch({
             setIsLoadingState(true);
             isLoadingRef.current = true;
 
-            const response = await jwtFetchHandler(url, fetchBody);
+            const searchQueryParams: ISearchQuery = {
+                limit,
+                offset: offsetRef.current
+            }
+
+            const response = await jwtFetchHandler(`${url}?${toQueryString(searchQueryParams)}`, fetchBody);
 
             if (response.returnType === "loginError") {
                 setAuthLevel({ userType: "none" });

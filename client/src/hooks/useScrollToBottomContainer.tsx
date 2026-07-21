@@ -36,6 +36,6 @@ export function useScrollToBottomContainer(
             console.log("THE REMOVAL OF AN EVENT LISTENER!!!");
         };
 
-    }, [enabled, functionality]);
+    }, [enabled, functionality, element.current]);
 
 }

@@ -66,7 +66,7 @@ export function Header({
 
     return (
         <>
-            <div className={styles.outerContainer}>
+            <header className={styles.outerContainer}>
 
                 {
                     isBannerLoading || isProfileImgLoading ?
@@ -192,7 +192,7 @@ export function Header({
                 }
 
 
-            </div>
+            </header>
         </>
     );
 }

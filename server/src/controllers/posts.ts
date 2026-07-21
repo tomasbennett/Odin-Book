@@ -32,6 +32,9 @@ import { IProfileRepliesParentPost } from "../../../shared/features/profiles/mod
 import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPISuccess";
 import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
 import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
+import { IPostRepliesSuccessAPI } from "../../../shared/features/posts/models/IPostRepliesSuccessAPI";
+import { postsInclude } from "../constants/postInclude";
+import { getParentPosts } from "../services/GetParentPostsRecursive";
 
 
 export const router = Router();
@@ -120,6 +123,151 @@ router.get("/:userId",
 
 
     });
+
+
+router.get("/:postId/replies",
+    ensureJWTAuthentication,
+    async (req: Request<{ postId: string }>, res: Response<IPostRepliesSuccessAPI | ICustomErrorResponse>, next: NextFunction) => {
+
+        const user = req.user!;
+        const { postId } = req.params;
+
+        try {
+
+
+            const [postDb, repliesDb, parentPostsDb] = await Promise.all([
+                prisma.post.findUnique({
+                    where: {
+                        id: postId
+                    },
+                    include: postsInclude
+                }),
+                prisma.post.findMany({
+                    where: {
+                        parentPostId: postId
+                    },
+                    include: postsInclude
+                }),
+                getParentPosts(postId)
+            ]);
+
+
+            if (!postDb) {
+                return res.status(400).json({
+                    ok: false,
+                    status: 404,
+                    message: "No post found with the following post ID: " + postId
+                });
+            }
+
+
+            const buildPost = async (): Promise<IPost> => {
+                const post = postDb;
+
+                const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
+
+                return {
+                    id: post.id,
+                    userId: post.userId,
+                    username: post.user.username,
+                    createdAt: post.createdAt,
+                    title: post.title || undefined,
+                    likeCount: post.likes.length,
+                    commentCount: post.comments.length,
+                    repliesCount: post.replies.length,
+                    userProfileImgUrl: userProfileImgUrl,
+                    content: post.textContent || undefined,
+                    fileDetails: fileDetails,
+                    haveYouLiked: post.likes.some(like => like.userId === user.userId),
+                }
+
+            }
+
+            const buildReplies = Promise.all(
+                repliesDb.map(async (reply): Promise<IPost> => {
+
+                    const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(reply);
+
+                    return {
+                        id: reply.id,
+                        userId: reply.userId,
+                        username: reply.user.username,
+                        createdAt: reply.createdAt,
+                        title: reply.title || undefined,
+                        likeCount: reply.likes.length,
+                        commentCount: reply.comments.length,
+                        repliesCount: reply.replies.length,
+                        userProfileImgUrl: userProfileImgUrl,
+                        content: reply.textContent || undefined,
+                        fileDetails: fileDetails,
+                        haveYouLiked: reply.likes.some(like => like.userId === user.userId),
+                    }
+
+
+                })
+            );
+
+            const buildParentPosts = Promise.all(
+                parentPostsDb.map(async (parentPost): Promise<IPost> => {
+
+                    const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(parentPost);
+
+                    return {
+                        id: parentPost.id,
+                        userId: parentPost.userId,
+                        username: parentPost.user.username,
+                        createdAt: parentPost.createdAt,
+                        title: parentPost.title || undefined,
+                        likeCount: parentPost.likes.length,
+                        commentCount: parentPost.comments.length,
+                        repliesCount: parentPost.replies.length,
+                        userProfileImgUrl: userProfileImgUrl,
+                        content: parentPost.textContent || undefined,
+                        fileDetails: fileDetails,
+                        haveYouLiked: parentPost.likes.some(like => like.userId === user.userId),
+                    }
+
+
+                })
+            );
+
+
+
+            const [postAPI, repliesAPI, parentPostsAPI] = await Promise.all([
+                buildPost(),
+                buildReplies,
+                buildParentPosts
+            ]);
+
+
+
+
+
+
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Post, parent posts and replies found!!!",
+                replies: repliesAPI,
+                parentPosts: parentPostsAPI,
+                post: postAPI,
+            })
+
+
+
+
+
+        } catch (error) {
+            next(error);
+
+        }
+
+
+    });
+
 
 
 
@@ -338,21 +486,21 @@ router.post("/",
 
                 let userProfileImgUrl: string | undefined;
                 let fileDetails: IFileDetails[] | undefined;
-    
+
                 if (files) {
-    
+
                     const uploadedResult = await Promise.all(
                         files.map(async (file) => {
-    
+
                             const uploadResult = await uploadFileToSupabase(file);
-    
+
                             if (!uploadResult.ok) {
                                 throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
                             }
-    
-    
-    
-    
+
+
+
+
                             return {
                                 // id: newPrismaFile.id,
                                 mimetype: file.mimetype,
@@ -362,32 +510,32 @@ router.post("/",
                                 postContentForId: newPost.id,
                                 supabaseFileId: uploadResult.supabaseFileId
                             }
-    
-    
+
+
                         })
                     );
-    
+
                     const newPrismaFiles = await prisma.files.createManyAndReturn({
                         data: uploadedResult,
                     });
-    
-    
+
+
                     const dbFilesArr = newPrismaFiles;
-    
+
                     const { userProfileImgUrl: userUrl, fileDetails: newPostFileDetails } = await generatePostContentAndProfileImage({
                         ...newPost,
                         files: dbFilesArr
                     });
-    
-    
+
+
                     userProfileImgUrl = userUrl;
                     fileDetails = newPostFileDetails;
-    
+
                 }
-    
-    
-                
-    
+
+
+
+
                 const post: IPost = {
                     id: newPost.id,
                     userId: user.userId,
@@ -601,7 +749,7 @@ router.post("/:postId/like",
 
 
 
-    
+
 router.patch("/:postId/unlike",
     ensureJWTAuthentication,
     async (req: Request<{ postId: string }, {}, ISendLike>, res: Response<ILikeAPISuccess | ICustomErrorResponse>, next: NextFunction) => {

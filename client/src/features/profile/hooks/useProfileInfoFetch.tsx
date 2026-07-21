@@ -43,6 +43,8 @@ export function useProfileInfoFetch() {
     const [searchParams] = useSearchParams();
     const { userId } = useParams<"userId">();
 
+    
+
     const rawState = searchParams.get(profileStateQueryKey);
 
     const parsed = ProfileSectionsSchema.safeParse(rawState);
@@ -289,6 +291,7 @@ export function useProfileInfoFetch() {
     }, []);
 
 
+
     return {
         isLoading,
         replies,
@@ -298,7 +301,11 @@ export function useProfileInfoFetch() {
         // repliesContainerRef,
         // postsContainerRef,
         // commentsContainerRef,
+        setComments,
+        setPosts,
+        setReplies,
         state,
+        userId
     }
 
 

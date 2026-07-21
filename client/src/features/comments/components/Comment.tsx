@@ -97,7 +97,7 @@ export function Comment({
 
 
                         <div className={styles.likeContainer}>
-                            <Like 
+                            <Like
                                 id={id}
                                 likeCount={likeCount}
                                 haveYouLiked={haveYouLiked}
