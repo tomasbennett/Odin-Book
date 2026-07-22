@@ -60,91 +60,91 @@ export function useHomeFetch() {
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [posts, setPosts] = useState<IPost[]>([
-        {
-            id: "1",
-            userId: "1",
-            username: "Ted_Kennedy",
-            createdAt: new Date(),
-            likeCount: 15,
-            commentCount: 23,
-            repliesCount: 1,
-            title: "Check out this post I made!!!",
-            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
-            userProfileImgUrl: undefined,
-            parentPost: undefined,
-            fileDetails: undefined,
-            haveYouLiked: false
-        },
-        {
-            id: "2",
-            userId: "2",
-            username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
-            createdAt: new Date("2022-06-08"),
-            likeCount: 4,
-            commentCount: 203,
-            repliesCount: 3,
-            title: undefined,
-            content: "Yo",
-            userProfileImgUrl: githubProfileImg,
-            parentPost: undefined,
-            haveYouLiked: true,
-            fileDetails: [
-                {
-                    id: "1",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "img/jpg",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-                {
-                    id: "2",
-                    publicUrl: githubProfileImg,
-                    name: "Github Profile img",
-                    mimetype: "img/jpg",
-                    size: 1600,
-                    createdAt: new Date()
-                },
-                {
-                    id: "3",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "img/jpg",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-            ]
-        },
-        {
-            id: "3",
-            userId: "3",
-            username: "T",
-            createdAt: new Date("2026-06-26"),
-            likeCount: 0,
-            commentCount: 1,
-            repliesCount: 100,
-            title: undefined,
-            content: undefined,
-            userProfileImgUrl: undefined,
-            parentPost: undefined,
-            haveYouLiked: true,
-            fileDetails: [
-                {
-                    id: "1",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "img/jpg",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-            ]
-        }
+        // {
+        //     id: "1",
+        //     userId: "1",
+        //     username: "Ted_Kennedy",
+        //     createdAt: new Date(),
+        //     likeCount: 15,
+        //     commentCount: 23,
+        //     repliesCount: 1,
+        //     title: "Check out this post I made!!!",
+        //     content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
+        //     userProfileImgUrl: undefined,
+        //     parentPost: undefined,
+        //     fileDetails: undefined,
+        //     haveYouLiked: false
+        // },
+        // {
+        //     id: "2",
+        //     userId: "2",
+        //     username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
+        //     createdAt: new Date("2022-06-08"),
+        //     likeCount: 4,
+        //     commentCount: 203,
+        //     repliesCount: 3,
+        //     title: undefined,
+        //     content: "Yo",
+        //     userProfileImgUrl: githubProfileImg,
+        //     parentPost: undefined,
+        //     haveYouLiked: true,
+        //     fileDetails: [
+        //         {
+        //             id: "1",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky",
+        //             mimetype: "img/jpg",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //         {
+        //             id: "2",
+        //             publicUrl: githubProfileImg,
+        //             name: "Github Profile img",
+        //             mimetype: "img/jpg",
+        //             size: 1600,
+        //             createdAt: new Date()
+        //         },
+        //         {
+        //             id: "3",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky",
+        //             mimetype: "img/jpg",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //     ]
+        // },
+        // {
+        //     id: "3",
+        //     userId: "3",
+        //     username: "T",
+        //     createdAt: new Date("2026-06-26"),
+        //     likeCount: 0,
+        //     commentCount: 1,
+        //     repliesCount: 100,
+        //     title: undefined,
+        //     content: undefined,
+        //     userProfileImgUrl: undefined,
+        //     parentPost: undefined,
+        //     haveYouLiked: true,
+        //     fileDetails: [
+        //         {
+        //             id: "1",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky",
+        //             mimetype: "img/jpg",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //     ]
+        // }
     ]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const limit: number = 20;
-    const [offset, setOffset] = useState<number>(0);
-    const hasMorePosts = useRef<boolean>(true);
+    // const [offset, setOffset] = useState<number>(0);
+    // const hasMorePosts = useRef<boolean>(true);
 
     const fetchPosts = async ({
         offset,
@@ -185,7 +185,7 @@ export function useHomeFetch() {
 
             console.log(`RESPONSE HAS RETURNED:`);
 
-            if ((controller !== abortControllerRef.current) || (controller.signal.aborted && controller.signal.reason === unmountSortTypeAbort)) {
+            if ((controller.signal.aborted && controller.signal.reason === unmountSortTypeAbort)) {
                 return;
             }
 
@@ -208,15 +208,15 @@ export function useHomeFetch() {
             if (homePostsResult.success) {
                 const apiPosts: IPost[] = homePostsResult.data.posts;
 
-                if (apiPosts.length < limit) {
-                    //REMOVE THE EVENT LISTENER FOR SCROLL PAGE TO LOAD MORE!!!
-                    hasMorePosts.current = false;
-                }
+                // if (apiPosts.length < limit) {
+                //     //REMOVE THE EVENT LISTENER FOR SCROLL PAGE TO LOAD MORE!!!
+                //     hasMorePosts.current = false;
+                // }
 
                 setPosts(prev => {
                     return [...prev, ...apiPosts]
                 });
-                setOffset(offset + limit);
+                // setOffset(offset + limit);
 
 
                 return;
@@ -268,22 +268,18 @@ export function useHomeFetch() {
 
 
     //SO WHY THIS CURRENTLY DOESN'T WORK IS BECAUSE THE FUNCTION NEEDS TO BE REATTACHED TO THE EVENT LISTENER EVERY TIME ISLOADING OR OFFSET CHANGES GIVEN THAT THEY ARE VARIABLE!!!
-    const scrollForMoreFetch = useCallback(() => {
-        //SO I WANT TO TEST WHETHER OR NOT A CHANGE LATER DOWN THE LINE CHANGES THIS
-        //
-        console.log(`The isLoading variable should change when the state changes, it's current value is: ${isLoading}`);
+    // const scrollForMoreFetch = useCallback(() => {
+    //     //SO I WANT TO TEST WHETHER OR NOT A CHANGE LATER DOWN THE LINE CHANGES THIS
+    //     //
+    //     console.log(`The isLoading variable should change when the state changes, it's current value is: ${isLoading}`);
 
-        if (isLoading || !(hasMorePosts.current)) {
-            return;
-        }
+    //     if (isLoading || !(hasMorePosts.current)) {
+    //         return;
+    //     }
 
-        fetchPosts({
-            offset,
-            limit,
-            sort
-        });
+        
 
-    }, [isLoading, offset, sort]);
+    // }, [isLoading, offset, sort]);
 
     //NEED TO CHANGE USESTATE OLD STALE VALUES TO USEREF
     //HOLD ON NEED TO CHECK THIS PRINCIPLE, DOES IT LOG CURRENT VALUE OR ONE AT FUNC CREATION???
@@ -295,15 +291,21 @@ export function useHomeFetch() {
 
 
     useEffect(() => {
-        setOffset(0);
-        // setPosts([]);
-        hasMorePosts.current = true;
+        // setOffset(0);
+        // // setPosts([]);
+        // hasMorePosts.current = true;
 
         // fetchPosts({
         //     offset: 0,
         //     limit,
         //     sort
         // }); 3 LINES REMOVED
+
+        fetchPosts({
+            offset: 0,
+            limit,
+            sort
+        });
 
         return () => {
             abortControllerRef.current?.abort(unmountSortTypeAbort);
@@ -317,7 +319,7 @@ export function useHomeFetch() {
         setPosts,
         sort,
         postsContainerRef,
-        
+        limit
     }
 
 

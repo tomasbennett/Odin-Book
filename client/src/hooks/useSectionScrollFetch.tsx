@@ -1,18 +1,18 @@
 import z from "zod";
-import { IScrollFetchParams } from "../../../models/IScrollFetchParams";
+import { IScrollFetchParams } from "../models/IScrollFetchParams";
 import { useRef, useState } from "react";
-import { useError } from "../../error/contexts/ErrorContext";
+import { useError } from "../features/error/contexts/ErrorContext";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../auth/contexts/AuthContext";
-import { useSocket } from "../../../contexts/SocketHandlerContext";
-import { knownError, noErrorCtxError, noSocketConnectionError, notExpectedFormatError, unknownError } from "../../../constants/errorConstants";
-import { errorPageRoute, homePageRoute } from "../../../constants/routes";
-import { useJWTFetch } from "../../../hooks/useJWTFetch";
-import { APIErrorSchema } from "../../../../../shared/features/api/models/APIErrorResponse";
-import { IArrayProperties } from "../../../../../shared/features/util/models/IArrayProperties";
-import { useScrollToBottomContainer } from "../../../hooks/useScrollToBottomContainer";
-import { toQueryString } from "../../../util/ToQueryString";
-import { ISearchQuery } from "../../../../../shared/features/util/models/ISearchQuery";
+import { useAuth } from "../features/auth/contexts/AuthContext";
+import { useSocket } from "../contexts/SocketHandlerContext";
+import { knownError, noErrorCtxError, noSocketConnectionError, notExpectedFormatError, unknownError } from "../constants/errorConstants";
+import { errorPageRoute, homePageRoute } from "../constants/routes";
+import { useJWTFetch } from "./useJWTFetch";
+import { APIErrorSchema } from "../../../shared/features/api/models/APIErrorResponse";
+import { IArrayProperties } from "../../../shared/features/util/models/IArrayProperties";
+import { useScrollToBottomContainer } from "./useScrollToBottomContainer";
+import { toQueryString } from "../util/ToQueryString";
+import { ISearchQuery } from "../../../shared/features/util/models/ISearchQuery";
 
 export function useSectionScrollFetch({
     url,

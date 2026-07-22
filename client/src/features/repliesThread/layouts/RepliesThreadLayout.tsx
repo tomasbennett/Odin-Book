@@ -71,6 +71,21 @@ export function RepliesThreadLayout() {
                                 />
 
                             </div>
+
+                            {
+                                replies.map(reply => {
+
+                                    return (
+                                        <Post
+                                            key={reply.id}
+                                            {...reply}
+                                            setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
+                                        />
+                                    )
+                                })
+                            }
+
+
                         </>
 
 

@@ -4,7 +4,7 @@ import { IComment } from '../../../../../shared/features/comments/models/ICommen
 import { formatSentAtDate } from '../../../util/FormatDateMessage';
 import styles from './Comment.module.css';
 import { useError } from '../../error/contexts/ErrorContext';
-import { errorPageRoute } from '../../../constants/routes';
+import { errorPageRoute, homePageRoute } from '../../../constants/routes';
 import { knownError, noErrorCtxError, unknownError } from '../../../constants/errorConstants';
 import { useJWTFetch } from '../../../hooks/useJWTFetch';
 import { SolidCommentIcon } from '../../../assets/icons/SolidCommentIcon';
@@ -15,11 +15,12 @@ import { Like } from '../../likes/components/Like';
 import { domain } from '../../../constants/EnvironmentAPI';
 import { ILikeableObject } from '../../../../../shared/features/likes/models/ILikeableObject';
 import { useAuth } from '../../auth/contexts/AuthContext';
+import { IUpdateLikeCountParams } from '../../likes/models/IUpdateLikeCountParams';
 
 
 
 type ICommentProps = {
-    setLikeCount: React.Dispatch<React.SetStateAction<IComment[]>>;
+    setLikeCount: (params: IUpdateLikeCountParams) => void;
 } & IComment;
 
 
@@ -51,7 +52,7 @@ export function Comment({
     const { authLevel } = useAuth();
 
     if (authLevel.userType !== "user") {
-        return <Navigate to="/" replace={true} />
+        return <Navigate to={homePageRoute} replace={true} />
     }
 
 

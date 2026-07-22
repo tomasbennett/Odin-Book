@@ -36,193 +36,30 @@ import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
 
 export const router = Router();
 
-router.get("/:userId", 
-    ensureJWTAuthentication, 
+router.get("/:userId",
+    ensureJWTAuthentication,
     async (req: Request<{ userId: string }, {}, ISocketSchema>, res: Response<IProfileCommentsAPI | ICustomErrorResponse>, next: NextFunction) => {
-    //SO WHILST YOU'LL GET THE ORIGINAL BULK FROM /USERS/:USERID, THIS ENDPOINT WILL BE USED TO GET ANY ADDITIONAL comments THAT THE USER HAS MADE, AND WILL BE USED FOR INFINITE SCROLLING BUT NOT HAVING TO LOAD IT ALL IN ONE GO!!!
-
-    
-    const { userId } = req.params;
-    const user = req.user!;
-    const { senderSocketId } = req.body;
-        
-    
-    try {
-        const { limit, offset } = SearchQuerySchema.parse(req.query);
-        //GET COMMENTS OUT INCLUDING THEIR LIKES AND CONTENT AND ID
-
-        const usersComments = await prisma.comment.findMany({
-            where: {
-                userId: userId
-            },
-            orderBy: {
-                createdAt: "desc"
-            },
-            take: limit,
-            skip: offset,
-            include: {
-                likes: true,
-                singleGifOrImg: true,
-                user: {
-                    include: {
-                        profileImg: true
-                    }
-                },
-                post: {
-                    include: {
-                        user: {
-                            include: {
-                                profileImg: true
-                            }
-                        }
-                    }
-                },
-                replies: true
-            }
-        });
+        //SO WHILST YOU'LL GET THE ORIGINAL BULK FROM /USERS/:USERID, THIS ENDPOINT WILL BE USED TO GET ANY ADDITIONAL comments THAT THE USER HAS MADE, AND WILL BE USED FOR INFINITE SCROLLING BUT NOT HAVING TO LOAD IT ALL IN ONE GO!!!
 
 
-        //THE DIFFICULTY WITHIN TYPES HERE IS BECAUSE OF OBJECT.ENTRIES RETURNING A STRING TYPE NOT A LITERAL TYPE!!!
-
-        const profileCommentDetails: IProfileComments = await Promise.all(
-            usersComments.map(async (comment) => {
-                const post = comment.post;
-                const postUser = post.user;
-                const likes = comment.likes;
-
-                const hasUserLiked = likes.some((like) => like.userId === user.userId);
+        const { userId } = req.params;
+        const user = req.user!;
+        const { senderSocketId } = req.body;
 
 
-                let imgOrGifDetails: IFileDetails | undefined;
-                let postUserProfileImageUrl: string | undefined;
-                let userProfileImgUrl: string | undefined;
+        try {
+            const { limit, offset } = SearchQuerySchema.parse(req.query);
+            //GET COMMENTS OUT INCLUDING THEIR LIKES AND CONTENT AND ID
 
-                const filesToGeneratePublicUrlsForObjMapping: Record<"imgOrGifContent" | "postUserProfileImg" | "userProfileImg", boolean> = {
-                    "imgOrGifContent": !!comment.singleGifOrImg,
-                    "postUserProfileImg": !!postUser.profileImg,
-                    "userProfileImg": !!comment.user.profileImg
-                };
-
-
-
-                const filesToGeneratePublicUrlsFor: string[] = [];
-
-                if (comment.singleGifOrImg) {
-                    filesToGeneratePublicUrlsFor.push(comment.singleGifOrImg.supabaseFileId);
-                }
-
-                if (postUser.profileImg) {
-                    filesToGeneratePublicUrlsFor.push(postUser.profileImg.supabaseFileId);
-                }
-
-
-                const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
-
-
-                if (!generatedPublicUrlResult.ok) {
-                    throw new Error("Failed to generate public URLs for comment or post user profile image!!!");
-                }
-
-
-                let indx = 0;
-
-                const urlsMapping = Object.entries(filesToGeneratePublicUrlsForObjMapping).reduce(
-                    (acc, [key, exists]) => {
-                        acc[key as keyof typeof filesToGeneratePublicUrlsForObjMapping] =
-                            exists
-                                ? generatedPublicUrlResult.supabasePublicURLs[indx++]
-                                : undefined;
-
-                        return acc;
-                    },
-                    {} as Record<
-                        keyof typeof filesToGeneratePublicUrlsForObjMapping,
-                        string | undefined
-                    >
-                );
-
-                if (comment.singleGifOrImg && urlsMapping["imgOrGifContent"]) {
-                    imgOrGifDetails = {
-                        id: comment.singleGifOrImg.id,
-                        publicUrl: urlsMapping["imgOrGifContent"],
-                        name: comment.singleGifOrImg.filename,
-                        size: comment.singleGifOrImg.filesize,
-                        mimetype: comment.singleGifOrImg.mimetype,
-                        createdAt: comment.singleGifOrImg.uploadedAt
-                    };
-                }
-
-                postUserProfileImageUrl = urlsMapping["postUserProfileImg"];
-
-                userProfileImgUrl = urlsMapping["userProfileImg"];
-
-
-
-
-                return {
-                    id: comment.id,
-                    postId: post.id,
-                    userId: comment.userId,
-                    username: comment.user.username,
-                    userProfileImgUrl: userProfileImgUrl,
-                    createdAt: comment.createdAt,
-                    parentCommentId: comment.parentCommentId || undefined,
-                    likeCount: likes.length,
-                    text: comment.textContent || undefined,
-                    imgOrGifDetails: imgOrGifDetails,
-                    postUsername: postUser.username,
-                    postTitle: post.title || undefined,
-                    postUserId: postUser.id,
-                    postUserProfileImageUrl: postUserProfileImageUrl,
-                    commentCount: comment.replies.length,
-                    haveYouLiked: hasUserLiked
-                };
-            })
-        );
-
-
-        return res.status(200).json({
-            ok: true,
-            status: 200,
-            message: "Comments found, no guarantee that there are any comments though, so check the length of the array!!!",
-            comments: profileCommentDetails
-        })
-
-
-
-
-
-
-
-
-    } catch (error) {
-        next(error);
-
-    }
-
-
-
-});
-
-
-
-router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{ commentId: string }>, res: Response<ICommentsThreadAPIResponse | ICustomErrorResponse>, next: NextFunction) => {
-    const user = req.user!;
-    const { commentId } = req.params;
-
-
-    try {
-
-        //MAKE SURE TO GET BOTH THE REPLIES AND THE UPPER PARENT COMMENTS/ORIGINAL POST FOR THIS ONE!!!
-
-        const [replies, comment, parentComments] = await Promise.all([
-            prisma.comment.findMany({
+            const usersComments = await prisma.comment.findMany({
                 where: {
-                    parentCommentId: commentId
+                    userId: userId
                 },
                 orderBy: {
-                    createdAt: "asc"
+                    createdAt: "desc"
                 },
+                take: limit,
+                skip: offset,
                 include: {
                     likes: true,
                     singleGifOrImg: true,
@@ -231,224 +68,389 @@ router.get("/:commentId/replies", ensureJWTAuthentication, async (req: Request<{
                             profileImg: true
                         }
                     },
-                    replies: true
-                }
-            }),
-            prisma.comment.findUnique({
-                where: {
-                    id: commentId
-                },
-                include: {
                     post: {
                         include: {
                             user: {
                                 include: {
                                     profileImg: true
                                 }
-                            },
-                            likes: true,
-                            files: true,
-                            replies: true,
-                            comments: true
-                        }
-                    },
-                    likes: true,
-                    singleGifOrImg: true,
-                    user: {
-                        include: {
-                            profileImg: true
+                            }
                         }
                     },
                     replies: true
                 }
-            }),
-            getParentComments(commentId)
-        ]);
-
-        if (!comment || !comment.post) {
-            return res.status(404).json({
-                ok: false,
-                status: 404,
-                message: "Comment or post not found!!!"
             });
-        }
 
 
-        const buildReplies = Promise.all(
-            replies.map(async (reply): Promise<IComment> => {
+            //THE DIFFICULTY WITHIN TYPES HERE IS BECAUSE OF OBJECT.ENTRIES RETURNING A STRING TYPE NOT A LITERAL TYPE!!!
 
-                const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(reply);
+            const profileCommentDetails: IProfileComments = await Promise.all(
+                usersComments.map(async (comment) => {
+                    const post = comment.post;
+                    const postUser = post.user;
+                    const likes = comment.likes;
+
+                    const hasUserLiked = likes.some((like) => like.userId === user.userId);
 
 
-                return {
-                    id: reply.id,
-                    postId: reply.postId,
-                    userId: reply.userId,
-                    username: reply.user.username,
-                    userProfileImgUrl: userProfileImgUrl,
-                    createdAt: reply.createdAt,
-                    parentCommentId: commentId,
-                    likeCount: reply.likes.length,
-                    text: reply.textContent || undefined,
-                    [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                    commentCount: reply.replies.length,
-                    haveYouLiked: reply.likes.some((like) => like.userId === user.userId),
-                }
+                    let imgOrGifDetails: IFileDetails | undefined;
+                    let postUserProfileImageUrl: string | undefined;
+                    let userProfileImgUrl: string | undefined;
+
+                    const filesToGeneratePublicUrlsForObjMapping: Record<"imgOrGifContent" | "postUserProfileImg" | "userProfileImg", boolean> = {
+                        "imgOrGifContent": !!comment.singleGifOrImg,
+                        "postUserProfileImg": !!postUser.profileImg,
+                        "userProfileImg": !!comment.user.profileImg
+                    };
+
+
+
+                    const filesToGeneratePublicUrlsFor: string[] = [];
+
+                    if (comment.singleGifOrImg) {
+                        filesToGeneratePublicUrlsFor.push(comment.singleGifOrImg.supabaseFileId);
+                    }
+
+                    if (postUser.profileImg) {
+                        filesToGeneratePublicUrlsFor.push(postUser.profileImg.supabaseFileId);
+                    }
+
+
+                    const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
+
+
+                    if (!generatedPublicUrlResult.ok) {
+                        throw new Error("Failed to generate public URLs for comment or post user profile image!!!");
+                    }
+
+
+                    let indx = 0;
+
+                    const urlsMapping = Object.entries(filesToGeneratePublicUrlsForObjMapping).reduce(
+                        (acc, [key, exists]) => {
+                            acc[key as keyof typeof filesToGeneratePublicUrlsForObjMapping] =
+                                exists
+                                    ? generatedPublicUrlResult.supabasePublicURLs[indx++]
+                                    : undefined;
+
+                            return acc;
+                        },
+                        {} as Record<
+                            keyof typeof filesToGeneratePublicUrlsForObjMapping,
+                            string | undefined
+                        >
+                    );
+
+                    if (comment.singleGifOrImg && urlsMapping["imgOrGifContent"]) {
+                        imgOrGifDetails = {
+                            id: comment.singleGifOrImg.id,
+                            publicUrl: urlsMapping["imgOrGifContent"],
+                            name: comment.singleGifOrImg.filename,
+                            size: comment.singleGifOrImg.filesize,
+                            mimetype: comment.singleGifOrImg.mimetype,
+                            createdAt: comment.singleGifOrImg.uploadedAt
+                        };
+                    }
+
+                    postUserProfileImageUrl = urlsMapping["postUserProfileImg"];
+
+                    userProfileImgUrl = urlsMapping["userProfileImg"];
+
+
+
+
+                    return {
+                        id: comment.id,
+                        postId: post.id,
+                        userId: comment.userId,
+                        username: comment.user.username,
+                        userProfileImgUrl: userProfileImgUrl,
+                        createdAt: comment.createdAt,
+                        parentCommentId: comment.parentCommentId || undefined,
+                        likeCount: likes.length,
+                        text: comment.textContent || undefined,
+                        imgOrGifDetails: imgOrGifDetails,
+                        postUsername: postUser.username,
+                        postTitle: post.title || undefined,
+                        postUserId: postUser.id,
+                        postUserProfileImageUrl: postUserProfileImageUrl,
+                        commentCount: comment.replies.length,
+                        haveYouLiked: hasUserLiked
+                    };
+                })
+            );
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Comments found, no guarantee that there are any comments though, so check the length of the array!!!",
+                comments: profileCommentDetails
             })
-        );
 
-        const buildParentComments = Promise.all(
-            parentComments.map(async (parentComment): Promise<IComment> => {
 
-                const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(parentComment);
 
-                return {
-                    id: parentComment.id,
-                    postId: parentComment.postId,
-                    userId: parentComment.userId,
-                    username: parentComment.user.username,
+
+
+
+
+
+        } catch (error) {
+            next(error);
+
+        }
+
+
+
+    });
+
+
+
+router.get("/:commentId/replies",
+    ensureJWTAuthentication,
+    async (req: Request<{ commentId: string }>, res: Response<ICommentsThreadAPIResponse | ICustomErrorResponse>, next: NextFunction) => {
+        const user = req.user!;
+        const { commentId } = req.params;
+
+
+        try {
+
+            //MAKE SURE TO GET BOTH THE REPLIES AND THE UPPER PARENT COMMENTS/ORIGINAL POST FOR THIS ONE!!!
+
+            const [replies, comment, parentComments] = await Promise.all([
+                prisma.comment.findMany({
+                    where: {
+                        parentCommentId: commentId
+                    },
+                    orderBy: {
+                        createdAt: "asc"
+                    },
+                    include: {
+                        likes: true,
+                        singleGifOrImg: true,
+                        user: {
+                            include: {
+                                profileImg: true
+                            }
+                        },
+                        replies: true
+                    }
+                }),
+                prisma.comment.findUnique({
+                    where: {
+                        id: commentId
+                    },
+                    include: {
+                        post: {
+                            include: {
+                                user: {
+                                    include: {
+                                        profileImg: true
+                                    }
+                                },
+                                likes: true,
+                                files: true,
+                                replies: true,
+                                comments: true
+                            }
+                        },
+                        likes: true,
+                        singleGifOrImg: true,
+                        user: {
+                            include: {
+                                profileImg: true
+                            }
+                        },
+                        replies: true
+                    }
+                }),
+                getParentComments(commentId)
+            ]);
+
+            if (!comment || !comment.post) {
+                return res.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "Comment or post not found!!!"
+                });
+            }
+
+
+            const buildReplies = Promise.all(
+                replies.map(async (reply): Promise<IComment> => {
+
+                    const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(reply);
+
+
+                    return {
+                        id: reply.id,
+                        postId: reply.postId,
+                        userId: reply.userId,
+                        username: reply.user.username,
+                        userProfileImgUrl: userProfileImgUrl,
+                        createdAt: reply.createdAt,
+                        parentCommentId: commentId,
+                        likeCount: reply.likes.length,
+                        text: reply.textContent || undefined,
+                        [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                        commentCount: reply.replies.length,
+                        haveYouLiked: reply.likes.some((like) => like.userId === user.userId),
+                    }
+                })
+            );
+
+            const buildParentComments = Promise.all(
+                parentComments.map(async (parentComment): Promise<IComment> => {
+
+                    const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(parentComment);
+
+                    return {
+                        id: parentComment.id,
+                        postId: parentComment.postId,
+                        userId: parentComment.userId,
+                        username: parentComment.user.username,
+                        userProfileImgUrl: userProfileImgUrl,
+                        createdAt: parentComment.createdAt,
+                        parentCommentId: parentComment.parentCommentId || undefined,
+                        likeCount: parentComment.likes.length,
+                        text: parentComment.textContent || undefined,
+                        [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
+                        commentCount: parentComment.replies.length,
+                        haveYouLiked: parentComment.likes.some((like) => like.userId === user.userId),
+                    }
+                })
+            );
+
+            const buildComment = async () => {
+                const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(comment);
+
+                const commentAPI: IComment = {
+                    id: comment.id,
+                    postId: comment.postId,
+                    userId: comment.userId,
+                    username: comment.user.username,
                     userProfileImgUrl: userProfileImgUrl,
-                    createdAt: parentComment.createdAt,
-                    parentCommentId: parentComment.parentCommentId || undefined,
-                    likeCount: parentComment.likes.length,
-                    text: parentComment.textContent || undefined,
+                    createdAt: comment.createdAt,
+                    parentCommentId: comment.parentCommentId || undefined,
+                    likeCount: comment.likes.length,
+                    text: comment.textContent || undefined,
                     [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                    commentCount: parentComment.replies.length,
-                    haveYouLiked: parentComment.likes.some((like) => like.userId === user.userId),
-                }
-            })
-        );
+                    commentCount: comment.replies.length,
+                    haveYouLiked: comment.likes.some((like) => like.userId === user.userId),
+                };
 
-        const buildComment = async () => {
-            const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(comment);
+                return commentAPI;
+            }
 
-            const commentAPI: IComment = {
-                id: comment.id,
-                postId: comment.postId,
-                userId: comment.userId,
-                username: comment.user.username,
-                userProfileImgUrl: userProfileImgUrl,
-                createdAt: comment.createdAt,
-                parentCommentId: comment.parentCommentId || undefined,
-                likeCount: comment.likes.length,
-                text: comment.textContent || undefined,
-                [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                commentCount: comment.replies.length,
-                haveYouLiked: comment.likes.some((like) => like.userId === user.userId),
-            };
+            const buildPost = async () => {
+                const post = comment.post;
 
-            return commentAPI;
+                //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
+
+                // let postUserProfileImgUrl: string | undefined;
+                // let fileDetails: IFileDetails[] | undefined;
+
+                // const filesToGeneratePublicUrlsFor: string[] = [];
+                // const mapping: IPostFileMapping = {};
+
+                // if (post.user.profileImg) {
+                //     mapping.postUserProfileImg = filesToGeneratePublicUrlsFor.length;
+
+                //     filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
+                // }
+
+                // if (post.files.length > 0) {
+                //     mapping.postContentFiles = {
+                //         start: filesToGeneratePublicUrlsFor.length,
+                //         count: post.files.length
+                //     };
+
+                //     post.files.forEach((file) => {
+                //         filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
+                //     });
+                // }
+
+                // const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
+
+                // if (!generatedPublicUrlResult.ok) {
+                //     throw new Error("Failed to generate public URLs for post or post user profile image!!!");
+                // }
+
+                // if (mapping.postUserProfileImg !== undefined) {
+                //     postUserProfileImgUrl = generatedPublicUrlResult.supabasePublicURLs[
+                //         mapping.postUserProfileImg
+                //     ];
+                // }
+
+                // if (mapping.postContentFiles) {
+                //     const { start, count } = mapping.postContentFiles;
+
+                //     fileDetails = post.files.map((file, i) => ({
+                //         id: file.id,
+                //         publicUrl:
+                //             generatedPublicUrlResult.supabasePublicURLs[start + i],
+                //         name: file.filename,
+                //         size: file.filesize,
+                //         mimetype: file.mimetype,
+                //         createdAt: file.uploadedAt
+                //     }));
+                // }
+
+
+                const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
+
+
+
+                const postAPI: IPost = {
+                    id: post.id,
+                    userId: post.userId,
+                    username: post.user.username,
+                    title: post.title || undefined,
+                    content: post.textContent || undefined,
+                    createdAt: post.createdAt,
+                    likeCount: post.likes.length,
+                    userProfileImgUrl: userProfileImgUrl,
+                    fileDetails: fileDetails,
+                    commentCount: post.comments.length,
+                    repliesCount: post.replies.length,
+                    haveYouLiked: post.likes.some((like) => like.userId === user.userId),
+                };
+
+                return postAPI;
+            }
+
+
+            const [repliesAPI, parentCommentsAPI, commentAPI, postAPI] = await Promise.all([
+                buildReplies,
+                buildParentComments,
+                buildComment(),
+                buildPost()
+            ]);
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Replies and parent comments fetched successfully!!!",
+                replies: repliesAPI,
+                comment: commentAPI,
+                post: postAPI,
+                parentComments: parentCommentsAPI
+            });
+
+
+
+
+
+
+        } catch (error) {
+            next(error);
+
         }
 
-        const buildPost = async () => {
-            const post = comment.post;
 
-            //SO POST CAN HAVE MULTIPLE FILES BEING THE ONLY REAL DIFFERENCE IN THE CONTENT AREA
-
-            // let postUserProfileImgUrl: string | undefined;
-            // let fileDetails: IFileDetails[] | undefined;
-
-            // const filesToGeneratePublicUrlsFor: string[] = [];
-            // const mapping: IPostFileMapping = {};
-
-            // if (post.user.profileImg) {
-            //     mapping.postUserProfileImg = filesToGeneratePublicUrlsFor.length;
-
-            //     filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
-            // }
-
-            // if (post.files.length > 0) {
-            //     mapping.postContentFiles = {
-            //         start: filesToGeneratePublicUrlsFor.length,
-            //         count: post.files.length
-            //     };
-
-            //     post.files.forEach((file) => {
-            //         filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
-            //     });
-            // }
-
-            // const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
-
-            // if (!generatedPublicUrlResult.ok) {
-            //     throw new Error("Failed to generate public URLs for post or post user profile image!!!");
-            // }
-
-            // if (mapping.postUserProfileImg !== undefined) {
-            //     postUserProfileImgUrl = generatedPublicUrlResult.supabasePublicURLs[
-            //         mapping.postUserProfileImg
-            //     ];
-            // }
-
-            // if (mapping.postContentFiles) {
-            //     const { start, count } = mapping.postContentFiles;
-
-            //     fileDetails = post.files.map((file, i) => ({
-            //         id: file.id,
-            //         publicUrl:
-            //             generatedPublicUrlResult.supabasePublicURLs[start + i],
-            //         name: file.filename,
-            //         size: file.filesize,
-            //         mimetype: file.mimetype,
-            //         createdAt: file.uploadedAt
-            //     }));
-            // }
-
-
-            const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
-
-
-
-            const postAPI: IPost = {
-                id: post.id,
-                userId: post.userId,
-                username: post.user.username,
-                title: post.title || undefined,
-                content: post.textContent || undefined,
-                createdAt: post.createdAt,
-                likeCount: post.likes.length,
-                userProfileImgUrl: userProfileImgUrl,
-                fileDetails: fileDetails,
-                commentCount: post.comments.length,
-                repliesCount: post.replies.length,
-                haveYouLiked: post.likes.some((like) => like.userId === user.userId),
-            };
-
-            return postAPI;
-        }
-
-
-        const [repliesAPI, parentCommentsAPI, commentAPI, postAPI] = await Promise.all([
-            buildReplies,
-            buildParentComments,
-            buildComment(),
-            buildPost()
-        ]);
-
-
-
-        return res.status(200).json({
-            ok: true,
-            status: 200,
-            message: "Replies and parent comments fetched successfully!!!",
-            replies: repliesAPI,
-            comment: commentAPI,
-            post: postAPI,
-            parentComments: parentCommentsAPI
-        });
-
-
-
-
-
-
-    } catch (error) {
-        next(error);
-
-    }
-
-
-});
+    });
 
 
 router.post("/",

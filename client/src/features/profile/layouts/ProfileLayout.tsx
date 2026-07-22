@@ -5,7 +5,7 @@ import { useProfileInfoFetch } from "../hooks/useProfileInfoFetch";
 import { Header } from "./Header";
 import styles from "./ProfileLayout.module.css";
 import { homePageRoute } from "../../../constants/routes";
-import { useSectionScrollFetch } from "../hooks/useSectionScrollFetch";
+import { useSectionScrollFetch } from "../../../hooks/useSectionScrollFetch";
 import { defaultProfileCommentsLimit, defaultProfilePostsLimit, defaultProfileRepliesLimit } from "../../../../../shared/features/profiles/constants";
 import { ProfilePostsAPISuccessSchema } from "../../../../../shared/features/profiles/models/IProfilePosts";
 import { domain } from "../../../constants/EnvironmentAPI";
