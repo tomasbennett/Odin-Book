@@ -1,6 +1,6 @@
-import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
-import { FileIcon } from "../assets/icons/FileIcon";
-import { formatFileSize } from "../util/FormatBytes";
+import { IFileDetails } from "../../../../../shared/features/files/models/IFileDetails";
+import { FileIcon } from "../../../assets/icons/FileIcon";
+import { formatFileSize } from "../../../util/FormatBytes";
 import styles from "./TextFileElement.module.css";
 
 

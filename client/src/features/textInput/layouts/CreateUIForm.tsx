@@ -1,12 +1,12 @@
 import { UseFormRegisterReturn, FieldError } from "react-hook-form";
 import styles from "./CreateUIForm.module.css";
-import { useAuth } from "../features/auth/contexts/AuthContext";
+import { useAuth } from "../../auth/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { homePageRoute } from "../constants/routes";
+import { homePageRoute } from "../../../constants/routes";
 
 import defaultUserImg from "../assets/DEFAULT_USER_IMG.png";
-import { FileIcon } from "../assets/icons/FileIcon";
-import { ArrowIcon } from "../assets/icons/ArrowIcon";
+import { FileIcon } from "../../../assets/icons/FileIcon";
+import { ArrowIcon } from "../../../assets/icons/ArrowIcon";
 
 type ICreateUIFormProps = {
     registerText: UseFormRegisterReturn;
