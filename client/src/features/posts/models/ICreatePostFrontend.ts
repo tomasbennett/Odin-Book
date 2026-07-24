@@ -1,8 +1,8 @@
 import z from "zod";
-import { allowedAllFileTypes, maxFileSizeInBytes } from "../../../shared/features/files/constants";
-import { FilesMultipleOptionalSchema } from "../../../shared/features/files/models/INewOptionalFile";
-import { POST_FILE_ARRAY_KEY } from "../../../shared/features/posts/constants";
-import { CreatePostSchema } from "../../../shared/features/posts/models/ICreatePost";
+import { allowedAllFileTypes, maxFileSizeInBytes } from "../../../../../shared/features/files/constants";
+import { FilesMultipleOptionalSchema } from "../../../../../shared/features/files/models/INewOptionalFile";
+import { POST_FILE_ARRAY_KEY } from "../../../../../shared/features/posts/constants";
+import { CreatePostSchema } from "../../../../../shared/features/posts/models/ICreatePost";
 
 export const CreatePostFrontendSchema = CreatePostSchema.extend({
     [POST_FILE_ARRAY_KEY]: FilesMultipleOptionalSchema(allowedAllFileTypes, maxFileSizeInBytes)
@@ -25,3 +25,7 @@ export const CreatePostFrontendSchema = CreatePostSchema.extend({
         }
 
     });
+
+
+
+export type ICreatePostFrontend = z.infer<typeof CreatePostFrontendSchema>;

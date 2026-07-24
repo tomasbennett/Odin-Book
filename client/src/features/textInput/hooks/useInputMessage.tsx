@@ -8,17 +8,12 @@ import { useSocket } from "../../../contexts/SocketHandlerContext";
 import { useJWTFetch } from "../../../hooks/useJWTFetch";
 import { useAuth } from "../../auth/contexts/AuthContext";
 import { useError } from "../../error/contexts/ErrorContext";
-import { IInputMessageBody, IInputMessageErrors, IInputMessageParse } from "../models/IInputMessageErrors";
+import { IInputMessageBody, IInputMessageErrors, IInputMessageParse, IUseInputMessageParams } from "../models/IInputMessageErrors";
 import { IFileDetails } from "../../../../../shared/features/files/models/IFileDetails";
 
 
 
-type IUseInputMessageParams = {
-    parseInputFunc: IInputMessageParse,
-    parseResponseFunc: (data: unknown) => { ok: true } | { ok: false }
-    allowedFileMimeTypes: string[],
-    allowedMaxFileSize: number
-}
+
 
 
 
@@ -111,7 +106,11 @@ export function useInputMessage({
 
             if (!isValidSubmission.success) {
                 const validationErrors = isValidSubmission.error;
-
+                errCtx.throwError({
+                    status: 0,
+                    ok: false,
+                    message: "Invalid submission when attempting to create message!!!"
+                });
                 setErrors({
                     content: validationErrors.content,
                     files: validationErrors.files,

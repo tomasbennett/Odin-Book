@@ -7,26 +7,34 @@ import { homePageRoute } from "../../../constants/routes";
 import defaultUserImg from "../assets/DEFAULT_USER_IMG.png";
 import { FileIcon } from "../../../assets/icons/FileIcon";
 import { ArrowIcon } from "../../../assets/icons/ArrowIcon";
+import { useInputMessage } from "../hooks/useInputMessage";
+import { IUseInputMessageParams } from "../models/IInputMessageErrors";
+import { FileElementComponent } from "../components/FileElement";
+import { useRef, useEffect } from "react";
 
 type ICreateUIFormProps = {
-    registerText: UseFormRegisterReturn;
-    registerFile: UseFormRegisterReturn;
+    // registerText: UseFormRegisterReturn;
+    // registerFile: UseFormRegisterReturn;
 
-    rootError?: FieldError;
-    textError?: FieldError;
-    fileError?: FieldError;
+    // rootError?: FieldError;
+    // textError?: FieldError;
+    // fileError?: FieldError;
 
-    onSubmit: React.FormEventHandler<HTMLFormElement>;
-}
+    // onSubmit: React.FormEventHandler<HTMLFormElement>;
+} & IUseInputMessageParams;
 
 
 export function CreateUIForm({
-    registerFile,
-    registerText,
-    onSubmit,
-    rootError,
-    textError,
-    fileError
+    // registerFile,
+    // registerText,
+    // onSubmit,
+    // rootError,
+    // textError,
+    // fileError,
+    parseInputFunc,
+    parseResponseFunc,
+    allowedFileMimeTypes,
+    allowedMaxFileSize
 }: ICreateUIFormProps) {
 
     const { authLevel } = useAuth();
@@ -37,28 +45,50 @@ export function CreateUIForm({
     }
 
 
+    const {
+        isLoading,
+        errors,
+        onSubmit,
+        content,
+        setContent,
+        prepFiles,
+        preppedFilePreviews,
+        removeFile
+    } = useInputMessage({
+        parseInputFunc,
+        parseResponseFunc,
+        allowedFileMimeTypes,
+        allowedMaxFileSize
+    });
+
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        const textarea = textareaRef.current;
+
+        if (!textarea) {
+            return;
+        }
+
+        textarea.style.height = "0px";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }, [])
+
     return (
         <>
 
-            <form className={styles.form} onSubmit={onSubmit}>
+            <form className={styles.form} onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit();
+            }}>
 
                 {
-                    (rootError || fileError || textError) && (
+                    (errors.root || errors.files || errors.content) && (
                         <div className={styles.errorContainer}>
                             {
-                                rootError && (
-                                    <p className={styles.errorMessage}>{rootError.message}</p>
-                                )
-                            }
-                            {
-                                textError && (
-                                    <p className={styles.errorMessage}>{textError.message}</p>
-                                )
-                            }
-                            {
-                                fileError && (
-                                    <p className={styles.errorMessage}>{fileError.message}</p>
-                                )
+                                Object.entries(errors).filter(([key, value]) => value !== undefined).map(([key, value]) => (
+                                    <p key={key} className={styles.errorText}>{value}</p>
+                                ))
                             }
                         </div>
                     )
@@ -78,12 +108,32 @@ export function CreateUIForm({
 
                             <label className={styles.textLabel}>
 
-                                <input {...registerText} type="text" className={styles.textInput} />
+                                <textarea ref={textareaRef} value={content} onChange={(e) => {
+                                    const textarea = e.target;
+
+                                    setContent(textarea.value);
+
+                                    textarea.style.height = "0px";
+                                    textarea.style.height = `${textarea.scrollHeight}px`;
+
+
+
+                                }} placeholder="Enter your message here..." className={`${styles.textInput} ${styles.inputField}`} />
 
                             </label>
 
                             <div className={styles.filesContainer}>
+                                {
+                                    preppedFilePreviews.map((file) => (
+                                        <FileElementComponent
+                                            key={file.id}
+                                            fileId={file.id}
+                                            removeFile={removeFile}
+                                            fileDetails={file}
+                                        />
 
+                                    ))
+                                }
                             </div>
 
 
@@ -95,7 +145,7 @@ export function CreateUIForm({
                             <div className={styles.leftSideBtnsList}>
 
                                 <label className={`${styles.fileInput} ${styles.inputField}`}>
-                                    
+
                                     <FileIcon />
 
                                     <input hidden type="file" multiple onChange={(e) => {
@@ -105,7 +155,7 @@ export function CreateUIForm({
                                             return;
                                         }
 
-                                        // prepFiles(e);
+                                        prepFiles(e);
 
                                         e.currentTarget.value = "";
                                     }} />
