@@ -1,7 +1,7 @@
 import { VALID_SORT_OPTIONS } from "../../../../../shared/features/posts/constants";
 import { ISortPostByQuery } from "../../../../../shared/features/posts/models/ISortPostsByQuery";
 import { capitaliseFirstLetter } from "../../../util/capitaliseFirstLetter";
-import { sortOptionsClient } from "../constants/sortOptionDetails";
+// import { sortOptionsClient } from "../constants/sortOptionDetails";
 import styles from "./SortDialogBox.module.css";
 
 type ISortDialogBoxProps = {

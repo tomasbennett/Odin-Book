@@ -8,6 +8,7 @@ import { prisma } from "../db/prisma";
 import { IProfilePosts, IProfilePostsAPISuccess } from "../../../shared/features/profiles/models/IProfilePosts";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
+import { sortKeyWord } from "../../../shared/features/posts/constants";
 
 
 export const router = Router();
@@ -23,7 +24,11 @@ router.get("/",
 
 
         try {
-            const { offset, limit, sort } = HomePostsQuerySchema.parse(query);
+            const queryResult = HomePostsQuerySchema.parse(query);
+
+            const sort = queryResult[sortKeyWord];
+            const offset = queryResult.offset;
+            const limit = queryResult.limit;
 
             let postsOrderBy: Prisma.PostOrderByWithRelationInput;
 

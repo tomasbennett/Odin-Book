@@ -16,6 +16,7 @@ import { ISearchQuery } from "../../../shared/features/util/models/ISearchQuery"
 
 export function useSectionScrollFetch({
     url,
+    additionalQuery,
     fetchBody,
     appendData,
     limit,
@@ -35,7 +36,7 @@ export function useSectionScrollFetch({
     const offsetRef = useRef<number>(originalOffset);
     const [isMoreDataAvailable, setIsMoreDataAvailable] = useState<boolean>(isMoreAvailable);
 
-    const containerRef = useRef<HTMLElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const scrollFetch = async () => {
         if (!errCtx) {
@@ -56,12 +57,17 @@ export function useSectionScrollFetch({
             setIsLoadingState(true);
             isLoadingRef.current = true;
 
-            const searchQueryParams: ISearchQuery = {
+            const searchQueryDefParams: ISearchQuery = {
                 limit,
                 offset: offsetRef.current
             }
 
-            const response = await jwtFetchHandler(`${url}?${toQueryString(searchQueryParams)}`, fetchBody);
+            const additionalSearchQueryParams = additionalQuery ? {
+                ...searchQueryDefParams,
+                ...additionalQuery
+            } : searchQueryDefParams;
+
+            const response = await jwtFetchHandler(`${url}?${toQueryString(additionalSearchQueryParams)}`, fetchBody);
 
             if (response.returnType === "loginError") {
                 setAuthLevel({ userType: "none" });

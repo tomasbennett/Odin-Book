@@ -27,7 +27,7 @@ import cubeNightSky from "../../../assets/cube-night-sky.jpg";
 export function useHomeFetch() {
     const nav = useNavigate();
 
-    const postsContainerRef = useRef<HTMLDivElement | null>(null);
+    // const postsContainerRef = useRef<HTMLDivElement | null>(null);
 
 
     const errCtx = useError();
@@ -318,7 +318,7 @@ export function useHomeFetch() {
         posts,
         setPosts,
         sort,
-        postsContainerRef,
+        // postsContainerRef,
         limit
     }
 
