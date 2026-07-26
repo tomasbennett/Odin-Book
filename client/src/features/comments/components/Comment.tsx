@@ -44,7 +44,7 @@ export function Comment({
 
 
     const onClickComments = () => {
-        nav(`posts/${postId}/comments/${id}`, { replace: true });
+        nav(`comments/${id}`, { replace: true });
     }
 
     const likeFetchUrl = `${domain}/api/comments/${id}/like`;
@@ -109,7 +109,7 @@ export function Comment({
                         </div>
 
 
-                        <div className={styles.replyContainer}>
+                        <div onClick={onClickComments} className={styles.replyContainer}>
 
                             <div className={styles.repliesSVGContainer}>
                                 <HollowCommentIcon />

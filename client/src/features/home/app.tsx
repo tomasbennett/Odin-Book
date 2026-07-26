@@ -1,18 +1,18 @@
-import { PostsList } from "./components/PostsList";
+// import { PostsList } from "./components/PostsList";
 
-export function HomeApp() {
-
-
+// export function HomeApp() {
 
 
-    return (
-        <>
+
+
+//     return (
+//         <>
         
 
-            <PostsList />
+//             <PostsList />
         
         
         
-        </>
-    )
-}
+//         </>
+//     )
+// }

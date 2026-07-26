@@ -1,5 +1,5 @@
 
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, replace } from 'react-router-dom'
 import { GeneralHomeLayout } from './layouts/GeneralHomeLayout'
 import { SignInLayout } from './features/auth/layouts/SignInLayout'
 import { NotAuthenticatedRoute, ProtectedRoute } from './features/auth/components/ProtectedRoute'
@@ -8,12 +8,19 @@ import { ErrorPageLayout } from './features/error/layouts/ErrorLayout'
 import { AuthProvider } from './features/auth/contexts/AuthContext'
 import { ErrorProvider } from './features/error/contexts/ErrorContext'
 import { SocketProvider } from './contexts/SocketHandlerContext'
-import { HomeApp } from './features/home/app'
+import { HomeLayout } from './features/home/layouts/HomeLayout'
+import { homePageRoute, profilePageRoute } from './constants/routes'
+import { ProfileLayout } from './features/profile/layouts/ProfileLayout'
+import { PostCommentsThread } from './features/commentsThread/layouts/PostCommentsThread'
+import { RepliesThreadLayout } from './features/repliesThread/layouts/RepliesThreadLayout'
+import { CommentRepliesThread } from './features/commentsThread/layouts/CommentRepliesThread'
+import { profileStateQueryKey } from './features/profile/constants/profileStateQueryKey'
+import { IProfileSections } from './features/profile/models/IProfileSections'
 
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: homePageRoute,
     element:
       <AuthProvider>
         <GeneralHomeLayout />
@@ -25,10 +32,10 @@ const router = createBrowserRouter([
         element: <ErrorPageLayout />,
       },
       {
-        element: 
-        <NotAuthenticatedRoute>
-          <Outlet />
-        </NotAuthenticatedRoute>,
+        element:
+          <NotAuthenticatedRoute>
+            <Outlet />
+          </NotAuthenticatedRoute>,
         children: [
           {
             element: <SignInLayout />,
@@ -50,16 +57,68 @@ const router = createBrowserRouter([
         ]
       },
       {
-        element: 
-        <ProtectedRoute>
-          <SocketProvider>
-            <Outlet />
-          </SocketProvider>
-        </ProtectedRoute>,
+        element:
+          <ProtectedRoute>
+            <SocketProvider>
+              <Outlet />
+            </SocketProvider>
+          </ProtectedRoute>,
         children: [
           {
             index: true,
-            element: <HomeApp />
+            element: <HomeLayout />
+          },
+          {
+            path: profilePageRoute,
+            children: [
+              {
+                index: true,
+                element: <Navigate to={`${profilePageRoute}/me`} replace={true} />
+              },
+              {
+                path: ":userId",
+                element: <ProfileLayout />
+              }
+            ]
+          },
+          {
+            path: "posts",
+            children: [
+              {
+                index: true,
+                element: <Navigate to={homePageRoute} replace={true} />
+              },
+              {
+                path: ":postId",
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to={"comments"} replace={true} />
+                  },
+                  {
+                    path: "comments",
+                    element: <PostCommentsThread />
+                  },
+                  {
+                    path: "replies",
+                    element: <RepliesThreadLayout />
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            path: "comments",
+            children: [
+              {
+                index: true,
+                element: <Navigate to={`${profilePageRoute}/me?${profileStateQueryKey}=${"comments" satisfies IProfileSections}`} replace={true} />
+              },
+              {
+                path: ":commentId",
+                element: <CommentRepliesThread />
+              }
+            ]
           }
         ]
       }

@@ -1,8 +1,9 @@
-import { CreatePostOrCommentInput } from "../../../components/CreatePostOrCommentInput";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { Comment } from "../../comments/components/Comment";
+import { CreateCommentInput } from "../../comments/components/CreateCommentInput";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { createSingleLikeUpdater } from "../../likes/services/likeSingleObjects";
+import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { Post } from "../../posts/components/Post";
 import { usePostCommentThreadFetch } from "../hooks/usePostCommentsThreadFetch";
 import styles from "./PostCommentsThread.module.css";
@@ -45,15 +46,20 @@ export function PostCommentsThread() {
 
                                         :
 
-                                        <Post 
-                                            {...post}
-                                            setLikesCount={createSingleLikeUpdater(setPost)}
-                                        />
+                                        <>
+                                            <Post 
+                                                {...post}
+                                                setLikesCount={createSingleLikeUpdater(setPost)}
+                                            />
+                                        
+                                            <CreateCommentInput 
+                                                setComments={setComments}
+                                                postId={post.id}
+                                            />
+                                        </>
+
                                 }
 
-                                <CreatePostOrCommentInput 
-                                    placeHolder="Add a comment to this post here..."
-                                />
 
                             </div>
 

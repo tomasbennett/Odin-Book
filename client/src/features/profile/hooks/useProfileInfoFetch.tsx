@@ -39,11 +39,15 @@ export function useProfileInfoFetch() {
     const nav = useNavigate();
     const errCtx = useError();
     const { jwtFetchHandler } = useJWTFetch();
-    const { setAuthLevel } = useAuth();
+    const { authLevel, setAuthLevel } = useAuth();
     const [searchParams] = useSearchParams();
-    const { userId } = useParams<"userId">();
 
-    
+    const { userId: routeUserId } = useParams<"userId">();
+
+    const userId =
+        routeUserId === "me" && authLevel.userType === "user"
+            ? authLevel.userId
+            : routeUserId;
 
     const rawState = searchParams.get(profileStateQueryKey);
 

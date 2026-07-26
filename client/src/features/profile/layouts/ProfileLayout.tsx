@@ -17,6 +17,7 @@ import { LoadingCircle } from "../../../components/LoadingCircle";
 import { Comment } from "../../comments/components/Comment";
 import { Post } from "../../posts/components/Post";
 import { COMMENT_IMG_GIF_KEY } from "../../../../../shared/features/comments/constants";
+import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 
 
 
@@ -216,7 +217,7 @@ export function ProfileLayout() {
                                                         return (
                                                             <Comment
                                                                 key={comment.id}
-                                                                setLikeCount={setComments}
+                                                                setLikeCount={createArrayLikeUpdater(comment.id, setComments)}
                                                                 postId={comment.postId}
                                                                 userId={userId}
                                                                 username={comment.username}
@@ -253,7 +254,7 @@ export function ProfileLayout() {
                                                             return (
                                                                 <Post
                                                                     key={post.id}
-                                                                    setLikesCount={setPosts}
+                                                                    setLikesCount={createArrayLikeUpdater(post.id, setPosts)}
                                                                     userId={userId}
                                                                     username={post.username}
                                                                     createdAt={post.createdAt}
@@ -290,7 +291,7 @@ export function ProfileLayout() {
                                                                 return (
                                                                     <Post
                                                                         key={reply.id}
-                                                                        setLikesCount={setReplies}
+                                                                        setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
                                                                         userId={userId}
                                                                         username={reply.username}
                                                                         createdAt={reply.createdAt}

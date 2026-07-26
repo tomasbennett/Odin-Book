@@ -3,7 +3,7 @@ import { IComment } from "../../../../../shared/features/comments/models/ICommen
 import { IPost } from "../../../../../shared/features/posts/models/IPost";
 
 
-export const ProfileSections = ["Replies", "Posts", "Comments"] as const;
+export const ProfileSections = ["replies", "posts", "comments"] as const;
 
 
 export type IProfileSections = typeof ProfileSections[number];

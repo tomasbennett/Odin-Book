@@ -15,6 +15,7 @@ import { ILikeableObject } from "../../../../../shared/features/likes/models/ILi
 import { useAuth } from "../../auth/contexts/AuthContext";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { IUpdateLikeCountParams } from "../../likes/models/IUpdateLikeCountParams";
+import { profilePageRoute } from "../../../constants/routes";
 
 
 type IPostProps = {
@@ -42,22 +43,22 @@ export function Post({
     const nav = useNavigate();
 
     const onClickComment = () => {
-
+        nav(`posts/${id}/comments`, { replace: true })
     }
 
     const onClickReply = () => {
-
+        nav(`posts/${id}/replies`, { replace: true })
     }
 
     const onClickParentPost = () => {
         if (!parentPost) return;
 
-        nav(`/post/${parentPost.parentPostId}`, { replace: true });
+        nav(`/posts/${parentPost.parentPostId}/replies`, { replace: true });
     }
 
     const onClickUsername = () => {
+        nav(`${profilePageRoute}/${userId}`, { replace: true });
 
-        nav(`/profile/${userId}`, { replace: true });
     }
 
 
@@ -183,7 +184,7 @@ export function Post({
 
                         </div>
 
-                        <div className={styles.repliesContainer}>
+                        <div onClick={onClickReply} className={styles.repliesContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowRepliesIcon />
@@ -192,7 +193,7 @@ export function Post({
 
                         </div>
 
-                        <div className={styles.commentContainer}>
+                        <div onClick={onClickComment} className={styles.commentContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowCommentIcon />

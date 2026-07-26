@@ -16,7 +16,7 @@ import { noSocketConnectionError } from "../../../constants/errorConstants";
 type ICreateCommentInputProps = {
     setComments: React.Dispatch<React.SetStateAction<IComment[]>>,
     postId: string,
-    parentCommentId: string | undefined
+    parentCommentId?: string | undefined
 }
 
 export function CreateCommentInput({

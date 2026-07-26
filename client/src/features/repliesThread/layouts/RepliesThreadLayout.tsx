@@ -1,7 +1,7 @@
-import { CreatePostOrCommentInput } from "../../../components/CreatePostOrCommentInput";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { createSingleLikeUpdater } from "../../likes/services/likeSingleObjects";
+import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { Post } from "../../posts/components/Post";
 import { useRepliesThreadFetch } from "../hooks/useRepliesThreadFetch";
 import styles from "./RepliesThreadLayout.module.css";
@@ -60,15 +60,22 @@ export function RepliesThreadLayout() {
 
                                         :
 
-                                        <Post
-                                            {...post}
-                                            setLikesCount={createSingleLikeUpdater(setPost)}
-                                        />
+                                        <>
+
+                                            <Post
+                                                {...post}
+                                                setLikesCount={createSingleLikeUpdater(setPost)}
+                                            />
+
+                                            <CreatePostInput 
+                                                setPosts={setReplies}
+                                                parentPostId={post.parentPost?.parentPostId}
+                                            />
+                                        
+                                        </>
+
                                 }
 
-                                <CreatePostOrCommentInput
-                                    placeHolder="Add a reply to this post..."
-                                />
 
                             </div>
 

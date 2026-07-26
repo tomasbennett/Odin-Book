@@ -1,7 +1,5 @@
 import styles from "./CommentRepliesThread.module.css";
 
-
-import { CreatePostOrCommentInput } from "../../../components/CreatePostOrCommentInput";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { Comment } from "../../comments/components/Comment";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
@@ -9,6 +7,7 @@ import { createSingleLikeUpdater } from "../../likes/services/likeSingleObjects"
 import { Post } from "../../posts/components/Post";
 import { usePostCommentThreadFetch } from "../hooks/usePostCommentsThreadFetch";
 import { useCommentRepliesThreadFetch } from "../hooks/useCommentRepliesThreadFetch";
+import { CreateCommentInput } from "../../comments/components/CreateCommentInput";
 
 
 
@@ -26,6 +25,9 @@ export function CommentRepliesThread() {
         parentComments,
         setParentComments
     } = useCommentRepliesThreadFetch();
+
+
+    
 
 
     return (
@@ -100,9 +102,20 @@ export function CommentRepliesThread() {
                                         />
                                 }
 
-                                <CreatePostOrCommentInput 
-                                    placeHolder="Add a reply to this comment here..."
-                                />
+                                {
+                                    post === null ?
+                                        null
+
+                                        :
+
+                                        <CreateCommentInput 
+                                            setComments={setReplies}
+                                            postId={post.id}
+                                            parentCommentId={comment?.parentCommentId}
+                                        />
+
+                                }
+
 
                             </div>
 
