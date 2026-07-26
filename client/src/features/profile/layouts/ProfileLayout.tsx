@@ -205,7 +205,7 @@ export function ProfileLayout() {
 
                                     :
 
-                                    state === "Comments" ?
+                                    state === "comments" ?
                                         <div className={styles.contentContainer}>
                                             {
                                                 isMoreCommentsAvailable ?
@@ -245,7 +245,7 @@ export function ProfileLayout() {
 
                                         :
 
-                                        state === "Posts" ?
+                                        state === "posts" ?
                                             <div className={styles.contentContainer}>
                                                 {
                                                     isMorePostsAvailable ?
@@ -282,7 +282,7 @@ export function ProfileLayout() {
 
                                             :
 
-                                            state === "Replies" ?
+                                            state === "replies" ?
                                                 <div className={styles.contentContainer}>
                                                     {
                                                         isMoreRepliesAvailable ?
