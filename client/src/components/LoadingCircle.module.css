@@ -1,10 +1,14 @@
 /* HTML: <div class="loader"></div> */
 .loader {
     /* width: 4rem; */
+    /* width: 100%;
+    height: 100%; */
+
     aspect-ratio: 1;
     border-radius: 50%;
     border: .8rem solid;
-    border-color: white #0000; /* var(--input-bcg-colour) */
+    border-color: white #0000; 
+    /* var(--input-bcg-colour) */
     animation: l1 1s infinite;
 }
 

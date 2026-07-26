@@ -1,0 +1,273 @@
+/* NEEDS A LOT OF JAVASCRIPT TINKERING WITH THE TEXTAREA AND THE FILES CONTAINER SETUP */
+
+.form{
+    /* height: 20rem; */
+    /* flex: 0 0 auto; */
+
+    flex-shrink: 0;
+
+    width: 100%;
+    height: auto;
+
+
+    /* overflow: hidden; */
+
+
+    border-bottom: .1rem solid white;
+    padding: 2rem 2.5rem 1rem;
+
+    color: white;
+    fill: white;
+
+    & *{
+        /* outline: .1rem solid orange; */
+    }
+}
+
+
+.messageOuterContainer{
+    width: 100%;
+    /* height: 100%; */
+    /* height: 18rem; */
+
+    display: flex;
+    column-gap: 2.5rem;
+
+    overflow: hidden;
+}
+
+
+.userProfileImgContainer{
+    flex-shrink: 0;
+
+    height: 100%;
+    width: 8rem;
+
+    overflow: hidden;
+
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    
+    .userImgInnerContainer{
+        max-width: 100%;
+        max-height: 100%;
+        
+        aspect-ratio: 1;
+        border-radius: 50%;
+
+        overflow: hidden;
+
+        img{
+            width: 100%;
+            height: 100%;
+    
+    
+            object-fit: contain;
+        }
+    }
+
+}
+
+
+
+
+.messageInnerContainer{
+    flex: 1 1 0;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+}
+
+
+.bodyContainer{
+    flex: 1 1 auto;
+
+    width: 100%;
+    height: auto;
+    
+
+    /* padding-top: 3rem; */
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    row-gap: .5rem;
+
+    overflow-y: auto;
+}
+
+
+.textLabel{
+    flex-shrink: 0;
+    flex-basis: auto;
+
+
+
+    font-size: 1.8rem;
+
+    width: 100%;
+    height: auto;
+    
+    
+    
+    .textInput{
+        resize: none;
+        height: 7rem;
+
+        width: 100%;
+        /* height: 100%; */
+
+        background-color: transparent;
+    }
+
+    .textInput::placeholder{
+        color: white;
+    }
+}
+
+.filesContainer{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.lowerBtnsContainer{
+    --svg-height: 5rem;
+
+    flex-shrink: 0;
+
+    width: 100%;
+    /* height: 5rem; */
+
+    display: flex;
+    /* align-items: center; */
+    justify-content: space-between;
+    column-gap: 1rem;
+
+    overflow: hidden;
+
+
+    .leftSideBtnsList{
+        flex: 1 1 0;
+
+        height: var(--svg-height);
+
+        display: flex;
+
+
+        .fileInput{
+            flex-shrink: 0;
+
+            padding: .8rem;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            max-height: 100%;
+            max-width: 100%;
+
+            aspect-ratio: 1;
+
+            cursor: pointer;
+
+            /* background-color: rgba(255, 255, 255, 0.2); */
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            transition: background-color .2s linear;
+
+            svg{
+                width: 100%;
+                height: 100%;
+
+                fill: white;
+
+                object-fit: contain;
+            }
+        }
+
+        .fileInput:hover{
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    }
+
+
+    .submitContainer{
+        flex-shrink: 0;
+
+        /* height: var(--svg-height); */
+
+        overflow: hidden;
+
+
+        .submitBtn{
+            height: var(--svg-height);
+
+            aspect-ratio: 1;
+
+            padding: .6rem;
+
+            overflow: hidden;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+
+            background-color: rgb(255, 167, 182);
+            fill: white;
+
+            svg{
+                transform: rotateZ(270deg);
+
+
+                width: 100%;
+                height: 100%;
+
+                object-fit: contain;
+
+            }
+
+            .loadingContainer{
+
+
+                padding: .3rem;
+
+                width: 100%;
+                height: 100%;
+
+            }
+        }
+
+    }
+
+}
+

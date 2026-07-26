@@ -4,13 +4,14 @@ import { useAuth } from "../../auth/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { homePageRoute } from "../../../constants/routes";
 
-import defaultUserImg from "../assets/DEFAULT_USER_IMG.png";
+import defaultUserImg from "../../../assets/DEFAULT_USER_IMG.png";
 import { FileIcon } from "../../../assets/icons/FileIcon";
 import { ArrowIcon } from "../../../assets/icons/ArrowIcon";
 import { useInputMessage } from "../hooks/useInputMessage";
 import { IUseInputMessageParams } from "../models/IInputMessageErrors";
 import { FileElementComponent } from "../components/FileElement";
 import { useRef, useEffect } from "react";
+import { LoadingCircle } from "../../../components/LoadingCircle";
 
 type ICreateUIFormProps = {
     // registerText: UseFormRegisterReturn;
@@ -98,7 +99,11 @@ export function CreateUIForm({
 
                     <div className={styles.userProfileImgContainer}>
 
-                        <img src={authLevel.userProfileImgUrl ?? defaultUserImg} alt={`User profile image: ${authLevel.username}`} />
+                        <div className={styles.userImgInnerContainer}>
+
+                            <img src={authLevel.userProfileImgUrl ?? defaultUserImg} alt={`User profile image: ${authLevel.username}`} />
+
+                        </div>
 
                     </div>
 
@@ -136,7 +141,6 @@ export function CreateUIForm({
                                 }
                             </div>
 
-
                         </div>
 
 
@@ -167,7 +171,21 @@ export function CreateUIForm({
 
                                 <button className={styles.submitBtn} type="button">
 
-                                    <ArrowIcon />
+                                    {
+                                        isLoading ?
+
+                                            <div className={styles.loadingContainer}>
+                                                <LoadingCircle height="100%" />
+                                            </div>
+
+
+                                            :
+
+                                            <ArrowIcon />
+
+
+                                    }
+
 
                                 </button>
 
@@ -175,10 +193,7 @@ export function CreateUIForm({
 
                         </div>
 
-
                     </div>
-
-
 
                 </div>
 

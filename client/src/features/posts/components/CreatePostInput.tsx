@@ -14,7 +14,7 @@ import styles from "./CreatePostInput.module.css";
 
 type ICreatePostInputProps = {
     setPosts: React.Dispatch<React.SetStateAction<IPost[]>>,
-    parentPostId: string | undefined
+    parentPostId?: string | undefined
 }
 
 export function CreatePostInput({

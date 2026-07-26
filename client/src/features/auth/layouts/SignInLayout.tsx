@@ -213,17 +213,9 @@ export function SignInLayout() {
                     <form className={`${styles.form} ${screenWidthClassName}`} onSubmit={handleSubmit(onSubmit)}>
 
 
-                        {
-                            isThinScreen && (
-                                <h1 className={`${styles.title} ${screenWidthClassName}`}>{title}</h1>
-                            )
-                        }
-
                         <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
                             {
-                                !isThinScreen && (
                                     <h1 className={styles.title}>{title}</h1>
-                                )
                             }
 
                             <div className={`${styles.errorsContainer} ${screenWidthClassName}`}>

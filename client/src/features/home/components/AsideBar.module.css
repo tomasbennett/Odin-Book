@@ -1,0 +1,9 @@
+.outerContainer{
+    flex-shrink: 0;
+
+    height: 100%;
+    width: var(--aside-bar-width);
+
+    overflow: hidden;
+
+}

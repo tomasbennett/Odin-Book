@@ -1,7 +1,10 @@
 .listScrollContainer{
+
+    flex: 1 1 0;
+
     height: 100%;
-    width: 100%;
-    max-width: var(--content-max-width);
+    max-width: 40rem;
+    
 
     overflow-y: auto;
 
@@ -9,7 +12,8 @@
     flex-direction: column;
 
 
-    border: .1rem solid white;
+
+    /* border: .1rem solid white; */
 }
 
 

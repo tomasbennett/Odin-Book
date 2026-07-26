@@ -4,6 +4,7 @@ import styles from "./HomeLayout.module.css";
 import { PassiveSidebarVisual } from "../../../components/PassiveSidebarVisual";
 import { useHomeFetch } from "../hooks/useHomeFetch";
 import { LoadingCircle } from "../../../components/LoadingCircle";
+import { CreatePostInput } from "../../posts/components/CreatePostInput";
 
 
 
@@ -28,7 +29,19 @@ export function HomeLayout() {
 
                         :
 
-                        <PostsList {...homeFetch} />
+                        <>
+                            <main className={styles.main}>
+                                
+                                <CreatePostInput 
+                                    setPosts={homeFetch.setPosts}
+                                    
+                                />
+
+                                <PostsList {...homeFetch} />
+
+                            </main>
+                        
+                        </>
 
 
                 }
