@@ -101,6 +101,19 @@
 
     border-right: .2rem solid white;
 
+    overflow: hidden;
+}
+
+.fileName{
+    display: inline;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    /* width: 100%; */
+
 }
 
 

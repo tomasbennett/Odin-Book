@@ -203,6 +203,10 @@
 
     padding: 1rem var(--main-content-side-padding);
 
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
     
     line-height: 2rem;
 
@@ -346,5 +350,47 @@
 
 
 .filesContainer{
+    display: flex;
+    flex-direction: column;
+    row-gap: .8rem;
+
+    width: 100%;
+
+    overflow: hidden;
+
+    .imgFileContainer{
+        flex-shrink: 0;
+
+        position: relative;
+
     
+        width: 100%;
+    
+    
+        height: 20rem;
+    
+        overflow: hidden;
+    
+        img{
+            height: 100%;
+            width: 100%;
+    
+            object-fit: contain;
+            object-position: top left;
+    
+        }
+    }
+
+    .textFileContainer{
+        flex-shrink: 0;
+
+        max-width: 50rem;
+        min-width: 15rem;
+
+        width: clamp(15rem, 35rem, 50rem);
+
+        overflow: hidden;
+
+    }
+
 }

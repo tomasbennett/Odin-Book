@@ -90,8 +90,8 @@ export function useHomeFetch() {
                 {
                     id: "1",
                     publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "image/jpeg",
+                    name: "Cube night sky aojfkjdnfdsk fdsnfkjdbfsdkfn sfkisdjfhkdbfgsdh skdfjdskf",
+                    mimetype: "application/pdf",
                     size: 1300,
                     createdAt: new Date()
                 },
@@ -99,7 +99,7 @@ export function useHomeFetch() {
                     id: "2",
                     publicUrl: githubProfileImg,
                     name: "Github Profile img",
-                    mimetype: "image/jpeg",
+                    mimetype: "application/pdf",
                     size: 1600,
                     createdAt: new Date()
                 },
@@ -131,7 +131,7 @@ export function useHomeFetch() {
                     id: "1",
                     publicUrl: cubeNightSky,
                     name: "Cube night sky",
-                    mimetype: "image/jpeg",
+                    mimetype: "application/pdf",
                     size: 1300,
                     createdAt: new Date()
                 },

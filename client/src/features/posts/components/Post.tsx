@@ -145,7 +145,6 @@ export function Post({
 
                             {
                                 fileDetails && fileDetails.map((file) => {
-                                    console.log("THIS FILE MIMETYPE: " + file.mimetype);
 
                                     if (allowedImgTypes.includes(file.mimetype)) {
                                         return (
