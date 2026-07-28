@@ -5,17 +5,15 @@ import { RepostIcon } from "../../../assets/icons/RepostIcon";
 import { formatSentAtDate } from "../../../util/FormatDateMessage";
 import { allowedImgTypes, allowedTextFileTypes } from "../../../../../shared/features/files/constants";
 import { TextFileElement } from "../../textInput/components/TextFileElement";
-import { SolidThumbsUpIcon } from "../../../assets/icons/SolidThumbsUpIcon";
-import { HollowThumbsUpIcon } from "../../../assets/icons/HollowThumbsUpIcon";
 import { HollowRepliesIcon } from "../../../assets/icons/HollowRepliesIcon";
 import { HollowCommentIcon } from "../../../assets/icons/HollowCommentIcon";
 import { Like } from "../../likes/components/Like";
 import { domain } from "../../../constants/EnvironmentAPI";
-import { ILikeableObject } from "../../../../../shared/features/likes/models/ILikeableObject";
 import { useAuth } from "../../auth/contexts/AuthContext";
-import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { IUpdateLikeCountParams } from "../../likes/models/IUpdateLikeCountParams";
 import { profilePageRoute } from "../../../constants/routes";
+
+import defUserImg from "../../../assets/DEFAULT_USER_IMG.png";
 
 
 type IPostProps = {
@@ -80,12 +78,16 @@ export function Post({
                     parentPost && (
                         <>
 
-                            <div onClick={onClickParentPost} className={styles.parentPostContainer}>
+                            <div 
+                                onClick={onClickParentPost} 
+                                className={styles.parentPostContainer}>
+                                
                                 <div className={styles.repostIconSVGContainer}>
                                     <RepostIcon />
                                 </div>
 
                                 <p className={styles.parentPostUsername}>{parentPost.parentPostUsername}</p>
+                            
                             </div>
 
                         </>
@@ -103,19 +105,19 @@ export function Post({
                             className={styles.leftSideUpperContainer}>
 
                             <div className={styles.userProfileImgContainer}>
-                                <img src={userProfileImgUrl} alt="user profile" />
+                                <img src={userProfileImgUrl ?? defUserImg} alt="user profile" />
                             </div>
 
                             <div className={styles.titleUsernameContainer}>
                                 <p className={styles.username}>{username}</p>
 
-                                {
+                                {/* {
                                     title && (
                                         <div className={styles.postTitleContainer}>
                                             <p className={styles.postTitle}>{title}</p>
                                         </div>
                                     )
-                                }
+                                } */}
                             </div>
 
 
@@ -143,6 +145,7 @@ export function Post({
 
                             {
                                 fileDetails && fileDetails.map((file) => {
+                                    console.log("THIS FILE MIMETYPE: " + file.mimetype);
 
                                     if (allowedImgTypes.includes(file.mimetype)) {
                                         return (
@@ -160,6 +163,7 @@ export function Post({
                                         )
                                     }
 
+                                    
                                     return null;
                                 })
                             }
@@ -171,7 +175,8 @@ export function Post({
 
                     <div className={styles.lowerBtnsContainer}>
 
-                        <div className={styles.likesContainer}>
+                        <div 
+                            className={styles.likesContainer}>
 
                             <Like 
                                 id={id}
@@ -184,7 +189,9 @@ export function Post({
 
                         </div>
 
-                        <div onClick={onClickReply} className={styles.repliesContainer}>
+                        <div 
+                            onClick={onClickReply} 
+                            className={styles.repliesContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowRepliesIcon />
@@ -193,7 +200,9 @@ export function Post({
 
                         </div>
 
-                        <div onClick={onClickComment} className={styles.commentContainer}>
+                        <div 
+                            onClick={onClickComment} 
+                            className={styles.commentContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowCommentIcon />
@@ -212,8 +221,6 @@ export function Post({
 
 
             </div>
-
-
 
 
         </>

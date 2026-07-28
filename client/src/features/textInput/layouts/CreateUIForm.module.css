@@ -13,7 +13,7 @@
     /* overflow: hidden; */
 
 
-    border-bottom: .1rem solid white;
+    border-bottom: .1rem solid var(--low-light-gray);
     padding: 2rem 2.5rem 1rem;
 
     color: white;
@@ -245,8 +245,12 @@
             background-color: rgb(255, 167, 182);
             fill: white;
 
+            transform: rotateZ(270deg);
+
+            transition: transform .8s ease;
+
             svg{
-                transform: rotateZ(270deg);
+
 
 
                 width: 100%;
@@ -265,6 +269,10 @@
                 height: 100%;
 
             }
+        }
+
+        .submitBtn:hover{
+            transform: rotate(630deg);
         }
 
     }

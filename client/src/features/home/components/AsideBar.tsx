@@ -16,7 +16,13 @@ import React from "react";
 
 
 
-export function AsideBar() {
+type IAsideBarProps = {
+    sortType: ISortPostByQuery
+}
+
+export function AsideBar({
+    sortType: currentSortType
+}: IAsideBarProps) {
 
     const { authLevel } = useAuth();
 
@@ -24,12 +30,19 @@ export function AsideBar() {
         return <Navigate to={homePageRoute} replace={true} />
     }
 
-    const navLinkClassName = ({ isActive }: { isActive: boolean }) => {
+    const navLinkClassName = ({ isActive, sortType }: { 
+        isActive: boolean;
+        sortType?: ISortPostByQuery | undefined
+    }) => {
         let baseClass: string = styles.navLink;
 
-        if (isActive) {
-            return `${baseClass} ${styles.activeLink}`
+        if (isActive && (!sortType || currentSortType === sortType)) {
+            return `${baseClass} ${styles.activeLink}`;
         }
+
+        // if (isActive && ) {
+        //     return `${baseClass} ${styles.activeLink}`;
+        // }
 
         return `${baseClass} ${styles.inActiveLink}`
 
@@ -42,7 +55,11 @@ export function AsideBar() {
 
                 <div className={styles.topContainer}>
 
-                    <NavLink to={homePageRoute} className={navLinkClassName}>
+                    <NavLink 
+                        to={homePageRoute} 
+                        className={({ isActive }) => {
+                            return navLinkClassName({isActive})
+                        }}>
                         <HomeIcon />
                     </NavLink>
 
@@ -50,7 +67,11 @@ export function AsideBar() {
 
                 <div className={styles.searchOuterContainer}>
 
-                    <NavLink to={searchPageRoute} className={navLinkClassName}>
+                    <NavLink to={searchPageRoute} className={({ isActive }) => {
+                        return navLinkClassName({
+                            isActive
+                        })
+                    }}>
                         <SearchIcon />
                     </NavLink>
 
@@ -58,15 +79,30 @@ export function AsideBar() {
 
                 <div className={styles.middleContainer}>
 
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={navLinkClassName}>
+                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                        return navLinkClassName({
+                            isActive,
+                            sortType: "popular"
+                        })
+                    }}>
                         <SolidThumbsUpIcon />
                     </NavLink>
 
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"newest" satisfies ISortPostByQuery}`} className={navLinkClassName}>
+                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"newest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                        return navLinkClassName({
+                            isActive,
+                            sortType: "newest"
+                        })
+                    }}>
                         <CalendarIcon />
                     </NavLink>
 
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"oldest" satisfies ISortPostByQuery}`} className={navLinkClassName}>
+                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"oldest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                        return navLinkClassName({
+                            isActive,
+                            sortType: "oldest"
+                        })
+                    }}>
                         <HourGlassIcon />
                     </NavLink>
 
@@ -74,7 +110,9 @@ export function AsideBar() {
 
                 <div className={styles.lowerContainer}>
 
-                    <NavLink to={`${profilePageRoute}/${authLevel.userId}`} className={navLinkClassName}>
+                    <NavLink 
+                        to={`${profilePageRoute}/${authLevel.userId}`} 
+                        className={`${styles.imgNavLinkContainer} ${navLinkClassName}`}>
 
                         <img src={authLevel.userProfileImgUrl ?? defUserImg} alt={`User image: ${authLevel.username}`} />
 

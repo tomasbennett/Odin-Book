@@ -28,8 +28,8 @@
     
     animation: moveBackgroundPosition 100s linear alternate-reverse;
 
-    border-right: .1rem solid var(--inactive-input-colour);
-    border-left: .1rem solid var(--inactive-input-colour);
+    /* border-right: .1rem solid var(--inactive-input-colour);
+    border-left: .1rem solid var(--inactive-input-colour); */
 }
 
 @keyframes moveBackgroundPosition {

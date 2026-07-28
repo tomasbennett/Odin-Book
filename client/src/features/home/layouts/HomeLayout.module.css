@@ -27,6 +27,10 @@
     justify-content: flex-start;
 
     overflow-y: auto;
+
+    border-left: .1rem solid var(--low-light-gray);
+    border-right: .1rem solid var(--low-light-gray);
+
 }
 
 

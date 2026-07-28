@@ -21,7 +21,7 @@ export function HomeLayout() {
         
             <div className={styles.outerContainer}>
 
-                <AsideBar />
+                <AsideBar sortType={homeFetch.sort} />
 
                 {
                     homeFetch.isLoading ?
