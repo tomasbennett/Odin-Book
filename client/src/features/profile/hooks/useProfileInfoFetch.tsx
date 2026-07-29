@@ -34,6 +34,9 @@ import { Controller } from "react-hook-form";
 import { abortInitialFetchRequest } from "../constants/abortFetchReq";
 
 
+import cubeNightSky from "../../../assets/cube-night-sky.jpg"
+import githubProfileImg from "../../../assets/github-profile-img.jpg"
+
 export function useProfileInfoFetch() {
 
     const nav = useNavigate();
@@ -70,9 +73,283 @@ export function useProfileInfoFetch() {
     }, [parsed.success, userId, nav]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [replies, setReplies] = useState<IPost[]>([]);
-    const [posts, setPosts] = useState<IPost[]>([]);
-    const [comments, setComments] = useState<IComment[]>([]);
+    const [replies, setReplies] = useState<IPost[]>([
+        {
+            id: "1",
+            userId: "1",
+            username: "Ted_Kennedy",
+            createdAt: new Date(),
+            likeCount: 15,
+            commentCount: 23,
+            repliesCount: 1,
+            title: "Check out this post I made!!!",
+            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
+            userProfileImgUrl: undefined,
+            parentPost: undefined,
+            fileDetails: undefined,
+            haveYouLiked: false
+        },
+        {
+            id: "2",
+            userId: "2",
+            username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
+            createdAt: new Date("2022-06-08"),
+            likeCount: 4,
+            commentCount: 203,
+            repliesCount: 3,
+            title: undefined,
+            content: "Yo",
+            userProfileImgUrl: githubProfileImg,
+            parentPost: undefined,
+            haveYouLiked: true,
+            fileDetails: [
+                {
+                    id: "1",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky aojfkjdnfdsk fdsnfkjdbfsdkfn sfkisdjfhkdbfgsdh skdfjdskf",
+                    mimetype: "application/pdf",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+                {
+                    id: "2",
+                    publicUrl: githubProfileImg,
+                    name: "Github Profile img",
+                    mimetype: "application/pdf",
+                    size: 1600,
+                    createdAt: new Date()
+                },
+                {
+                    id: "3",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky",
+                    mimetype: "image/jpeg",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+            ]
+        },
+        {
+            id: "3",
+            userId: "3",
+            username: "T",
+            createdAt: new Date("2026-06-26"),
+            likeCount: 0,
+            commentCount: 1,
+            repliesCount: 100,
+            title: undefined,
+            content: undefined,
+            userProfileImgUrl: undefined,
+            parentPost: undefined,
+            haveYouLiked: true,
+            fileDetails: [
+                {
+                    id: "1",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky",
+                    mimetype: "application/pdf",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+            ]
+        }
+    ]);
+    const [posts, setPosts] = useState<IPost[]>([
+        {
+            id: "2",
+            userId: "2",
+            username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
+            createdAt: new Date("2022-06-08"),
+            likeCount: 4,
+            commentCount: 203,
+            repliesCount: 3,
+            title: undefined,
+            content: "Yo",
+            userProfileImgUrl: githubProfileImg,
+            parentPost: undefined,
+            haveYouLiked: true,
+            fileDetails: [
+                {
+                    id: "1",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky aojfkjdnfdsk fdsnfkjdbfsdkfn sfkisdjfhkdbfgsdh skdfjdskf",
+                    mimetype: "application/pdf",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+                {
+                    id: "2",
+                    publicUrl: githubProfileImg,
+                    name: "Github Profile img",
+                    mimetype: "application/pdf",
+                    size: 1600,
+                    createdAt: new Date()
+                },
+                {
+                    id: "3",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky",
+                    mimetype: "image/jpeg",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+            ]
+        },
+        {
+            id: "3",
+            userId: "3",
+            username: "T",
+            createdAt: new Date("2026-06-26"),
+            likeCount: 0,
+            commentCount: 1,
+            repliesCount: 100,
+            title: undefined,
+            content: undefined,
+            userProfileImgUrl: undefined,
+            parentPost: undefined,
+            haveYouLiked: true,
+            fileDetails: [
+                {
+                    id: "1",
+                    publicUrl: cubeNightSky,
+                    name: "Cube night sky",
+                    mimetype: "application/pdf",
+                    size: 1300,
+                    createdAt: new Date()
+                },
+            ]
+        },
+        {
+            id: "1",
+            userId: "1",
+            username: "Ted_Kennedy",
+            createdAt: new Date(),
+            likeCount: 15,
+            commentCount: 23,
+            repliesCount: 1,
+            title: "Check out this post I made!!!",
+            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
+            userProfileImgUrl: undefined,
+            parentPost: undefined,
+            fileDetails: undefined,
+            haveYouLiked: false
+        },
+        
+    ]);
+    const [comments, setComments] = useState<IComment[]>([
+        {
+            postId: "post-1",
+            userId: "user-1",
+            username: "Alice",
+            createdAt: new Date("2026-01-01T10:00:00Z"),
+            commentCount: 5,
+            id: "comment-1",
+            likeCount: 12,
+            haveYouLiked: false,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "This is the first placeholder comment.",
+            commentImgGifKey: {
+                id: "1",
+                publicUrl: cubeNightSky,
+                mimetype: "image/jpeg",
+                size: 1400,
+                name: "fileName",
+                createdAt: new Date()
+            }
+        },
+        {
+            postId: "post-1",
+            userId: "user-2",
+            username: "Bob",
+            createdAt: new Date("2026-01-01T10:05:00Z"),
+            commentCount: 2,
+            id: "comment-2",
+            likeCount: 3,
+            haveYouLiked: true,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Et optio rem ipsum natus praesentium sint magni consequuntur veniam impedit blanditiis perspiciatis, dolores esse odit provident ducimus labore nobis asperiores ipsa, tenetur incidunt ex iure? Aut voluptatem quasi temporibus commodi adipisci. Quia laudantium beatae soluta voluptatibus sint natus fugit voluptates tenetur!"
+        },
+        {
+            postId: "post-1",
+            userId: "user-3",
+            username: "Charlie",
+            createdAt: new Date("2026-01-01T10:10:00Z"),
+            commentCount: 0,
+            id: "comment-3",
+            likeCount: 0,
+            haveYouLiked: false,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "Lorem ipsum dolor sit amet."
+        },
+        {
+            postId: "post-2",
+            userId: "user-4",
+            username: "Diana",
+            createdAt: new Date("2026-01-01T10:15:00Z"),
+            commentCount: 8,
+            id: "comment-4",
+            likeCount: 21,
+            haveYouLiked: true,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "Testing another default object."
+        },
+        {
+            postId: "post-2",
+            userId: "user-5",
+            username: "Ethan",
+            createdAt: new Date("2026-01-01T10:20:00Z"),
+            commentCount: 1,
+            id: "comment-5",
+            likeCount: 7,
+            haveYouLiked: false,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "React and TypeScript are a great combination."
+        },
+        {
+            postId: "post-2",
+            userId: "user-6",
+            username: "Fiona",
+            createdAt: new Date("2026-01-01T10:25:00Z"),
+            commentCount: 4,
+            id: "comment-6",
+            likeCount: 14,
+            haveYouLiked: true,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "This comment is here for testing layouts."
+        },
+        {
+            postId: "post-3",
+            userId: "user-7",
+            username: "George",
+            createdAt: new Date("2026-01-01T10:30:00Z"),
+            commentCount: 6,
+            id: "comment-7",
+            likeCount: 2,
+            haveYouLiked: false,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "Infinite scrolling should append this correctly."
+        },
+        {
+            postId: "post-3",
+            userId: "user-8",
+            username: "Hannah",
+            createdAt: new Date("2026-01-01T10:35:00Z"),
+            commentCount: 3,
+            id: "comment-8",
+            likeCount: 18,
+            haveYouLiked: true,
+            userProfileImgUrl: "",
+            parentCommentId: "",
+            text: "Final placeholder comment for testing."
+        }
+    ]);
     const [headerInfo, setHeaderInfo] = useState<IProfileHeader | null>(null);
 
     // const [postsOffset, setPostsOffset] = useState<number>(defaultProfilePostsLimit);
@@ -137,9 +414,9 @@ export function useProfileInfoFetch() {
             const successResult = ProfileAPISuccessSchema.safeParse(resJSON);
             if (successResult.success) {
                 setHeaderInfo(successResult.data.headerInfo);
-                setReplies(successResult.data.replies);
-                setPosts(successResult.data.posts);
-                setComments(successResult.data.comments);
+                // setReplies(successResult.data.replies);
+                // setPosts(successResult.data.posts);
+                // setComments(successResult.data.comments);
 
                 return;
             }

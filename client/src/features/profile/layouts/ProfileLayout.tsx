@@ -139,7 +139,11 @@ export function ProfileLayout() {
     });
 
 
-
+    const loadingComponent = (
+        <div className={styles.loadingContainer}>
+            <LoadingCircle height="3rem" />
+        </div>
+    )
 
 
 
@@ -175,7 +179,7 @@ export function ProfileLayout() {
 
                     <div className={styles.sectionsHeaderContainer}>
 
-                        <SectionsHeaders />
+                        <SectionsHeaders sectionType={state} />
 
                     </div>
 
@@ -187,59 +191,63 @@ export function ProfileLayout() {
                             headerInfo === null ?
                                 <div className={styles.mainErrorContainer}>
 
-                                    { /* This could be an svg detailing an error just like for the header as well!!!  */  }
+                                    { /* This could be an svg detailing an error just like for the header as well!!!  */}
                                     <p>
-                                        No header information given for this user!!!
+                                        No user information given for this user!!!
                                     </p>
 
                                 </div>
 
                                 :
 
-                                isInitialFetchLoading ||
-                                    isScrollCommentsLoading ||
-                                    isScrollPostsLoading ||
-                                    isScrollRepliesLoading ?
+                                isInitialFetchLoading ?
 
-                                    <LoadingCircle height="4rem" />
+                                    (
+                                        loadingComponent
+                                    )
 
                                     :
 
                                     state === "comments" ?
                                         <div className={styles.contentContainer}>
-                                            {
-                                                isMoreCommentsAvailable ?
-                                                    comments.map(comment => {
-                                                        const imageProp = {
-                                                            [COMMENT_IMG_GIF_KEY]: comment[COMMENT_IMG_GIF_KEY],
-                                                        };
+                                            <>
+                                                {comments.map(comment => {
+                                                    const imageProp = {
+                                                        [COMMENT_IMG_GIF_KEY]: comment[COMMENT_IMG_GIF_KEY],
+                                                    };
 
-                                                        return (
-                                                            <Comment
-                                                                key={comment.id}
-                                                                setLikeCount={createArrayLikeUpdater(comment.id, setComments)}
-                                                                postId={comment.postId}
-                                                                userId={userId}
-                                                                username={comment.username}
-                                                                createdAt={comment.createdAt}
-                                                                commentCount={comment.commentCount}
-                                                                id={comment.id}
-                                                                likeCount={comment.likeCount}
-                                                                haveYouLiked={comment.haveYouLiked}
-                                                                userProfileImgUrl={comment.userProfileImgUrl}
-                                                                parentCommentId={comment.parentCommentId}
-                                                                text={comment.text}
-                                                                {...imageProp}
-                                                            />
-                                                        )
-                                                    })
+                                                    return (
+                                                        <Comment
+                                                            key={comment.id}
+                                                            setLikeCount={createArrayLikeUpdater(comment.id, setComments)}
+                                                            postId={comment.postId}
+                                                            userId={userId}
+                                                            username={comment.username}
+                                                            createdAt={comment.createdAt}
+                                                            commentCount={comment.commentCount}
+                                                            id={comment.id}
+                                                            likeCount={comment.likeCount}
+                                                            haveYouLiked={comment.haveYouLiked}
+                                                            userProfileImgUrl={comment.userProfileImgUrl}
+                                                            parentCommentId={comment.parentCommentId}
+                                                            text={comment.text}
+                                                            {...imageProp}
+                                                        />
+                                                    );
+                                                })}
 
-                                                    :
+                                                {isScrollCommentsLoading && !isInitialFetchLoading && (
+                                                    (
+                                                        loadingComponent
+                                                    )
+                                                )}
 
+                                                {!isMoreCommentsAvailable && (
                                                     <p className={styles.noContentAvailable}>
                                                         {`No more comments from ${headerInfo.username ?? "this user!!!"}`}
                                                     </p>
-                                            }
+                                                )}
+                                            </>
                                         </div>
 
 
@@ -247,37 +255,45 @@ export function ProfileLayout() {
 
                                         state === "posts" ?
                                             <div className={styles.contentContainer}>
+
+                                                {posts.map(post => {
+
+                                                    return (
+                                                        <Post
+                                                            key={post.id}
+                                                            setLikesCount={createArrayLikeUpdater(post.id, setPosts)}
+                                                            userId={userId}
+                                                            username={post.username}
+                                                            createdAt={post.createdAt}
+                                                            commentCount={post.commentCount}
+                                                            repliesCount={post.repliesCount}
+                                                            id={post.id}
+                                                            likeCount={post.likeCount}
+                                                            haveYouLiked={post.haveYouLiked}
+                                                            userProfileImgUrl={post.userProfileImgUrl}
+                                                            title={post.title}
+                                                            parentPost={post.parentPost}
+                                                            content={post.content}
+                                                            fileDetails={post.fileDetails}
+                                                        />
+                                                    )
+                                                })}
+
+
                                                 {
-                                                    isMorePostsAvailable ?
-                                                        posts.map(post => {
-
-                                                            return (
-                                                                <Post
-                                                                    key={post.id}
-                                                                    setLikesCount={createArrayLikeUpdater(post.id, setPosts)}
-                                                                    userId={userId}
-                                                                    username={post.username}
-                                                                    createdAt={post.createdAt}
-                                                                    commentCount={post.commentCount}
-                                                                    repliesCount={post.repliesCount}
-                                                                    id={post.id}
-                                                                    likeCount={post.likeCount}
-                                                                    haveYouLiked={post.haveYouLiked}
-                                                                    userProfileImgUrl={post.userProfileImgUrl}
-                                                                    title={post.title}
-                                                                    parentPost={post.parentPost}
-                                                                    content={post.content}
-                                                                    fileDetails={post.fileDetails}
-                                                                />
-                                                            )
-                                                        })
-
-                                                        :
-
-                                                        <p className={styles.noContentAvailable}>
-                                                            {`No more posts from ${headerInfo.username ?? "this user!!!"}`}
-                                                        </p>
+                                                    isScrollPostsLoading && !isInitialFetchLoading &&
+                                                    (
+                                                        loadingComponent
+                                                    )
                                                 }
+
+                                                {
+                                                    isMorePostsAvailable &&
+                                                    <p className={styles.noContentAvailable}>
+                                                        {`No more posts from ${headerInfo.username ?? "this user!!!"}`}
+                                                    </p>
+                                                }
+
                                             </div>
 
                                             :
@@ -285,36 +301,44 @@ export function ProfileLayout() {
                                             state === "replies" ?
                                                 <div className={styles.contentContainer}>
                                                     {
-                                                        isMoreRepliesAvailable ?
-                                                            replies.map(reply => {
+                                                        replies.map(reply => {
 
-                                                                return (
-                                                                    <Post
-                                                                        key={reply.id}
-                                                                        setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
-                                                                        userId={userId}
-                                                                        username={reply.username}
-                                                                        createdAt={reply.createdAt}
-                                                                        commentCount={reply.commentCount}
-                                                                        repliesCount={reply.repliesCount}
-                                                                        id={reply.id}
-                                                                        likeCount={reply.likeCount}
-                                                                        haveYouLiked={reply.haveYouLiked}
-                                                                        userProfileImgUrl={reply.userProfileImgUrl}
-                                                                        title={reply.title}
-                                                                        parentPost={reply.parentPost}
-                                                                        content={reply.content}
-                                                                        fileDetails={reply.fileDetails}
-                                                                    />
-                                                                )
-                                                            })
-
-                                                            :
-
-                                                            <p className={styles.noContentAvailable}>
-                                                                {`No more replies from ${headerInfo.username ?? "this user!!!"}`}
-                                                            </p>
+                                                            return (
+                                                                <Post
+                                                                    key={reply.id}
+                                                                    setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
+                                                                    userId={userId}
+                                                                    username={reply.username}
+                                                                    createdAt={reply.createdAt}
+                                                                    commentCount={reply.commentCount}
+                                                                    repliesCount={reply.repliesCount}
+                                                                    id={reply.id}
+                                                                    likeCount={reply.likeCount}
+                                                                    haveYouLiked={reply.haveYouLiked}
+                                                                    userProfileImgUrl={reply.userProfileImgUrl}
+                                                                    title={reply.title}
+                                                                    parentPost={reply.parentPost}
+                                                                    content={reply.content}
+                                                                    fileDetails={reply.fileDetails}
+                                                                />
+                                                            )
+                                                        })
                                                     }
+
+                                                    {
+                                                        isScrollRepliesLoading && !isInitialFetchLoading &&
+                                                        (
+                                                            loadingComponent
+                                                        )
+                                                    }
+
+                                                    {
+                                                        !isMoreRepliesAvailable &&
+                                                        <p className={styles.noContentAvailable}>
+                                                            {`No more replies from ${headerInfo.username ?? "this user!!!"}`}
+                                                        </p>
+                                                    }
+
                                                 </div>
 
                                                 :

@@ -11,7 +11,7 @@ import { useProfileImgChange } from "../hooks/useProfileImgChange";
 import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY } from "../../../../../shared/features/users/constants";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 
-
+import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png"
 
 
 export function Header({
@@ -85,7 +85,7 @@ export function Header({
 
                                 <label className={styles.backgroundImgContainer}>
 
-                                    <img src={`${bannerImgPreview}`} alt={`Banner Image: ${authLevel.username}`} />
+                                    <img src={`${bannerImgPreview ?? defUserProfileImg}`} alt={`Banner Image: ${authLevel.username}`} />
 
                                     <input onChange={(e) => {
                                         uploadNewBannerImg(e);
@@ -96,7 +96,7 @@ export function Header({
 
                                 <label className={styles.profileImgContainer}>
 
-                                    <img src={`${profileImgPreview}`} alt={`Profile Image: ${authLevel.username}`} />
+                                    <img src={`${profileImgPreview ?? defUserProfileImg}`} alt={`Profile Image: ${authLevel.username}`} />
 
                                     <input onChange={(e) => {
                                         uploadNewProfileImg(e);

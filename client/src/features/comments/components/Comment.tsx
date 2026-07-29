@@ -73,6 +73,7 @@ export function Comment({
 
                     <div className={styles.usernameAndDateContainer}>
                         <p className={styles.username}>{username}</p>
+                        <p className={styles.separationBar}>|</p>
                         <p className={styles.createdAt}>{formatSentAtDate(createdAt)}</p>
                     </div>
 
@@ -97,7 +98,7 @@ export function Comment({
                     <div className={styles.likeReplyContainer}>
 
 
-                        <div className={styles.likeContainer}>
+                        <div className={styles.likesContainer}>
                             <Like
                                 id={id}
                                 likeCount={likeCount}
@@ -109,9 +110,11 @@ export function Comment({
                         </div>
 
 
-                        <div onClick={onClickComments} className={styles.replyContainer}>
+                        <div 
+                            onClick={onClickComments} 
+                            className={styles.repliesContainer}>
 
-                            <div className={styles.repliesSVGContainer}>
+                            <div className={`${styles.btnSVGContainer} ${styles.repliesSVGContainer}`}>
                                 <HollowCommentIcon />
                             </div>
 
