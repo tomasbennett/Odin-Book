@@ -387,7 +387,10 @@
         max-width: 50rem;
         min-width: 15rem;
 
-        width: clamp(15rem, 35rem, 50rem);
+        min-width: 15rem;
+        max-width: 50rem;
+        /* width: clamp(15rem, 35rem, 50rem); */
+        width: max-content;
 
         overflow: hidden;
 

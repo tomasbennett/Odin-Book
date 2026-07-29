@@ -54,7 +54,7 @@ export function SearchUsersLayout() {
                 {
                     isLoading && (
                         <div className={styles.loadContainer}>
-                            <LoadingCircle height="5rem" />
+                            <LoadingCircle height="4rem" />
                         </div>
                     )
                 }

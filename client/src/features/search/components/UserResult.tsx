@@ -1,6 +1,10 @@
 import { IUserSearchBar } from "../../../../../shared/features/users/models/ISearchBarUser";
 import styles from "./UserResult.module.css";
 
+import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png";
+import { useNavigate } from "react-router-dom";
+import { profilePageRoute } from "../../../constants/routes";
+
 
 
 export function UserResult({
@@ -10,16 +14,23 @@ export function UserResult({
     userProfileImgUrl
 }: IUserSearchBar) {
 
+    const nav = useNavigate();
 
+
+    const onClickUserAccount = () => {
+        nav(`${profilePageRoute}/${userId}`, {
+            replace: true
+        });
+    }
 
     return (
         <>
 
-            <div className={styles.userResultContainer}>
+            <div onClick={onClickUserAccount} className={styles.userResultContainer}>
 
                 <div className={styles.userProfileImgContainer}>
                     <img
-                        src={userProfileImgUrl}
+                        src={userProfileImgUrl ?? defUserProfileImg}
                         alt={`${username}'s profile picture`}
                         className={styles.userProfileImg}
                     />

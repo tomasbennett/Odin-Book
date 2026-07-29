@@ -1,0 +1,52 @@
+.searchUsersLayoutContainer{
+    width: 100%;
+    max-width: var(--main-max-width);
+
+    margin: 0 auto;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 1.5rem;
+
+    padding: 1rem 2rem;
+    padding-top: 2rem;
+
+
+    border-left: .1rem solid var(--low-light-gray);
+    border-right: .1rem solid var(--low-light-gray);
+
+}
+
+
+.searchBarContainer{
+    flex-shrink: 0;
+
+    width: 100%;
+
+    padding: 1rem 0;
+
+    border-bottom: .1rem solid var(--low-light-gray);
+
+}
+
+
+
+.searchResultsContainer{
+    flex: 0 0 auto;
+    width: 100%;
+
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    row-gap: .8rem;
+
+
+
+}

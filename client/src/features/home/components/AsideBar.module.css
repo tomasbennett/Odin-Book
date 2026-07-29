@@ -16,8 +16,8 @@
 
     fill: white;
 
-    border-left: .1rem solid white;
-    border-right: .1rem solid white;
+    border-left: .1rem solid var(--low-light-gray);
+    border-right: .1rem solid var(--low-light-gray);
 }
 
 

@@ -9,13 +9,14 @@ import { AuthProvider } from './features/auth/contexts/AuthContext'
 import { ErrorProvider } from './features/error/contexts/ErrorContext'
 import { SocketProvider } from './contexts/SocketHandlerContext'
 import { HomeLayout } from './features/home/layouts/HomeLayout'
-import { homePageRoute, profilePageRoute } from './constants/routes'
+import { homePageRoute, profilePageRoute, searchPageRoute } from './constants/routes'
 import { ProfileLayout } from './features/profile/layouts/ProfileLayout'
 import { PostCommentsThread } from './features/commentsThread/layouts/PostCommentsThread'
 import { RepliesThreadLayout } from './features/repliesThread/layouts/RepliesThreadLayout'
 import { CommentRepliesThread } from './features/commentsThread/layouts/CommentRepliesThread'
 import { profileStateQueryKey } from './features/profile/constants/profileStateQueryKey'
 import { IProfileSections } from './features/profile/models/IProfileSections'
+import { SearchUsersLayout } from './features/search/layouts/SearchUsersLayout'
 
 
 const router = createBrowserRouter([
@@ -119,6 +120,10 @@ const router = createBrowserRouter([
                 element: <CommentRepliesThread />
               }
             ]
+          },
+          {
+            path: searchPageRoute,
+            element: <SearchUsersLayout />
           }
         ]
       }

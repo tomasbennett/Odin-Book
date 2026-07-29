@@ -20,7 +20,7 @@ export function SearchBar({
 
             <input
                 type="text"
-                placeholder="Search users..."
+                placeholder="Search users here..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 className={styles.searchInput}

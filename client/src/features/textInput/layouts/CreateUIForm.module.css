@@ -242,7 +242,7 @@
 
             cursor: pointer;
 
-            background-color: rgb(255, 167, 182);
+            background-color: var(--submit-pink-btn-bcg);
             fill: white;
 
             transform: rotateZ(270deg);

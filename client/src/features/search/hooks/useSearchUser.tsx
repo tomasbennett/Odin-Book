@@ -14,6 +14,10 @@ import { ISearchQuery } from "../../../../../shared/features/util/models/ISearch
 import { UserSearchedAPISuccessSchema } from "../../../../../shared/features/users/models/ISearchUserAPISuccess";
 import { useScrollToBottomContainer } from "../../../hooks/useScrollToBottomContainer";
 
+import cubeNightSky from "../../../assets/cube-night-sky.jpg";
+import githubProfileImg from "../../../assets/github-profile-img.jpg";
+
+
 export function useSearchUser() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -23,22 +27,22 @@ export function useSearchUser() {
         // {
         //     userId: "1",
         //     username: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam dolorum aut qui deserunt nemo amet unde nisi optio excepturi explicabo repudiandae, placeat omnis, vero ipsum cupiditate totam assumenda a ipsa ullam eligendi cumque neque ab! Illum vero eius velit aut libero. Saepe culpa, nobis officia dolorum quod quas minus repellendus!",
-        //     prepstatus: "no_invite_prepped"
+        //     userProfileImgUrl: cubeNightSky
         // },
         // {
         //     userId: "2",
         //     username: "Cannon Basics",
-        //     prepstatus: "invite_prepped"
+        //     userProfileImgUrl: githubProfileImg
         // },
         // {
         //     userId: "3",
         //     username: "JAMAL__DESPERADO",
-        //     prepstatus: "invite_prepped"
+            
         // },
         // {
         //     userId: "4",
         //     username: "CharredRemains123",
-        //     prepstatus: "no_invite_prepped"
+            
         // }
     ]);
 
