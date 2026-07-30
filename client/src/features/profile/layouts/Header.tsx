@@ -146,11 +146,10 @@ export function Header({
                                     <div
                                         className={
                                             `${(
-                                                aboutUserServer &&
-                                                isUserProfileOwner
-                                            ) ?
-                                                styles.emptyAboutContainer :
-                                                styles.fullAboutContainer
+                                                !aboutUserServer &&
+                                                !isUserProfileOwner
+                                            ) &&
+                                                styles.emptyAboutContainer
                                             } ${styles.aboutUserContainer
                                             }`
                                         }>
@@ -173,7 +172,7 @@ export function Header({
 
                                                             textarea.style.height = "0px";
                                                             textarea.style.height = `${textarea.scrollHeight}px`;
-                        
+
 
 
                                                         }} />
@@ -206,23 +205,29 @@ export function Header({
                                                 </div>
                                             ) :
 
-                                                <p
-                                                    className={`${(aboutUserServer && isUserProfileOwner) ?
-                                                        styles.emptyAbout : styles.fullAbout} 
-                                                            ${styles.aboutUser}`}>
-                                                    {
-                                                        (
-                                                            !aboutUserServer &&
-                                                            isUserProfileOwner
-                                                        ) ?
 
-                                                            "Tell others about yourself..."
 
-                                                            :
+                                                    <p
+                                                        className={`${(!aboutUserServer && isUserProfileOwner) &&
+                                                            styles.emptyAbout} 
+                                                                    ${styles.aboutUser}`}>
+                                                        {
+                                                            (
+                                                                !aboutUserServer &&
+                                                                isUserProfileOwner
+                                                            ) ?
 
-                                                            aboutUserServer
-                                                    }
-                                                </p>
+                                                                "Tell others about yourself..."
+
+                                                                :
+
+                                                                aboutUserServer
+
+                                                        }
+                                                    </p>
+
+
+
                                         }
 
 

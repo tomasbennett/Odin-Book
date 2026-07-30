@@ -256,6 +256,10 @@
     /* border-right: .1rem solid var(--low-light-gray); */
 }
 
+.aboutUser.emptyAbout{
+    margin: auto 0;
+}
+
 
 .stateAboutUserContainer {
     flex-shrink: 0;
@@ -295,4 +299,9 @@
     }
 
 
+}
+
+
+.emptyAboutContainer{
+    display: none;
 }
