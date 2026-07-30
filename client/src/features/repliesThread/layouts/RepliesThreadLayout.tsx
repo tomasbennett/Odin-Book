@@ -38,59 +38,72 @@ export function RepliesThreadLayout() {
                         :
 
                         <>
-                            {
-                                parentPosts.map(parentPost => {
+                            <div className={styles.innerContainer}>
+
+                                <div className={styles.parentPostsContainer}>
+
+                                    {
+                                        parentPosts.map(parentPost => {
 
 
-                                    return (
-                                        <Post
-                                            key={parentPost.id}
-                                            {...parentPost}
-                                            setLikesCount={createArrayLikeUpdater(parentPost.id, setParentPosts)}
-                                        />
-                                    )
-                                })
-                            }
+                                            return (
+                                                <Post
+                                                    key={parentPost.id}
+                                                    {...parentPost}
+                                                    setLikesCount={createArrayLikeUpdater(parentPost.id, setParentPosts)}
+                                                />
+                                            )
+                                        })
+                                    }
 
-                            <div className={styles.mainPostContainer}>
-                                {
-                                    post === null ?
+                                </div>
 
-                                        null
+                                <div className={styles.mainPostContainer}>
+                                    {
+                                        post === null ?
 
-                                        :
+                                            null
 
-                                        <>
+                                            :
 
-                                            <Post
-                                                {...post}
-                                                setLikesCount={createSingleLikeUpdater(setPost)}
-                                            />
+                                            <>
 
-                                            <CreatePostInput 
-                                                setPosts={setReplies}
-                                                parentPostId={post.parentPost?.parentPostId}
-                                            />
-                                        
-                                        </>
+                                                <Post
+                                                    {...post}
+                                                    setLikesCount={createSingleLikeUpdater(setPost)}
+                                                />
 
-                                }
+                                                <CreatePostInput 
+                                                    setPosts={setReplies}
+                                                    parentPostId={post.parentPost?.parentPostId}
+                                                />
+                                            
+                                            </>
+
+                                    }
 
 
+                                </div>
+
+
+                                <div className={styles.repliesContainer}>
+
+                                    {
+                                        replies.map(reply => {
+
+                                            return (
+                                                <Post
+                                                    key={reply.id}
+                                                    {...reply}
+                                                    setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
+                                                />
+                                            )
+                                        })
+                                    }
+
+                                </div>
+                                
                             </div>
-
-                            {
-                                replies.map(reply => {
-
-                                    return (
-                                        <Post
-                                            key={reply.id}
-                                            {...reply}
-                                            setLikesCount={createArrayLikeUpdater(reply.id, setReplies)}
-                                        />
-                                    )
-                                })
-                            }
 
 
                         </>

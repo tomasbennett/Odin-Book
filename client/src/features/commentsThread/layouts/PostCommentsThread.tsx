@@ -38,51 +38,56 @@ export function PostCommentsThread() {
                         :
 
                         <>
-                            <div className={styles.postInputContainer}>
 
-                                {
-                                    post === null ?
-                                        null
-
-                                        :
-
-                                        <>
-                                            <Post 
-                                                {...post}
-                                                setLikesCount={createSingleLikeUpdater(setPost)}
-                                            />
-                                        
-                                            <CreateCommentInput 
-                                                setComments={setComments}
-                                                postId={post.id}
-                                            />
-                                        </>
-
-                                }
-
-
-                            </div>
-
-                            <div className={styles.commentsContainer}>
+                            <div className={styles.innerContainer}>
                                 
-                                {
-                                    comments.map(comment => {
+                                <div className={styles.postInputContainer}>
+
+                                    {
+                                        post === null ?
+                                            null
+
+                                            :
+
+                                            <>
+                                                <Post 
+                                                    {...post}
+                                                    setLikesCount={createSingleLikeUpdater(setPost)}
+                                                />
+                                            
+                                                <CreateCommentInput 
+                                                    setComments={setComments}
+                                                    postId={post.id}
+                                                />
+                                            </>
+
+                                    }
 
 
-                                        return (
-                                            <Comment 
-                                                key={comment.id}
-                                                {...comment}
-                                                setLikeCount={createArrayLikeUpdater(comment.id, setComments)}
-                                            />
-                                        )
-                                    })
+                                </div>
 
-                                }
+                                <div className={styles.commentsContainer}>
+                                    
+                                    {
+                                        comments.map(comment => {
 
+
+                                            return (
+                                                <Comment 
+                                                    key={comment.id}
+                                                    {...comment}
+                                                    setLikeCount={createArrayLikeUpdater(comment.id, setComments)}
+                                                />
+                                            )
+                                        })
+
+                                    }
+
+
+                                </div>
 
                             </div>
-                        
+
                         
                         </>
 

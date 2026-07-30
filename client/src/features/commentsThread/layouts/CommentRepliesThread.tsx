@@ -46,97 +46,102 @@ export function CommentRepliesThread() {
                         :
 
                         <>
-                            <div className={styles.postInputContainer}>
 
-                                {
-                                    post === null ?
-                                        null
-
-                                        :
-
-                                        <Post 
-                                            {...post}
-                                            setLikesCount={createSingleLikeUpdater(setPost)}
-                                        />
-                                }
-
-                            </div>
-
-                            {
-                                parentComments.length > 0 ?
-                                    <div className={styles.parentComments}>
-                                        
-                                        {
-                                            parentComments.map(parentComment => {
-
-
-                                                return (
-                                                    <Comment 
-                                                        key={parentComment.id}
-                                                        {...parentComment}
-                                                        setLikeCount={createArrayLikeUpdater(parentComment.id, setParentComments)}
-                                                    />
-                                                )
-                                            })
-                                        }
-
-                                    </div>
-
-                                :
-
-                                null
-                            }
-
-                            <div className={styles.commentInputContainer}>
-
-                                {
-                                    comment === null ?
-                                        null 
-
-                                        :
-
-                                        <Comment 
-                                            key={comment.id}
-                                            {...comment}
-                                            setLikeCount={createSingleLikeUpdater(setComment)}
-                                        />
-                                }
-
-                                {
-                                    post === null ?
-                                        null
-
-                                        :
-
-                                        <CreateCommentInput 
-                                            setComments={setReplies}
-                                            postId={post.id}
-                                            parentCommentId={comment?.parentCommentId}
-                                        />
-
-                                }
-
-
-                            </div>
-
-
-                            <div className={styles.repliesContainer}>
+                            <div className={styles.innerContainer}>
                                 
-                                {
-                                    replies.map(reply => {
+                                <div className={styles.postInputContainer}>
 
+                                    {
+                                        post === null ?
+                                            null
 
-                                        return (
-                                            <Comment 
-                                                key={reply.id}
-                                                {...reply}
-                                                setLikeCount={createArrayLikeUpdater(reply.id, setReplies)}
+                                            :
+
+                                            <Post 
+                                                {...post}
+                                                setLikesCount={createSingleLikeUpdater(setPost)}
                                             />
-                                        )
-                                    })
+                                    }
 
+                                </div>
+
+                                {
+                                    parentComments.length > 0 ?
+                                        <div className={styles.parentComments}>
+                                            
+                                            {
+                                                parentComments.map(parentComment => {
+
+
+                                                    return (
+                                                        <Comment 
+                                                            key={parentComment.id}
+                                                            {...parentComment}
+                                                            setLikeCount={createArrayLikeUpdater(parentComment.id, setParentComments)}
+                                                        />
+                                                    )
+                                                })
+                                            }
+
+                                        </div>
+
+                                    :
+
+                                    null
                                 }
 
+                                <div className={styles.commentInputContainer}>
+
+                                    {
+                                        comment === null ?
+                                            null 
+
+                                            :
+
+                                            <Comment 
+                                                key={comment.id}
+                                                {...comment}
+                                                setLikeCount={createSingleLikeUpdater(setComment)}
+                                            />
+                                    }
+
+                                    {
+                                        post === null ?
+                                            null
+
+                                            :
+
+                                            <CreateCommentInput 
+                                                setComments={setReplies}
+                                                postId={post.id}
+                                                parentCommentId={comment?.parentCommentId}
+                                            />
+
+                                    }
+
+
+                                </div>
+
+
+                                <div className={styles.repliesContainer}>
+                                    
+                                    {
+                                        replies.map(reply => {
+
+
+                                            return (
+                                                <Comment 
+                                                    key={reply.id}
+                                                    {...reply}
+                                                    setLikeCount={createArrayLikeUpdater(reply.id, setReplies)}
+                                                />
+                                            )
+                                        })
+
+                                    }
+
+
+                                </div>
 
                             </div>
                         
