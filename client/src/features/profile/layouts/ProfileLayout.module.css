@@ -26,9 +26,11 @@ CONTAINERS SO THAT THE PROFILE IMAGE CAN HAND HALF WAY DOWN WITH AN
 OVERFLOW HIDDEN */
 
 .headerContainer{
+    --actual-header-height: 25rem;
+
     flex-shrink: 0;
 
-    height: 25rem;
+    /* height: 30rem; */
     width: 100%;
 
     overflow: hidden;

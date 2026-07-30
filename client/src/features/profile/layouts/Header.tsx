@@ -5,14 +5,14 @@ import { logInPageRoute } from "../../../constants/routes";
 import { IProfileHeader } from "../../../../../shared/features/profiles/models/IProfileHeader";
 import { CalendarIcon } from "../../../assets/icons/Calendar";
 import { EditTextIcon } from "../../../assets/icons/EditTextIcon";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAboutUserEdit } from "../hooks/useAboutUserEdit";
 import { useProfileImgChange } from "../hooks/useProfileImgChange";
 import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY } from "../../../../../shared/features/users/constants";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 
 import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png"
-
+import cubeNightSky from "../../../assets/cube-night-sky.jpg"
 
 export function Header({
     userId: userProfileId,
@@ -64,6 +64,20 @@ export function Header({
     );
 
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        const textarea = textareaRef.current;
+
+        if (!textarea) {
+            return;
+        }
+
+        textarea.style.height = "0px";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }, [textareaRef.current, aboutUserEditState])
+
+
     return (
         <>
             <header className={styles.outerContainer}>
@@ -85,7 +99,7 @@ export function Header({
 
                                 <label className={styles.backgroundImgContainer}>
 
-                                    <img src={`${bannerImgPreview ?? defUserProfileImg}`} alt={`Banner Image: ${authLevel.username}`} />
+                                    <img src={`${bannerImgPreview ?? cubeNightSky}`} alt={`Banner Image: ${authLevel.username}`} />
 
                                     <input onChange={(e) => {
                                         uploadNewBannerImg(e);
@@ -109,46 +123,81 @@ export function Header({
 
                             <div className={styles.textContainer}>
 
-                                <h3 className={styles.username}>{username}</h3>
+                                <div className={styles.topTextContainer}>
 
-                                <div className={styles.joinedAtContainer}>
+                                    <h3 className={styles.username}>{username}</h3>
 
-                                    <div className={styles.joinedSVGContainer}>
-                                        <CalendarIcon />
+                                    <div className={styles.joinedAtContainer}>
+
+                                        <div className={styles.joinedSVGContainer}>
+                                            <CalendarIcon />
+                                        </div>
+
+                                        <p className={styles.accountCreatedAt}>Joined: {accountCreatedAt.toLocaleDateString()}</p>
+
                                     </div>
-
-                                    <p className={styles.accountCreatedAt}>Joined {accountCreatedAt.toLocaleDateString()}</p>
 
                                 </div>
 
 
 
-                                {
 
-                                    <div className={`${(aboutUserServer && isUserProfileOwner) ? styles.emptyAboutContainer : styles.fullAboutContainer} ${styles.aboutUserContainer}`}>
+                                {
+                                    <div
+                                        className={
+                                            `${(
+                                                aboutUserServer &&
+                                                isUserProfileOwner
+                                            ) ?
+                                                styles.emptyAboutContainer :
+                                                styles.fullAboutContainer
+                                            } ${styles.aboutUserContainer
+                                            }`
+                                        }>
 
                                         {
                                             aboutUserEditState ? (
-                                                <div className={styles.editAboutUserContainer}>
+                                                <div
+                                                    className={styles.editAboutUserContainer}>
 
-                                                    <textarea className={styles.editAboutUserTextarea} value={aboutUserDraft} onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        setAboutUserDraft(val);
+                                                    <textarea
+                                                        className={styles.editAboutUserTextarea}
+                                                        value={aboutUserDraft}
+                                                        placeholder="Tell others about yourself here..."
+                                                        ref={textareaRef}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setAboutUserDraft(val);
 
-                                                    }} />
+                                                            const textarea = e.target;
 
-                                                    <div className={styles.editAboutUserBtnContainer}>
+                                                            textarea.style.height = "0px";
+                                                            textarea.style.height = `${textarea.scrollHeight}px`;
+                        
 
-                                                        <button className={styles.editAboutUserSaveBtn} type="button" onClick={() => {
-                                                            patchAboutUser();
 
-                                                        }}>
+                                                        }} />
+
+                                                    <div
+                                                        className={styles.editAboutUserBtnContainer}
+                                                    >
+
+                                                        <button
+                                                            className={styles.editAboutUserSaveBtn}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                patchAboutUser();
+
+                                                            }}>
                                                             Save
                                                         </button>
 
-                                                        <button className={styles.editAboutUserCancelBtn} type="button" onClick={() => {
-                                                            onCancel();
-                                                        }}>
+                                                        <button
+                                                            className={styles.editAboutUserCancelBtn}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                onCancel();
+                                                            }}>
                                                             Cancel
                                                         </button>
 
@@ -157,9 +206,21 @@ export function Header({
                                                 </div>
                                             ) :
 
-                                                <p className={`${(aboutUserServer && isUserProfileOwner) ? styles.emptyAbout : styles.fullAbout} ${styles.aboutUser}`}>
+                                                <p
+                                                    className={`${(aboutUserServer && isUserProfileOwner) ?
+                                                        styles.emptyAbout : styles.fullAbout} 
+                                                            ${styles.aboutUser}`}>
                                                     {
-                                                        (aboutUserServer && isUserProfileOwner) || "Tell others about yourself..."
+                                                        (
+                                                            !aboutUserServer &&
+                                                            isUserProfileOwner
+                                                        ) ?
+
+                                                            "Tell others about yourself..."
+
+                                                            :
+
+                                                            aboutUserServer
                                                     }
                                                 </p>
                                         }
@@ -170,7 +231,11 @@ export function Header({
 
                                                 <div className={styles.stateAboutUserContainer}>
 
-                                                    <button disabled={isLoading} className={styles.stateAboutUserBtn} type="button" onClick={() => toggleAboutUserEditState()}>
+                                                    <button
+                                                        disabled={isLoading}
+                                                        className={styles.stateAboutUserBtn}
+                                                        type="button"
+                                                        onClick={() => toggleAboutUserEditState()}>
 
                                                         <EditTextIcon />
 
