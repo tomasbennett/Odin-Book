@@ -78,16 +78,16 @@ export function Post({
                     parentPost && (
                         <>
 
-                            <div 
-                                onClick={onClickParentPost} 
+                            <div
+                                onClick={onClickParentPost}
                                 className={styles.parentPostContainer}>
-                                
+
                                 <div className={styles.repostIconSVGContainer}>
                                     <RepostIcon />
                                 </div>
 
                                 <p className={styles.parentPostUsername}>{parentPost.parentPostUsername}</p>
-                            
+
                             </div>
 
                         </>
@@ -162,7 +162,7 @@ export function Post({
                                         )
                                     }
 
-                                    
+
                                     return null;
                                 })
                             }
@@ -174,39 +174,47 @@ export function Post({
 
                     <div className={styles.lowerBtnsContainer}>
 
-                        <div 
+                        <div
                             className={styles.likesContainer}>
 
-                            <Like 
+                            <Like
                                 id={id}
                                 likeCount={likeCount}
                                 likeFetchUrl={likeFetchUrl}
                                 haveYouLiked={haveYouLiked}
                                 setLikeCount={setLikesCount}
-                                // userId={authLevel.userId} 
-                                />
+                            // userId={authLevel.userId} 
+                            />
 
                         </div>
 
-                        <div 
-                            onClick={onClickReply} 
+                        <div
+                            onClick={onClickReply}
                             className={styles.repliesContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowRepliesIcon />
                             </div>
-                            <p className={styles.repliesCount}>{repliesCount}</p>
+                            <p className={styles.repliesCount}>
+                                {
+                                    (repliesCount > 0) && repliesCount
+                                }
+                            </p>
 
                         </div>
 
-                        <div 
-                            onClick={onClickComment} 
+                        <div
+                            onClick={onClickComment}
                             className={styles.commentContainer}>
 
                             <div className={styles.btnSVGContainer}>
                                 <HollowCommentIcon />
                             </div>
-                            <p className={styles.commentCount}>{commentCount}</p>
+                            <p className={styles.commentCount}>
+                                {
+                                    (commentCount > 0) && commentCount
+                                }
+                            </p>
 
                         </div>
 

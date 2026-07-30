@@ -308,11 +308,12 @@ export function Like<T extends ILikeableObject>({
                     }
                 </div>
 
-                {
-                    likeCount > 0 && (
-                        <p className={styles.likeCount}>{likeCount}</p>
-                    )
-                }
+                <p className={styles.likeCount}>
+                    {
+                        (likeCount > 0) && likeCount
+                    }
+                </p>
+
 
             </div>
 

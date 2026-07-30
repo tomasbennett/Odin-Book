@@ -105,24 +105,25 @@ export function Comment({
                                 haveYouLiked={haveYouLiked}
                                 likeFetchUrl={likeFetchUrl}
                                 setLikeCount={setLikeCount}
-                                // userId={authLevel.userId} 
-                                />
+                            // userId={authLevel.userId} 
+                            />
                         </div>
 
 
-                        <div 
-                            onClick={onClickComments} 
+                        <div
+                            onClick={onClickComments}
                             className={styles.repliesContainer}>
 
                             <div className={`${styles.btnSVGContainer} ${styles.repliesSVGContainer}`}>
                                 <HollowCommentIcon />
                             </div>
 
-                            {
-                                commentCount > 0 && (
-                                    <p className={styles.commentCount}>{commentCount}</p>
-                                )
-                            }
+
+                            <p className={styles.commentCount}>
+                                {
+                                    (commentCount > 0) && commentCount
+                                }
+                            </p>
 
                         </div>
 
