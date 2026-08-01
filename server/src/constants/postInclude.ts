@@ -9,5 +9,9 @@ export const postsInclude = {
             profileImg: true
         }
     },
-    files: true
+    postFileContent: {
+        include: {
+            file: true
+        }
+    }
 } satisfies Prisma.PostInclude;

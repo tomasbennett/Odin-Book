@@ -8,7 +8,11 @@ import { IPostFileMapping } from "../models/IPostFileMapping";
 export async function generatePostContentAndProfileImage(
     post: Prisma.PostGetPayload<{
         include: {
-            files: true,
+            postFileContent: {
+                include: {
+                    file: true
+                }
+            }
             user: {
                 include: {
                     profileImg: true
@@ -34,14 +38,14 @@ export async function generatePostContentAndProfileImage(
         filesToGeneratePublicUrlsFor.push(post.user.profileImg.supabaseFileId);
     }
 
-    if (post.files.length > 0) {
+    if (post.postFileContent.length > 0) {
         mapping.postContentFiles = {
             start: filesToGeneratePublicUrlsFor.length,
-            count: post.files.length
+            count: post.postFileContent.length
         };
 
-        post.files.forEach((file) => {
-            filesToGeneratePublicUrlsFor.push(file.supabaseFileId);
+        post.postFileContent.forEach((file) => {
+            filesToGeneratePublicUrlsFor.push(file.file.supabaseFileId);
         });
     }
 
@@ -60,15 +64,21 @@ export async function generatePostContentAndProfileImage(
     if (mapping.postContentFiles) {
         const { start, count } = mapping.postContentFiles;
 
-        fileDetails = post.files.map((file, i) => ({
-            id: file.id,
-            publicUrl:
-                generatedPublicUrlResult.supabasePublicURLs[start + i],
-            name: file.filename,
-            size: file.filesize,
-            mimetype: file.mimetype,
-            createdAt: file.uploadedAt
-        }));
+        fileDetails = post.postFileContent.map((postFile, i) => {
+            const file = postFile.file;
+
+            return {
+                id: file.id,
+                publicUrl:
+                    generatedPublicUrlResult.supabasePublicURLs[start + i],
+                name: file.filename,
+                size: file.filesize,
+                mimetype: file.mimetype,
+                createdAt: file.uploadedAt
+
+            }
+
+        });
     }
 
 

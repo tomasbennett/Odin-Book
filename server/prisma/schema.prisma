@@ -35,11 +35,10 @@ model User {
   accountBackgroundImgId String? @db.Uuid
   accountBackgroundImg   Files?  @relation("UserAccountBackgroundImage", fields: [accountBackgroundImgId], references: [id])
 
-
   refreshTokens RefreshToken[]
 
-  posts    Post[]
-  comments Comment[]
+  posts                Post[]
+  comments             Comment[]
   likedCommentsOrPosts UserLikes[]
 }
 
@@ -66,12 +65,55 @@ model Files {
 
   profileImgFor User[] @relation("UserProfileImage")
 
-  commentContentFor Comment[] @relation("CommentContentFiles")
-  accountBackgroundImgFor User[] @relation("UserAccountBackgroundImage")
+  commentContentFor       Comment[] @relation("CommentContentFiles")
+  accountBackgroundImgFor User[]    @relation("UserAccountBackgroundImage")
+
+  // postContentForId String? @db.Uuid
+  // postContentFor   Post?   @relation("PostFileContent", fields: [postContentForId], references: [id])
+
+  postContentFor  PostFileContent[] @relation("PostFileContent")
+
+  //NOTE TO SELF THIS PROBABLY NEEDS CHANGING / A POST SHOULD BE ABLE TO HAVE MULTIPLE FILES OBVIOUSLY BUT A FILE CAN BE THE CONTENT FOR MULTIPLE POSTS MEANING A JUNCTION TABLE
+}
+
+model PostFileContent {
+  id String @id @default(uuid()) @db.Uuid
+
+  fileId  String @db.Uuid
+  file  Files  @relation("PostFileContent", fields: [fileId], references: [id], onDelete: Cascade)
+
+  postId  String @db.Uuid
+  post  Post @relation("PostFileContent", fields: [postId], references: [id], onDelete: Cascade)
 
 
-  postContentForId String? @db.Uuid
-  postContentFor    Post?    @relation("PostFileContent", fields: [postContentForId], references: [id])
+
+  @@unique([fileId, postId])
+
+}
+
+model Post {
+  id String @id @default(uuid()) @db.Uuid
+
+  title       String?
+  textContent String?
+
+  // files Files[] @relation("PostFileContent")
+
+  postFileContent PostFileContent[] @relation("PostFileContent")
+
+  likes UserLikes[]
+
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  comments Comment[]
+
+  parentPostId String? @db.Uuid
+  parentPost   Post?   @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
+
+  replies Post[] @relation("PostReplies")
 }
 
 model Comment {
@@ -97,34 +139,6 @@ model Comment {
   replies Comment[] @relation("CommentReplies")
 }
 
-model Post {
-  id String @id @default(uuid()) @db.Uuid
-
-  title       String?
-  textContent String?
-  
-  files        Files[]  @relation("PostFileContent")
-
-  likes UserLikes[]
-
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
-
-  comments Comment[]
-
-
-  parentPostId String? @db.Uuid
-  parentPost   Post?  @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
-
-  replies Post[] @relation("PostReplies")
-
-}
-
-
-
-
 model UserLikes {
   id String @id @default(uuid()) @db.Uuid
 
@@ -134,8 +148,8 @@ model UserLikes {
   post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String? @db.Uuid
 
-  comment   Comment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId String? @db.Uuid
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?  @db.Uuid
 
   createdAt DateTime @default(now())
 

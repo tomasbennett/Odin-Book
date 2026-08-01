@@ -1,14 +1,14 @@
-// import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
-// // import "dotenv/config";
-// import dotenv from "dotenv";
-// dotenv.config({
-//     path: "../.env"
-// });
-// import bcrypt from "bcrypt";
+// import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({
+    path: "../.env"
+});
+import bcrypt from "bcrypt";
 
 // //AT THE END TEST IF YOU CAN IMPORT FROM THE SHARED FOLDER THROUGH A SEPARATE TSCONFIG.JSON FILE IN PRISMA FOLDER AND THEN ADD TO THE SEED COMMAND IN PACKAGE.JSON FILE
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
 // async function buildDefaultValues(): Promise<Prisma.UserCreateInput[]> {
 //     const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS) : 10;
@@ -68,19 +68,19 @@
 
 
 
-// async function main() {
-//     try {
-//         console.log('Seeding database with default values...');
-//         await insertDefaultValues();
-//         console.log('Database seeding completed.');
+async function main() {
+    try {
+        console.log('Seeding database with default values...');
+        await insertDefaultValues();
+        console.log('Database seeding completed.');
         
-//     } catch (error) {
-//         console.error('Error seeding database:', error);
+    } catch (error) {
+        console.error('Error seeding database:', error);
 
-//     } finally {
-//         await prisma.$disconnect();
+    } finally {
+        await prisma.$disconnect();
 
-//     }
-// }
+    }
+}
 
-// main();
+main();
