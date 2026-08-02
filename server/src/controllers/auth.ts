@@ -3,7 +3,7 @@ import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErr
 import { ICustomSuccessMessage } from "../../../shared/features/api/models/APISuccessResponse";
 
 import crypto from "crypto"
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
 import { invalidRefreshTokenStatus } from "../../../shared/features/auth/constants";
 import { ISuccessResAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";

@@ -9,7 +9,7 @@ export async function generatePostContentAndProfileImage(
     post: Prisma.PostGetPayload<{
         include: {
             postFileContent: {
-                include: {
+                select: {
                     file: true
                 }
             }

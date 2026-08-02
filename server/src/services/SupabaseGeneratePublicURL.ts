@@ -1,4 +1,4 @@
-import { supabase } from "../supabase/client";
+import { supabase } from "../../lib/client";
 
 export async function GenerateSupabasePublicURL(
     supabaseFileIds: string[]

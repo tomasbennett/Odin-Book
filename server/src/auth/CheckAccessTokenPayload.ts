@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { SOCKET_INVALID_ACCESS_TOKEN_MESSAGE, expiredAccessTokenStatus } from "../../../shared/features/auth/constants";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
 import { IAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";
 

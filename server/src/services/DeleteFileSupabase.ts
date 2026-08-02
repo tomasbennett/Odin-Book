@@ -1,5 +1,5 @@
-import { prisma } from "../db/prisma";
-import { supabase } from "../supabase/client";
+import { prisma } from "../../lib/prisma";
+import { supabase } from "../../lib/client";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 
 

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { IUserSearchedAPISuccess } from "../../../shared/features/users/models/ISearchUserAPISuccess";
 import { IUserSearchBar } from "../../../shared/features/users/models/ISearchBarUser";

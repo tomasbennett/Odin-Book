@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
-import upload from "../supabase/multer";
+import upload from "../multer/multer";
 import { COMMENT_IMG_GIF_KEY, SOCKET_EVENT_COMMENT_CREATED, SOCKET_EVENT_COMMENT_DELETED } from "../../../shared/features/comments/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { IProfileComments, IProfileCommentsAPI } from "../../../shared/features/profiles/models/IProfileComments";
 import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
@@ -32,6 +32,7 @@ import { Socket } from "socket.io";
 import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPISuccess";
 import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
 import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
+import { postsInclude } from "../constants/postInclude";
 
 
 export const router = Router();
@@ -242,17 +243,7 @@ router.get("/:commentId/replies",
                     },
                     include: {
                         post: {
-                            include: {
-                                user: {
-                                    include: {
-                                        profileImg: true
-                                    }
-                                },
-                                likes: true,
-                                files: true,
-                                replies: true,
-                                comments: true
-                            }
+                            include: postsInclude
                         },
                         likes: true,
                         singleGifOrImg: true,
@@ -397,7 +388,9 @@ router.get("/:commentId/replies",
                 // }
 
 
-                const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
+                const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(
+                    post
+                );
 
 
 

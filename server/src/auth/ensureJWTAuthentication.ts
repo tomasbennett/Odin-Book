@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import jwt from "jsonwebtoken"
 import { expiredAccessTokenStatus } from "../../../shared/features/auth/constants";
 import { CheckAccessTokenPayload } from "./CheckAccessTokenPayload";

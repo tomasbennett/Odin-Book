@@ -1,7 +1,7 @@
 import { Prisma, User } from "@prisma/client";
 import { NextFunction, Router } from "express";
 import { Request, Response } from "express";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -13,8 +13,8 @@ import { environment } from "../../../shared/constants";
 import { issueSignedInResponse } from "../auth/IssueSignedInResponse";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { refreshTokenCookieKey } from "../constants/constants";
-import upload from "../supabase/multer";
-import { supabase } from "../supabase/client";
+import upload from "../multer/multer";
+import { supabase } from "../../lib/client";
 import { USER_PROFILE_IMG_FILE_KEY } from "../../../shared/features/auth/constants";
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
 import { allowedImgTypes } from "../../../shared/features/files/constants";

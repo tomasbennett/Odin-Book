@@ -1,12 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
 import { IProfileReplies, IProfileRepliesAPI } from "../../../shared/features/profiles/models/IProfileReplies";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
+import { postsInclude } from "../constants/postInclude";
 
 export const router = Router();
 
@@ -37,7 +38,11 @@ router.get("/:userId",
                 include: {
                     parentPost: {
                         include: {
-                            files: true,
+                            postFileContent: {
+                                include: {
+                                    file: true
+                                }
+                            },
                             user: {
                                 include: {
                                     profileImg: true
@@ -45,15 +50,7 @@ router.get("/:userId",
                             }
                         }
                     },
-                    files: true,
-                    user: {
-                        include: {
-                            profileImg: true
-                        }
-                    },
-                    likes: true,
-                    comments: true,
-                    replies: true
+                    ...postsInclude
                 }
             });
 

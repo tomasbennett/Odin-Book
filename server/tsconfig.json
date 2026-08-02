@@ -8,6 +8,11 @@
     "esModuleInterop": true,
     "strict": true
   },
-  "include": ["./src/**/*.ts", "../shared/**/*.ts"],
+  "include": [
+    "./src/**/*.ts", 
+    "../shared/**/*.ts", 
+    "./lib/**/*.ts",
+    "./prisma/**/*.ts"
+  ],
   "exclude": ["./node_modules"] // "./src/**/*.d.ts", 
 }

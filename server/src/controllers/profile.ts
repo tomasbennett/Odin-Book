@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { IProfileAPISuccess } from "../../../shared/features/profiles/models/IProfileAPI";
 import { IProfileHeader } from "../../../shared/features/profiles/models/IProfileHeader";
 import { IProfilePosts } from "../../../shared/features/profiles/models/IProfilePosts";
@@ -12,7 +12,7 @@ import { generatePostContentAndProfileImage } from "../services/GeneratePostCont
 import { GenerateSupabasePublicURL } from "../services/SupabaseGeneratePublicURL";
 import { IFileDetails } from "../../../shared/features/files/models/IFileDetails";
 import { IUserSearchedAPISuccess } from "../../../shared/features/users/models/ISearchUserAPISuccess";
-import upload from "../supabase/multer";
+import upload from "../multer/multer";
 import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY, SOCKET_EVENT_USER_PATCH_PROFILE_INFO, SOCKET_USER_PROFILE_IS_VISIBLE_ROOM_PREFIX } from "../../../shared/features/users/constants";
 import { IPatchUserProfile } from "../../../shared/features/users/models/IPatchUserProfile";
 import { IPatchUserProfileRequest } from "../../../shared/features/users/models/IRequestPatchUserProfile";
@@ -24,6 +24,7 @@ import { uploadFileToSupabase } from "../services/UploadFileToSupabase";
 import { io } from "../app";
 import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 import { defaultProfileCommentsLimit, defaultProfilePostsLimit, defaultProfileRepliesLimit } from "../../../shared/features/profiles/constants";
+import { postsInclude } from "../constants/postInclude";
 
 
 
@@ -66,17 +67,7 @@ router.get("/:userId",
                     orderBy: {
                         createdAt: "desc"
                     },
-                    include: {
-                        likes: true,
-                        comments: true,
-                        replies: true,
-                        files: true,
-                        user: {
-                            include: {
-                                profileImg: true
-                            }
-                        }
-                    }
+                    include: postsInclude
                 }),
                 prisma.post.findMany({
                     where: {
@@ -90,18 +81,14 @@ router.get("/:userId",
                         createdAt: "desc"
                     },
                     include: {
-                        likes: true,
-                        comments: true,
-                        replies: true,
-                        user: {
-                            include: {
-                                profileImg: true
-                            }
-                        },
-                        files: true,
+                        ...postsInclude,
                         parentPost: {
                             include: {
-                                files: true,
+                                postFileContent: {
+                                    include: {
+                                        file: true
+                                    }
+                                },
                                 user: {
                                     include: {
                                         profileImg: true

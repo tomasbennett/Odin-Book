@@ -1,6 +1,5 @@
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { prisma } from "../db/prisma";
-import { supabase } from "../supabase/client";
+import { supabase } from "../../lib/client";
 
 export async function uploadFileToSupabase(
     file: Express.Multer.File,

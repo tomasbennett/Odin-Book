@@ -3,7 +3,7 @@ import { Response } from "express";
 
 import crypto from "crypto";
 import { environment } from "../../../shared/constants";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { ISignInError, ISuccessResSignIn } from "../../../shared/features/auth/models/ILoginSchema";
 import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAccessTokenResponse";
 import { CreateAccessToken } from "./CreateAccessToken";

@@ -1,5 +1,5 @@
 import { IComment } from "../../../shared/features/comments/models/IComment";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 
 export async function getParentComments(commentId: string) {
     const parentComments = [];

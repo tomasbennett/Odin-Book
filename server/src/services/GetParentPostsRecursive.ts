@@ -1,5 +1,5 @@
 import { postsInclude } from "../constants/postInclude";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 
 export async function getParentPosts(postId: string) {
     const parentPosts = [];

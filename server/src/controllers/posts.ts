@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
-import upload from "../supabase/multer";
+import upload from "../multer/multer";
 import { POST_FILE_ARRAY_KEY, SOCKET_EVENT_POST_OR_REPLY_CREATED, SOCKET_EVENT_POST_OR_REPLY_DELETED, SOCKET_NEW_POST_OR_REPLY_ROOM_PREFIX } from "../../../shared/features/posts/constants";
 import { SearchQuerySchema } from "../../../shared/features/util/models/ISearchQuery";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { IProfilePosts, IProfilePostsAPISuccess } from "../../../shared/features/profiles/models/IProfilePosts";
 import { IPost } from "../../../shared/features/posts/models/IPost";
@@ -61,17 +61,7 @@ router.get("/:userId",
                 },
                 take: limit,
                 skip: offset,
-                include: {
-                    likes: true,
-                    comments: true,
-                    replies: true,
-                    user: {
-                        include: {
-                            profileImg: true
-                        }
-                    },
-                    files: true
-                }
+                include: postsInclude
             });
 
 
@@ -307,7 +297,11 @@ router.get("/:postId/comments",
                     },
                     likes: true,
                     replies: true,
-                    files: true,
+                    postFileContent: {
+                        include: {
+                            file: true
+                        }
+                    },
                     user: {
                         include: {
                             profileImg: true
@@ -471,7 +465,11 @@ router.post("/",
                                     profileImg: true
                                 }
                             },
-                            files: true
+                            postFileContent: {
+                                include: {
+                                    file: true
+                                }
+                            }
                         }
                     }
                 }
@@ -522,9 +520,14 @@ router.post("/",
 
                     const dbFilesArr = newPrismaFiles;
 
-                    const { userProfileImgUrl: userUrl, fileDetails: newPostFileDetails } = await generatePostContentAndProfileImage({
+                    const { 
+                        userProfileImgUrl: userUrl, 
+                        fileDetails: newPostFileDetails 
+                    } = await generatePostContentAndProfileImage({
                         ...newPost,
-                        files: dbFilesArr
+                        postFileContent: dbFilesArr.map((file) => ({
+                            file: file,
+                        })),
                     });
 
 

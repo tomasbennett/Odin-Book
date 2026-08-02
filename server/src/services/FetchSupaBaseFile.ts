@@ -1,5 +1,5 @@
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
-import { supabase } from "../supabase/client";
+import { supabase } from "../../lib/client";
 
 
 

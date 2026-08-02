@@ -4,11 +4,12 @@ import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErr
 import { HomePostsQuerySchema } from "../../../shared/features/home/models/IHomePostsQuery";
 import { Prisma } from "@prisma/client";
 import { count } from "console";
-import { prisma } from "../db/prisma";
+import { prisma } from "../../lib/prisma";
 import { IProfilePosts, IProfilePostsAPISuccess } from "../../../shared/features/profiles/models/IProfilePosts";
 import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 import { sortKeyWord } from "../../../shared/features/posts/constants";
+import { postsInclude } from "../constants/postInclude";
 
 
 export const router = Router();
@@ -65,17 +66,7 @@ router.get("/",
                 take: limit,
                 skip: offset,
                 orderBy: postsOrderBy,
-                include: {
-                    likes: true,
-                    comments: true,
-                    replies: true,
-                    user: {
-                        include: {
-                            profileImg: true
-                        }
-                    },
-                    files: true
-                }
+                include: postsInclude
             });
 
 
