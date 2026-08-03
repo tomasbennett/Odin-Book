@@ -210,97 +210,83 @@ async function generateRandomProfiles(
 }
 
 
-async function generateRandomPosts(
-    users: User[],
-    files: Files[],
-    postsPerUser: number
-): Promise<Post[]> {
-
-    const operations: Array<(userId: string) => [Prisma.PostCreateManyInput, Prisma.PostFileContentCreateManyInput | null]> = [
-        (userId: string) => {
-
-            return [
-                {
-                    userId,
-                    textContent: faker.lorem.paragraphs(3),
-                },
-                null
-            ]
-        },
-        (userId: string) => {
-
-            const postId = crypto.randomUUID();
-
-            const fileId = randomItemFromArray(files)?.id;
-            if (!fileId) {
-                throw new Error("No files available to associate with the post.");
-            }
-
-            return [
-                {
-                    id: postId,
-                    userId,
-                    textContent: faker.lorem.paragraphs(2),
-                },
-                {
-                    fileId,
-                    postId: postId
-                }
-            ]
-        },
-        (userId: string) => {
-            const postId = crypto.randomUUID();
-
-            const fileId = randomItemFromArray(files)?.id;
-            if (!fileId) {
-                throw new Error("No files available to associate with the post.");
-            }
-
-            return [
-                {
-                    id: postId,
-                    userId,
-                },
-                {
-                    fileId,
-                    postId: postId
-                }
-            ]
-        }
-    ]
-
-    const results = Array.from(
-        { length: users.length * postsPerUser },
-        (_, index) => {
-            const user = users[index % users.length];
-            const operation =
-                operations[Math.floor(Math.random() * operations.length)];
-
-            return operation(user.id);
-        }
-    );
-
-    const postsData = results.map(([post, _]) => post);
-
-    const postImgContentData = results
-        .map(([, file]) => file)
-        .filter(
-            (file): file is Prisma.PostFileContentCreateManyInput =>
-                file !== null
-        );
 
 
 
-    const postsDb = await prisma.post.createManyAndReturn({
-        data: postsData
+
+
+type CreateCommentContext = {
+    userId: string;
+    postId: string;
+    files: Files[];
+    parentCommentId?: string;
+};
+
+
+function createTextComment({
+    userId,
+    postId,
+    parentCommentId,
+}: CreateCommentContext): Prisma.CommentCreateManyInput {
+
+    return {
+        userId,
+        postId,
+        parentCommentId,
+        textContent: faker.lorem.paragraphs(1),
+    };
+}
+
+
+function createImageComment({
+    userId,
+    postId,
+    files,
+    parentCommentId,
+}: CreateCommentContext): Prisma.CommentCreateManyInput {
+
+    const fileId = randomItemFromArray(files)?.id;
+
+    if (!fileId) {
+        throw new Error("No files available to associate with the comment.");
+    }
+
+    return {
+        userId,
+        postId,
+        parentCommentId,
+        singleGifOrImgId: fileId
+    };
+}
+
+const generateCommentMethods = [
+    createTextComment,
+    createImageComment
+]
+
+
+function createRandomComment(
+    context: CreateCommentContext
+): Prisma.CommentCreateManyInput {
+
+    const generateMethod = faker.helpers.arrayElement(generateCommentMethods);
+
+    return generateMethod(context);
+}
+
+
+async function prismaComment(data: Prisma.CommentCreateManyInput[]): Promise<Comment[]> {
+    const commentsDb = await prisma.comment.createManyAndReturn({
+        data
     });
 
-    const postImgContentDb = await prisma.postFileContent.createManyAndReturn({
-        data: postImgContentData
-    })
-
-    return postsDb;
+    return commentsDb;
 }
+
+
+
+
+
 
 
 async function generateRandomComments(
@@ -310,25 +296,25 @@ async function generateRandomComments(
     rangeOfCommentsPerPost: { min: number; max: number }
 ): Promise<Comment[]> {
 
-    const operations: Array<(userId: string, postId: string) => Prisma.CommentCreateManyInput> = [
-        (userId: string, postId: string) => ({
-            userId,
-            postId,
-            textContent: faker.lorem.paragraphs(1),
-        }),
-        (userId: string, postId: string) => {
-            const fileId = randomItemFromArray(files)?.id;
-            if (!fileId) {
-                throw new Error("No files available to associate with the comment.");
-            }
+    // const operations: Array<(userId: string, postId: string) => Prisma.CommentCreateManyInput> = [
+    //     (userId: string, postId: string) => ({
+    //         userId,
+    //         postId,
+    //         textContent: faker.lorem.paragraphs(1),
+    //     }),
+    //     (userId: string, postId: string) => {
+    //         const fileId = randomItemFromArray(files)?.id;
+    //         if (!fileId) {
+    //             throw new Error("No files available to associate with the comment.");
+    //         }
 
-            return {
-                userId,
-                postId,
-                singleGifOrImgId: fileId
-            }
-        }
-    ]
+    //         return {
+    //             userId,
+    //             postId,
+    //             singleGifOrImgId: fileId
+    //         }
+    //     }
+    // ]
 
 
     const commentsData: Prisma.CommentCreateManyInput[] = posts.flatMap(post => {
@@ -345,23 +331,279 @@ async function generateRandomComments(
                 throw new Error("No users available to associate with the comment.");
             }
 
-            const operation =
-                operations[Math.floor(Math.random() * operations.length)];
+            // const operation =
+            //     operations[Math.floor(Math.random() * operations.length)];
 
-            return operation(user.id, post.id);
+            return createRandomComment({
+                userId: user.id,
+                postId: post.id,
+                files,
+            });
         });
     });
 
 
-    const commentsDb = await prisma.comment.createManyAndReturn({
-        data: commentsData
-    });
+    // const commentsDb = await prisma.comment.createManyAndReturn({
+    //     data: commentsData
+    // });
 
 
-    return commentsDb;
+    return await prismaComment(commentsData);
 
 
 }
+
+async function generateRandomCommentReplies(
+    users: User[],
+    files: Files[],
+    originalComments: Comment[],
+    repliesPerIteration: number,
+    iterations: number,
+): Promise<Comment[]> {
+
+    const commentsToReplyTo = [...originalComments];
+
+    for (let iteration = 0; iteration < iterations; iteration++) {
+
+        const generated: Prisma.CommentCreateManyInput[] = [];
+
+        for (let i = 0; i < repliesPerIteration; i++) {
+
+            const user = randomItemFromArray(users);
+            if (!user) {
+                throw new Error("No users available to associate with the comment reply.");
+            }
+
+            const parentComment = randomItemFromArray(commentsToReplyTo);
+            if (!parentComment) {
+                throw new Error("No comments available to reply to.");
+            }
+
+
+            generated.push(createRandomComment({
+                userId: user.id,
+                postId: parentComment.postId,
+                files,
+                parentCommentId: parentComment.id
+            }));
+        }
+
+        const newReplies = await prismaComment(generated);
+
+        commentsToReplyTo.push(...newReplies);
+
+    }
+
+    return commentsToReplyTo;
+}
+
+
+
+
+
+
+
+
+
+
+type GeneratedPost = {
+    post: Prisma.PostCreateManyInput;
+    file?: Prisma.PostFileContentCreateManyInput;
+};
+
+type CreatePostContext = {
+    userId: string;
+    files: Files[];
+    parentPostId?: string;
+};
+
+function randomFile(files: Files[]) {
+    const file = faker.helpers.arrayElement(files);
+
+    if (!file) {
+        throw new Error("No files available.");
+    }
+
+    return file;
+}
+
+function createTextPost({
+    userId,
+    parentPostId,
+}: CreatePostContext): GeneratedPost {
+
+    const id = crypto.randomUUID();
+
+    return {
+        post: {
+            id,
+            userId,
+            parentPostId,
+            textContent: faker.lorem.paragraphs(3),
+        }
+    };
+}
+
+function createImagePost({
+    userId,
+    parentPostId,
+    files,
+}: CreatePostContext): GeneratedPost {
+
+    const id = crypto.randomUUID();
+
+    const file = randomFile(files);
+
+    return {
+        post: {
+            id,
+            userId,
+            parentPostId,
+        },
+        file: {
+            fileId: file.id,
+            postId: id,
+        }
+    };
+}
+
+function createTextAndImagePost({
+    userId,
+    parentPostId,
+    files,
+}: CreatePostContext): GeneratedPost {
+
+    const id = crypto.randomUUID();
+
+    const file = randomFile(files);
+
+    return {
+        post: {
+            id,
+            userId,
+            parentPostId,
+            textContent: faker.lorem.paragraphs(2),
+        },
+        file: {
+            fileId: file.id,
+            postId: id,
+        }
+    };
+}
+
+const generators = [
+    createTextPost,
+    createImagePost,
+    createTextAndImagePost,
+];
+
+function createRandomPost(
+    context: CreatePostContext
+): GeneratedPost {
+
+    const generator = faker.helpers.arrayElement(generators);
+
+    return generator(context);
+}
+
+async function persistPosts(
+    generated: GeneratedPost[]
+): Promise<Post[]> {
+
+    const posts = generated.map(x => x.post);
+
+    const files = generated
+        .flatMap(x => x.file ? [x.file] : []);
+
+    const postsDb = await prisma.post.createManyAndReturn({
+        data: posts,
+    });
+
+    if (files.length > 0) {
+        await prisma.postFileContent.createMany({
+            data: files,
+        });
+    }
+
+    return postsDb;
+}
+
+async function generateRandomPosts(
+    users: User[],
+    files: Files[],
+    postsPerUser: number,
+): Promise<Post[]> {
+
+    const generated: GeneratedPost[] = [];
+
+    for (const user of users) {
+
+        for (let i = 0; i < postsPerUser; i++) {
+
+            generated.push(
+                createRandomPost({
+                    userId: user.id,
+                    files,
+                })
+            );
+
+        }
+
+    }
+
+    return persistPosts(generated);
+
+}
+
+
+async function generateRandomPostReplies(
+    users: User[],
+    files: Files[],
+    originalPosts: Post[],
+    repliesPerIteration: number,
+    iterations: number,
+): Promise<Post[]> {
+
+    const postsToReplyTo = [...originalPosts];
+
+    for (let iteration = 0; iteration < iterations; iteration++) {
+
+        const generated: GeneratedPost[] = [];
+
+        for (let i = 0; i < repliesPerIteration; i++) {
+
+            const user = faker.helpers.arrayElement(users);
+
+            const parent =
+                faker.helpers.arrayElement(postsToReplyTo);
+
+            generated.push(
+                createRandomPost({
+                    userId: user.id,
+                    files,
+                    parentPostId: parent.id,
+                })
+            );
+
+        }
+
+        const newReplies = await persistPosts(generated);
+
+        postsToReplyTo.push(...newReplies);
+
+    }
+
+    return postsToReplyTo;
+
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -380,8 +622,12 @@ async function main() {
         const users = await generateRandomProfiles(files, 13);
 
         const posts = await generateRandomPosts(users, files, 5);
-        const comments = await generateRandomComments(users, files, posts, { min: 1, max: 5 });
+        const comments = await generateRandomComments(
+            users, files, posts, { min: 1, max: 5 }
+        );
 
+        await generateRandomPostReplies(users, files, posts, 3, 3);
+        await generateRandomCommentReplies(users, files, comments, 3, 3);
 
         console.log('Database seeding completed.');
 
