@@ -626,8 +626,12 @@ async function main() {
             users, files, posts, { min: 1, max: 5 }
         );
 
-        await generateRandomPostReplies(users, files, posts, 3, 3);
-        await generateRandomCommentReplies(users, files, comments, 3, 3);
+        await generateRandomPostReplies(
+            users, files, posts, 3, 3
+        );
+        await generateRandomCommentReplies(
+            users, files, comments, 3, 3
+        );
 
         console.log('Database seeding completed.');
 
