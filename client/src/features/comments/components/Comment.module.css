@@ -90,6 +90,8 @@
             .username{
                 flex: 1 1 0;
 
+                cursor: pointer;
+
                 flex-shrink: 1;
             }
         }

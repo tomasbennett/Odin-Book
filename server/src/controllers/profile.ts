@@ -25,6 +25,7 @@ import { io } from "../app";
 import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 import { defaultProfileCommentsLimit, defaultProfilePostsLimit, defaultProfileRepliesLimit } from "../../../shared/features/profiles/constants";
 import { postsInclude } from "../constants/postInclude";
+import { COMMENT_IMG_GIF_KEY } from "../../../shared/features/comments/constants";
 
 
 
@@ -158,7 +159,7 @@ router.get("/:userId",
                 }
 
                 if (userHeaderInfoDb.accountBackgroundImg) {
-                    mapping.userProfileImg = filesToGeneratePublicUrlsFor.length;
+                    mapping.backgroundImg = filesToGeneratePublicUrlsFor.length;
 
 
                     filesToGeneratePublicUrlsFor.push(userHeaderInfoDb.accountBackgroundImg.supabaseFileId);
@@ -322,10 +323,14 @@ router.get("/:userId",
                             filesToGeneratePublicUrlsFor.push(comment.singleGifOrImg.supabaseFileId);
                         }
 
+                        
                         if (postUser.profileImg) {
                             filesToGeneratePublicUrlsFor.push(postUser.profileImg.supabaseFileId);
                         }
-
+                        
+                        if (comment.user.profileImg) {
+                            filesToGeneratePublicUrlsFor.push(comment.user.profileImg.supabaseFileId);
+                        }
 
                         const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
 
@@ -380,7 +385,7 @@ router.get("/:userId",
                             parentCommentId: comment.parentCommentId || undefined,
                             likeCount: comment.likes.length,
                             text: comment.textContent || undefined,
-                            imgOrGifDetails: imgOrGifDetails,
+                            [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
                             postUsername: postUser.username,
                             postTitle: post.title || undefined,
                             postUserId: postUser.id,

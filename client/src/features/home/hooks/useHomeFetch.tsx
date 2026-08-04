@@ -58,85 +58,85 @@ export function useHomeFetch() {
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [posts, setPosts] = useState<IPost[]>([
-        {
-            id: "1",
-            userId: "1",
-            username: "Ted_Kennedy",
-            createdAt: new Date(),
-            likeCount: 15,
-            commentCount: 23,
-            repliesCount: 1,
-            title: "Check out this post I made!!!",
-            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
-            userProfileImgUrl: undefined,
-            parentPost: undefined,
-            fileDetails: undefined,
-            haveYouLiked: false
-        },
-        {
-            id: "2",
-            userId: "2",
-            username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
-            createdAt: new Date("2022-06-08"),
-            likeCount: 4,
-            commentCount: 203,
-            repliesCount: 3,
-            title: undefined,
-            content: "Yo",
-            userProfileImgUrl: githubProfileImg,
-            parentPost: undefined,
-            haveYouLiked: true,
-            fileDetails: [
-                {
-                    id: "1",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky aojfkjdnfdsk fdsnfkjdbfsdkfn sfkisdjfhkdbfgsdh skdfjdskf",
-                    mimetype: "application/pdf",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-                {
-                    id: "2",
-                    publicUrl: githubProfileImg,
-                    name: "Github Profile img",
-                    mimetype: "application/pdf",
-                    size: 1600,
-                    createdAt: new Date()
-                },
-                {
-                    id: "3",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "image/jpeg",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-            ]
-        },
-        {
-            id: "3",
-            userId: "3",
-            username: "T",
-            createdAt: new Date("2026-06-26"),
-            likeCount: 0,
-            commentCount: 1,
-            repliesCount: 100,
-            title: undefined,
-            content: undefined,
-            userProfileImgUrl: undefined,
-            parentPost: undefined,
-            haveYouLiked: true,
-            fileDetails: [
-                {
-                    id: "1",
-                    publicUrl: cubeNightSky,
-                    name: "Cube night sky",
-                    mimetype: "application/pdf",
-                    size: 1300,
-                    createdAt: new Date()
-                },
-            ]
-        }
+        // {
+        //     id: "1",
+        //     userId: "1",
+        //     username: "Ted_Kennedy",
+        //     createdAt: new Date(),
+        //     likeCount: 15,
+        //     commentCount: 23,
+        //     repliesCount: 1,
+        //     title: "Check out this post I made!!!",
+        //     content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur deserunt, dolores asperiores aut nemo qui dolorum quaerat similique eveniet laborum ad amet cumque perspiciatis aspernatur delectus fuga error animi veritatis recusandae corporis adipisci at pariatur quisquam. Harum asperiores aperiam quod molestiae repellendus, consequatur autem, laborum labore quam animi fugiat assumenda. Mollitia nam fugit laborum! Voluptatibus maiores quasi iure deleniti mollitia voluptas reiciendis ut tempore odit earum, hic quod molestias, facilis dolores placeat qui harum, nulla id asperiores soluta!",
+        //     userProfileImgUrl: undefined,
+        //     parentPost: undefined,
+        //     fileDetails: undefined,
+        //     haveYouLiked: false
+        // },
+        // {
+        //     id: "2",
+        //     userId: "2",
+        //     username: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sit cupiditate incidunt cum, officiis illum dolorum neque rem eligendi ullam dolor recusandae natus nihil quia officia labore excepturi, consequuntur quos nesciunt.",
+        //     createdAt: new Date("2022-06-08"),
+        //     likeCount: 4,
+        //     commentCount: 203,
+        //     repliesCount: 3,
+        //     title: undefined,
+        //     content: "Yo",
+        //     userProfileImgUrl: githubProfileImg,
+        //     parentPost: undefined,
+        //     haveYouLiked: true,
+        //     fileDetails: [
+        //         {
+        //             id: "1",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky aojfkjdnfdsk fdsnfkjdbfsdkfn sfkisdjfhkdbfgsdh skdfjdskf",
+        //             mimetype: "application/pdf",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //         {
+        //             id: "2",
+        //             publicUrl: githubProfileImg,
+        //             name: "Github Profile img",
+        //             mimetype: "application/pdf",
+        //             size: 1600,
+        //             createdAt: new Date()
+        //         },
+        //         {
+        //             id: "3",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky",
+        //             mimetype: "image/jpeg",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //     ]
+        // },
+        // {
+        //     id: "3",
+        //     userId: "3",
+        //     username: "T",
+        //     createdAt: new Date("2026-06-26"),
+        //     likeCount: 0,
+        //     commentCount: 1,
+        //     repliesCount: 100,
+        //     title: undefined,
+        //     content: undefined,
+        //     userProfileImgUrl: undefined,
+        //     parentPost: undefined,
+        //     haveYouLiked: true,
+        //     fileDetails: [
+        //         {
+        //             id: "1",
+        //             publicUrl: cubeNightSky,
+        //             name: "Cube night sky",
+        //             mimetype: "application/pdf",
+        //             size: 1300,
+        //             createdAt: new Date()
+        //         },
+        //     ]
+        // }
     ]);
 
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -299,11 +299,11 @@ export function useHomeFetch() {
     // }); 3 LINES REMOVED
     useEffect(() => {
 
-        // fetchPosts({
-        //     offset: 0,
-        //     limit,
-        //     sort
-        // });
+        fetchPosts({
+            offset: 0,
+            limit,
+            sort
+        });
 
         setIsLoading(false)
 

@@ -4,7 +4,7 @@ import { IComment } from '../../../../../shared/features/comments/models/ICommen
 import { formatSentAtDate } from '../../../util/FormatDateMessage';
 import styles from './Comment.module.css';
 import { useError } from '../../error/contexts/ErrorContext';
-import { errorPageRoute, homePageRoute } from '../../../constants/routes';
+import { errorPageRoute, homePageRoute, profilePageRoute } from '../../../constants/routes';
 import { knownError, noErrorCtxError, unknownError } from '../../../constants/errorConstants';
 import { useJWTFetch } from '../../../hooks/useJWTFetch';
 import { SolidCommentIcon } from '../../../assets/icons/SolidCommentIcon';
@@ -42,9 +42,12 @@ export function Comment({
 
     const nav = useNavigate();
 
+    const onClickUsername = () => {
+        nav(`${profilePageRoute}/${userId}`, { replace: true });
+    }
 
     const onClickComments = () => {
-        nav(`comments/${id}`, { replace: true });
+        nav(`/comments/${id}`, { replace: true });
     }
 
     const likeFetchUrl = `${domain}/api/comments/${id}/like`;
@@ -72,7 +75,7 @@ export function Comment({
                 <div className={styles.rightContentContainer}>
 
                     <div className={styles.usernameAndDateContainer}>
-                        <p className={styles.username}>{username}</p>
+                        <p onClick={onClickUsername} className={styles.username}>{username}</p>
                         <p className={styles.separationBar}>|</p>
                         <p className={styles.createdAt}>{formatSentAtDate(createdAt)}</p>
                     </div>

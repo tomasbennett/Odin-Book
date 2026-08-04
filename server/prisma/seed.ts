@@ -13,6 +13,7 @@ import { faker } from "@faker-js/faker";
 import { supabase } from '../lib/client';
 import { randomItemFromArray } from '../../shared/features/util/services/randomItemFromArray';
 import { randomInt } from '../../shared/features/util/services/randomIntegerMinMax';
+import { ILikeableObject } from '../../shared/features/likes/models/ILikeableObject';
 
 // //AT THE END TEST IF YOU CAN IMPORT FROM THE SHARED FOLDER THROUGH A SEPARATE TSCONFIG.JSON FILE IN PRISMA FOLDER AND THEN ADD TO THE SEED COMMAND IN PACKAGE.JSON FILE
 const prisma = new PrismaClient();
@@ -601,6 +602,76 @@ async function generateRandomPostReplies(
 
 
 
+type IGenerateUsersArray = {
+    users: User[];
+    minLikesPer: number;
+    maxLikesPer: number;
+}
+
+
+function randomUsersToLike({
+    users,
+    minLikesPer,
+    maxLikesPer
+}: IGenerateUsersArray): User[] {
+
+    const numLikes = randomInt({ min: minLikesPer, max: maxLikesPer });
+
+    const shuffledUsers = faker.helpers.shuffle(users);
+
+    return shuffledUsers.slice(0, numLikes);
+}
+
+async function generateRandomPostLikes({
+    users,
+    posts,
+    minLikesPer,
+    maxLikesPer
+}: IGenerateUsersArray & { posts: Post[] }): Promise<void> {
+
+    for (const post of posts) {
+
+        const usersToLike = randomUsersToLike({ users, minLikesPer, maxLikesPer });
+
+        const likesData: Prisma.UserLikesCreateManyInput[] = usersToLike.map(user => ({
+            userId: user.id,
+            postId: post.id,
+        }));
+
+        await prisma.userLikes.createMany({
+            data: likesData,
+            skipDuplicates: true
+        });
+    }
+
+}
+
+async function generateRandomCommentLikes({
+    users,
+    comments,
+    minLikesPer,
+    maxLikesPer
+}: IGenerateUsersArray & { comments: Comment[] }): Promise<void> {
+
+    for (const comment of comments) {
+
+        const usersToLike = randomUsersToLike({ users, minLikesPer, maxLikesPer });
+
+        const likesData: Prisma.UserLikesCreateManyInput[] = usersToLike.map(user => ({
+            userId: user.id,
+            commentId: comment.id,
+        }));
+
+        await prisma.userLikes.createMany({
+            data: likesData,
+            skipDuplicates: true
+        });
+    }
+
+}
+
+
+
 
 
 
@@ -626,12 +697,20 @@ async function main() {
             users, files, posts, { min: 1, max: 5 }
         );
 
-        await generateRandomPostReplies(
+        const replyPosts = await generateRandomPostReplies(
             users, files, posts, 3, 3
         );
-        await generateRandomCommentReplies(
+        const replyComments = await generateRandomCommentReplies(
             users, files, comments, 3, 3
         );
+
+        await generateRandomPostLikes({
+            users, posts: replyPosts, minLikesPer: 0, maxLikesPer: 13
+        });
+
+        await generateRandomCommentLikes({
+            users, comments: replyComments, minLikesPer: 0, maxLikesPer: 26
+        });
 
         console.log('Database seeding completed.');
 

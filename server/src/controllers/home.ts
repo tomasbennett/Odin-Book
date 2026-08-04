@@ -31,34 +31,56 @@ router.get("/",
             const offset = queryResult.offset;
             const limit = queryResult.limit;
 
-            let postsOrderBy: Prisma.PostOrderByWithRelationInput;
+            const postsOrderBy: Prisma.PostOrderByWithRelationInput[] = [];
 
             switch (sort) {
                 case "newest":
-                    postsOrderBy = {
-                        createdAt: "desc"
-                    };
+                    postsOrderBy.push(
+                        {
+                            createdAt: "desc"
+                        }
+                    );
                     break;
 
                 case "oldest":
-                    postsOrderBy = {
-                        createdAt: "asc"
-                    };
+                    postsOrderBy.push(
+                        {
+                            createdAt: "asc"
+                        }
+                    );
+                    // postsOrderBy = {
+                    //     createdAt: "asc"
+                    // };
                     break;
 
                 case "popular":
-                    postsOrderBy = {
-                        likes: {
-                            _count: "desc"
+                    postsOrderBy.push(
+                        {
+                            likes: {
+                                _count: "desc"
+                            }
                         },
-                        createdAt: "desc"
-                    };
+                        {
+                            createdAt: "desc"
+                        }
+                    );
+                    // postsOrderBy = {
+                    //     likes: {
+                    //         _count: "desc"
+                    //     },
+                    //     createdAt: "desc"
+                    // };
                     break;
 
                 default:
-                    postsOrderBy = {
-                        createdAt: "desc"
-                    };
+                    postsOrderBy.push(
+                        {
+                            createdAt: "desc"
+                        }
+                    );
+                    // postsOrderBy = {
+                    //     createdAt: "desc"
+                    // };
                     break;
             }
 

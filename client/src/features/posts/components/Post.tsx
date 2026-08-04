@@ -41,11 +41,11 @@ export function Post({
     const nav = useNavigate();
 
     const onClickComment = () => {
-        nav(`posts/${id}/comments`, { replace: true })
+        nav(`/posts/${id}/comments`, { replace: true })
     }
 
     const onClickReply = () => {
-        nav(`posts/${id}/replies`, { replace: true })
+        nav(`/posts/${id}/replies`, { replace: true })
     }
 
     const onClickParentPost = () => {

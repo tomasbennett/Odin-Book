@@ -9,7 +9,8 @@
 
     overflow-y: auto;
 
-
+    
+    
     .loadingContainer{
         margin-top: 3rem;
     }
@@ -20,8 +21,9 @@
     min-height: 100%;
     flex: 1 1 0;
     min-width: 0;
-
-    max-width: var(--main-max-width);
+    
+    /* padding-bottom: 4rem; */
+    max-width: var(--thread-max-width);
 
 
     border-left: .1rem solid var(--low-light-gray);
