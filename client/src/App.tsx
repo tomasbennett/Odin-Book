@@ -17,6 +17,7 @@ import { CommentRepliesThread } from './features/commentsThread/layouts/CommentR
 import { profileStateQueryKey } from './features/profile/constants/profileStateQueryKey'
 import { IProfileSections } from './features/profile/models/IProfileSections'
 import { SearchUsersLayout } from './features/search/layouts/SearchUsersLayout'
+import { SidebarsLayout } from './layouts/SidebarsLayout'
 
 
 const router = createBrowserRouter([
@@ -66,65 +67,70 @@ const router = createBrowserRouter([
           </ProtectedRoute>,
         children: [
           {
-            index: true,
-            element: <HomeLayout />
-          },
-          {
-            path: profilePageRoute,
+            element: <SidebarsLayout />,
             children: [
               {
                 index: true,
-                element: <Navigate to={`${profilePageRoute}/me`} replace={true} />
+                element: <HomeLayout />
               },
               {
-                path: ":userId",
-                element: <ProfileLayout />
-              }
-            ]
-          },
-          {
-            path: "posts",
-            children: [
-              {
-                index: true,
-                element: <Navigate to={homePageRoute} replace={true} />
-              },
-              {
-                path: ":postId",
+                path: profilePageRoute,
                 children: [
                   {
                     index: true,
-                    element: <Navigate to={"comments"} replace={true} />
+                    element: <Navigate to={`${profilePageRoute}/me`} replace={true} />
                   },
                   {
-                    path: "comments",
-                    element: <PostCommentsThread />
-                  },
-                  {
-                    path: "replies",
-                    element: <RepliesThreadLayout />
+                    path: ":userId",
+                    element: <ProfileLayout />
                   }
                 ]
-              }
-            ]
-          },
-          {
-            path: "comments",
-            children: [
-              {
-                index: true,
-                element: <Navigate to={`${profilePageRoute}/me?${profileStateQueryKey}=${"comments" satisfies IProfileSections}`} replace={true} />
               },
               {
-                path: ":commentId",
-                element: <CommentRepliesThread />
+                path: "posts",
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to={homePageRoute} replace={true} />
+                  },
+                  {
+                    path: ":postId",
+                    children: [
+                      {
+                        index: true,
+                        element: <Navigate to={"comments"} replace={true} />
+                      },
+                      {
+                        path: "comments",
+                        element: <PostCommentsThread />
+                      },
+                      {
+                        path: "replies",
+                        element: <RepliesThreadLayout />
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                path: "comments",
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to={`${profilePageRoute}/me?${profileStateQueryKey}=${"comments" satisfies IProfileSections}`} replace={true} />
+                  },
+                  {
+                    path: ":commentId",
+                    element: <CommentRepliesThread />
+                  }
+                ]
+              },
+              {
+                path: searchPageRoute,
+                element: <SearchUsersLayout />
               }
             ]
           },
-          {
-            path: searchPageRoute,
-            element: <SearchUsersLayout />
-          }
         ]
       }
     ]

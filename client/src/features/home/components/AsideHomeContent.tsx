@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { HomeIcon } from "../../../assets/icons/HomeIcon";
-import styles from "./AsideBar.module.css";
+import styles from "./AsideHomeContent.module.css"
 import { homePageRoute, profilePageRoute, searchPageRoute } from "../../../constants/routes";
 import { useAuth } from "../../auth/contexts/AuthContext";
 
@@ -51,7 +51,7 @@ export function AsideBar({
     return (
         <>
         
-            <div className={styles.outerContainer}>
+            {/* <div className={styles.outerContainer}>
 
                 <div className={styles.topContainer}>
 
@@ -77,7 +77,7 @@ export function AsideBar({
 
                 </div>
 
-                <div className={styles.middleContainer}>
+                <div className={styles.middleContainer}> */}
 
                     <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={({ isActive }) => {
                         return navLinkClassName({
@@ -106,7 +106,7 @@ export function AsideBar({
                         <HourGlassIcon />
                     </NavLink>
 
-                </div>
+                {/* </div>
 
                 <div className={styles.lowerContainer}>
 
@@ -123,7 +123,7 @@ export function AsideBar({
 
 
 
-            </div>
+            </div> */}
         
         </>
     )
