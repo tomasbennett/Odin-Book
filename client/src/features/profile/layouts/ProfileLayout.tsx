@@ -164,6 +164,7 @@ export function ProfileLayout() {
                                 :
                                 //MAY NEED TO PASS THROUGH THE INTIAL LOADING STATE TO KEEP ALL LOADING CONSISTENT HERE
                                 <Header
+                                    isLoading={isInitialFetchLoading}
                                     userId={userId}
                                     username={headerInfo.username}
                                     userProfileImg={headerInfo.userProfileImg}

@@ -21,7 +21,8 @@ export function Header({
     accountBackgroundImg,
     accountCreatedAt,
     aboutUser,
-}: IProfileHeader) {
+    isLoading: isInitialFetchLoading
+}: IProfileHeader & { isLoading: boolean }) {
 
     const { authLevel } = useAuth();
 
@@ -83,7 +84,7 @@ export function Header({
             <header className={styles.outerContainer}>
 
                 {
-                    isBannerLoading || isProfileImgLoading ?
+                    isInitialFetchLoading || isBannerLoading || isProfileImgLoading ?
                         <div className={styles.loadingContainer}>
 
                             {/* Hollow or animated spaces for the banner and profile picture??? */}
@@ -97,25 +98,52 @@ export function Header({
 
                             <div className={styles.headerImgContainer}>
 
-                                <label className={styles.backgroundImgContainer}>
+                                <label
+                                    className={`${isUserProfileOwner && styles.isUsersInputImgContainer} ${styles.backgroundImgContainer}`}>
 
-                                    <img src={`${bannerImgPreview ?? cubeNightSky}`} alt={`Banner Image: ${authLevel.username}`} />
+                                    <div className={styles.innerWrapper}>
 
-                                    <input onChange={(e) => {
-                                        uploadNewBannerImg(e);
-                                    }}
-                                        type="file" hidden className={styles.bannerInput} />
+                                        <img
+                                            src={`${bannerImgPreview ?? cubeNightSky}`}
+                                            alt={`Banner Image: ${authLevel.username}`} />
+
+
+                                        {
+                                            isUserProfileOwner && (
+                                                <input
+                                                    onChange={(e) => {
+                                                        uploadNewBannerImg(e);
+                                                    }}
+                                                    type="file"
+                                                    hidden
+                                                    className={styles.bannerInput} />
+                                            )
+                                        }
+
+                                    </div>
+
+
+
 
                                 </label>
 
-                                <label className={styles.profileImgContainer}>
+                                <label className={`${isUserProfileOwner && styles.isUsersInputImgContainer} ${styles.profileImgContainer}`}>
 
-                                    <img src={`${profileImgPreview ?? defUserProfileImg}`} alt={`Profile Image: ${authLevel.username}`} />
+                                    <div className={styles.overflowHiddenCircleContainer}>
 
-                                    <input onChange={(e) => {
-                                        uploadNewProfileImg(e);
-                                    }}
-                                        type="file" hidden className={styles.profileImgInput} />
+                                        <img src={`${profileImgPreview ?? defUserProfileImg}`} alt={`Profile Image: ${authLevel.username}`} />
+
+                                        {
+                                            isUserProfileOwner && (
+                                                <input onChange={(e) => {
+                                                    uploadNewProfileImg(e);
+                                                }}
+                                                    type="file" hidden className={styles.profileImgInput} />
+
+                                            )
+                                        }
+
+                                    </div>
 
                                 </label>
 
@@ -149,7 +177,7 @@ export function Header({
                                                 !aboutUserServer &&
                                                 !isUserProfileOwner
                                             ) &&
-                                                styles.emptyAboutContainer
+                                            styles.emptyAboutContainer
                                             } ${styles.aboutUserContainer
                                             }`
                                         }>
@@ -207,24 +235,24 @@ export function Header({
 
 
 
-                                                    <p
-                                                        className={`${(!aboutUserServer && isUserProfileOwner) &&
-                                                            styles.emptyAbout} 
+                                                <p
+                                                    className={`${(!aboutUserServer && isUserProfileOwner) &&
+                                                        styles.emptyAbout} 
                                                                     ${styles.aboutUser}`}>
-                                                        {
-                                                            (
-                                                                !aboutUserServer &&
-                                                                isUserProfileOwner
-                                                            ) ?
+                                                    {
+                                                        (
+                                                            !aboutUserServer &&
+                                                            isUserProfileOwner
+                                                        ) ?
 
-                                                                "Tell others about yourself..."
+                                                            "Tell others about yourself..."
 
-                                                                :
+                                                            :
 
-                                                                aboutUserServer
+                                                            aboutUserServer
 
-                                                        }
-                                                    </p>
+                                                    }
+                                                </p>
 
 
 
