@@ -50,7 +50,7 @@ export function Comment({
         nav(`/comments/${id}`, { replace: true });
     }
 
-    const likeFetchUrl = `${domain}/api/comments/${id}/like`;
+    const likeFetchUrl = `${domain}/api/comments/${id}`;
 
     const { authLevel } = useAuth();
 

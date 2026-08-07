@@ -12,7 +12,9 @@ import { ProfileRepliesParentPostSchema } from "./IRepliesParentPost";
 
 
 export const ProfileRepliesSchema = z.array(
-    PostSchema.merge(ProfileRepliesParentPostSchema)
+    PostSchema.extend({
+        parentPost: ProfileRepliesParentPostSchema
+    })
 );
 
 

@@ -154,7 +154,7 @@ export function ProfileLayout() {
 
 
                 <div className={styles.innerContainer}>
-                    
+
                     <div className={styles.headerContainer}>
 
                         {
@@ -306,6 +306,13 @@ export function ProfileLayout() {
                                                     <div className={styles.contentContainer}>
                                                         {
                                                             replies.map(reply => {
+
+                                                                // const parentPost = reply.parentPost ? {
+                                                                //     "parentPostId": reply.parentPost.parentPostId,
+                                                                //     "parentPostUserId": reply.parentPost.parentPostUserId,
+                                                                //     "parentPostUsername": reply.parentPost.parentPostUsername,
+                                                                //     "parentPostUserImgUrl": reply.parentPost.parentPostUserImgUrl,
+                                                                // } : undefined;
 
                                                                 return (
                                                                     <Post

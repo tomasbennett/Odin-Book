@@ -23,6 +23,16 @@
 
 .parentPostContainer {
     flex-shrink: 0;
+    flex-grow: 0;
+    flex-basis: auto;
+
+    align-self: flex-start;
+
+    cursor: pointer;
+
+    min-width: 0;
+
+    width: auto;
 
     height: 5rem;
     /* width: 100%; */
@@ -42,12 +52,16 @@
     overflow: hidden;
 
     .repostIconSVGContainer {
+
+
         height: 100%;
         aspect-ratio: 1;
 
         overflow: hidden;
 
         border-radius: 50%;
+
+        padding: .5rem 0;
 
         svg {
             width: 100%;

@@ -223,9 +223,19 @@ router.get("/:commentId/replies",
                     where: {
                         parentCommentId: commentId
                     },
-                    orderBy: {
-                        createdAt: "asc"
-                    },
+                    orderBy: [
+                        {
+                            likes: {
+                                _count: "desc"
+                            }
+                        },
+                        {
+                            createdAt: "asc"
+                        },
+                        {
+                            id: "asc"
+                        }
+                    ],
                     include: {
                         likes: true,
                         singleGifOrImg: true,

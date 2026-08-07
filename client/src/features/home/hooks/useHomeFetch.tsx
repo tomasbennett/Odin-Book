@@ -298,6 +298,7 @@ export function useHomeFetch() {
     //     sort
     // }); 3 LINES REMOVED
     useEffect(() => {
+        setPosts([]);
 
         fetchPosts({
             offset: 0,
@@ -305,7 +306,7 @@ export function useHomeFetch() {
             sort
         });
 
-        setIsLoading(false)
+        // setIsLoading(false)
 
         return () => {
             abortControllerRef.current?.abort(unmountSortTypeAbort);

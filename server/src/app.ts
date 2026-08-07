@@ -48,7 +48,7 @@ const allowedOrigins: string[] = [
 app.use(cors({
   origin: environment === "PROD" ? true : allowedOrigins,
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-type", "Authorization"]
 }));
 app.use(express.json());

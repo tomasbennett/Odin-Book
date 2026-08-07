@@ -34,42 +34,39 @@ export function HomeLayout() {
 
 
         <>
-        
-            {/* <div className={styles.outerContainer}>
-
-                <AsideBar sortType={homeFetch.sort} /> */}
-
-                {
-                    homeFetch.isLoading ?
-                        <LoadingCircle height="5rem" />
-
-                        :
-
-                        <>
-                            <main className={styles.main}>
-                                
-                                <CreatePostInput 
-                                    setPosts={homeFetch.setPosts}
-                                    
-                                />
-
-                                <PostsList {...homeFetch} />
-
-                            </main>
-                        
-                        </>
 
 
-                }
+            <>
+                <main className={styles.main}>
+
+                    <CreatePostInput
+                        setPosts={homeFetch.setPosts}
+
+                    />
+                    
+                    {
+
+
+                        homeFetch.isLoading ?
+
+                            <div className={styles.loadingContainer}>
+
+                                <LoadingCircle height="5rem" />
+
+                            </div>
+
+                            :
+
+                            <PostsList {...homeFetch} />
+                    }
+
+                </main>
+
+            </>
 
 
 
-                {/* <div className={styles.passiveImgContainer}>
-                    <PassiveSidebarVisual />
-                </div>  
 
-            </div> */}
-        
         </>
 
 

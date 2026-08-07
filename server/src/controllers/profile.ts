@@ -238,7 +238,8 @@ router.get("/:userId",
             const buildingReplies = async () => {
                 const repliesAPI: IProfileReplies = await Promise.all(
                     repliesDb.map(async (reply) => {
-                        const buildParenPostDetails = async (): Promise<IProfileRepliesParentPost> => {
+
+                        const buildParentPostDetails = async (): Promise<IProfileRepliesParentPost> => {
                             const parentPostDb = reply.parentPost!;
 
                             const { userProfileImgUrl: parentUserProfileImgUrl, fileDetails: parentFileDetails } =
@@ -282,14 +283,14 @@ router.get("/:userId",
 
 
                         const [parentPost, profileReply]: [IProfileRepliesParentPost, IPost] = await Promise.all([
-                            buildParenPostDetails(),
+                            buildParentPostDetails(),
                             buildReplyDetails()
                         ]);
 
 
                         return {
-                            ...parentPost,
-                            ...profileReply
+                            ...profileReply,
+                            parentPost: parentPost
                         }
                     })
                 );

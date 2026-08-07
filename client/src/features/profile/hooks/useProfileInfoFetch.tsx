@@ -36,6 +36,7 @@ import { abortInitialFetchRequest } from "../constants/abortFetchReq";
 
 import cubeNightSky from "../../../assets/cube-night-sky.jpg"
 import githubProfileImg from "../../../assets/github-profile-img.jpg"
+import { IProfileReplies } from "../../../../../shared/features/profiles/models/IProfileReplies";
 
 export function useProfileInfoFetch() {
 
@@ -73,7 +74,7 @@ export function useProfileInfoFetch() {
     }, [parsed.success, userId, nav]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [replies, setReplies] = useState<IPost[]>([
+    const [replies, setReplies] = useState<IProfileReplies>([
         // {
         //     id: "1",
         //     userId: "1",

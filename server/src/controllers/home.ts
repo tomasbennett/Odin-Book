@@ -38,6 +38,9 @@ router.get("/",
                     postsOrderBy.push(
                         {
                             createdAt: "desc"
+                        },
+                        {
+                            id: "desc"
                         }
                     );
                     break;
@@ -46,6 +49,9 @@ router.get("/",
                     postsOrderBy.push(
                         {
                             createdAt: "asc"
+                        },
+                        {
+                            id: "desc"
                         }
                     );
                     // postsOrderBy = {
@@ -62,6 +68,9 @@ router.get("/",
                         },
                         {
                             createdAt: "desc"
+                        },
+                        {
+                            id: "desc"
                         }
                     );
                     // postsOrderBy = {
@@ -76,6 +85,9 @@ router.get("/",
                     postsOrderBy.push(
                         {
                             createdAt: "desc"
+                        },
+                        {
+                            id: "desc"
                         }
                     );
                     // postsOrderBy = {

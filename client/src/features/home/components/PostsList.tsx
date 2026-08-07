@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { sortKeyWord } from "../../../../../shared/features/posts/constants";
 import { ProfilePostsAPISuccessSchema } from "../../../../../shared/features/profiles/models/IProfilePosts";
 import { domain } from "../../../constants/EnvironmentAPI";
@@ -22,7 +23,7 @@ export function PostsList({
     sort
 }: IPostListProps) {
 
-    
+    // const containerRef = useRef<HTMLDivElement | null>(null);
 
     const {
         isLoadingState: isScrollFetchLoading,
@@ -56,7 +57,7 @@ export function PostsList({
 
         },
         originalOffset: posts.length,
-        limit: 20,
+        limit: 10,
         isOriginalFetchLoading: isLoading,
         isMoreAvailable: posts.length >= limit
     });

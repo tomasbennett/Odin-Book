@@ -136,7 +136,20 @@ router.get("/:postId/replies",
                     where: {
                         parentPostId: postId
                     },
-                    include: postsInclude
+                    include: postsInclude,
+                    orderBy: [
+                        {
+                            likes: {
+                                _count: "desc"
+                            }
+                        },
+                        {
+                            createdAt: "asc"
+                        },
+                        {
+                            id: "asc"
+                        }
+                    ]
                 }),
                 getParentPosts(postId)
             ]);

@@ -60,7 +60,7 @@ export function Post({
     }
 
 
-    const likeFetchUrl = `${domain}/api/posts/${id}/like`;
+    const likeFetchUrl = `${domain}/api/posts/${id}`;
 
     const { authLevel } = useAuth();
 
@@ -118,6 +118,12 @@ export function Post({
                                         </div>
                                     )
                                 } */}
+
+                                {/* <p>
+                                    {
+                                        userId
+                                    }
+                                </p> */}
                             </div>
 
 
@@ -135,7 +141,17 @@ export function Post({
                         {
                             content && (
                                 <div className={styles.postContent}>
-                                    <p className={styles.postContentText}>{content}</p>
+                                    <p className={styles.postContentText}>
+                                        {
+                                            content
+                                        }
+                                    </p>
+                                    {/* <br />
+                                    <p>
+                                        {
+                                            id
+                                        }
+                                    </p> */}
                                 </div>
                             )
                         }
@@ -166,6 +182,14 @@ export function Post({
                                     return null;
                                 })
                             }
+
+                            {/* <br />
+
+                            <p>
+                                {
+                                    id
+                                }
+                            </p> */}
 
                         </div>
 
