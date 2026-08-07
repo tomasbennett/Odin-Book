@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { Comment } from "../../comments/components/Comment";
 import { CreateCommentInput } from "../../comments/components/CreateCommentInput";
@@ -21,6 +22,21 @@ export function PostCommentsThread() {
         setComments
     } = usePostCommentThreadFetch();
 
+    // useEffect(() => {
+    //     setPost((prev) => {
+
+    //         if (prev === null || post === null) {
+    //             return prev;
+    //         }
+
+    //         return {
+    //             ...prev,
+    //             repliesCount: comments.length
+    //         }
+    //     });
+
+
+    // }, [comments]);
 
     return (
         <>
@@ -52,6 +68,7 @@ export function PostCommentsThread() {
                                             <>
                                                 <Post 
                                                     {...post}
+                                                    commentCount={comments.length}
                                                     setLikesCount={createSingleLikeUpdater(setPost)}
                                                 />
                                             

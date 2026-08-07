@@ -496,7 +496,7 @@ router.post("/",
 
                 const prismaFile = await prisma.files.create({
                     data: {
-                        filename: file.filename,
+                        filename: file.originalname,
                         filesize: file.size,
                         mimetype: file.mimetype,
                         supabaseFileId: fileResult.supabaseFileId,

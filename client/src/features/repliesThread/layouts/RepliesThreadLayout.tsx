@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
 import { createSingleLikeUpdater } from "../../likes/services/likeSingleObjects";
@@ -13,12 +14,28 @@ export function RepliesThreadLayout() {
     const {
         isLoading,
         post,
+        setPost,
         replies,
+        setReplies,
         parentPosts,
         setParentPosts,
-        setPost,
-        setReplies
     } = useRepliesThreadFetch();
+
+    // useEffect(() => {
+    //     setPost((prev) => {
+
+    //         if (prev === null || post === null) {
+    //             return prev;
+    //         }
+
+    //         return {
+    //             ...prev,
+    //             repliesCount: replies.length
+    //         }
+    //     });
+
+    // }, [replies]);
+
 
 
     return (
@@ -70,12 +87,13 @@ export function RepliesThreadLayout() {
 
                                                 <Post
                                                     {...post}
+                                                    repliesCount={replies.length}
                                                     setLikesCount={createSingleLikeUpdater(setPost)}
                                                 />
 
                                                 <CreatePostInput 
                                                     setPosts={setReplies}
-                                                    parentPostId={post.parentPost?.parentPostId}
+                                                    parentPostId={post.id}
                                                 />
                                             
                                             </>

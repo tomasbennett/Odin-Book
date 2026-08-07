@@ -151,7 +151,9 @@ export function ProfileLayout() {
 
     const loadingComponent = (
         <div className={styles.loadingContainer}>
+
             <LoadingCircle height="3rem" />
+            
         </div>
     )
 

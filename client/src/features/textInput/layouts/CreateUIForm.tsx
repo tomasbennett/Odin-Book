@@ -62,7 +62,7 @@ export function CreateUIForm({
         allowedMaxFileSize
     });
 
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     useEffect(() => {
         const textarea = textareaRef.current;
@@ -73,7 +73,7 @@ export function CreateUIForm({
 
         textarea.style.height = "0px";
         textarea.style.height = `${textarea.scrollHeight}px`;
-    }, [])
+    }, []);
 
     return (
         <>
@@ -169,7 +169,9 @@ export function CreateUIForm({
 
                             <div className={styles.submitContainer}>
 
-                                <button className={styles.submitBtn} type="button">
+                                <button 
+                                    className={styles.submitBtn} 
+                                    type="submit">
 
                                     {
                                         isLoading ?

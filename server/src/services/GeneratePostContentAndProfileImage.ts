@@ -49,7 +49,8 @@ export async function generatePostContentAndProfileImage(
         });
     }
 
-    const generatedPublicUrlResult = await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
+    const generatedPublicUrlResult =
+        await GenerateSupabasePublicURL(filesToGeneratePublicUrlsFor);
 
     if (!generatedPublicUrlResult.ok) {
         throw new Error("Failed to generate public URLs for post or post user profile image!!!");
@@ -82,7 +83,7 @@ export async function generatePostContentAndProfileImage(
     }
 
 
-    
+
     return {
         userProfileImgUrl: postUserProfileImgUrl,
         fileDetails

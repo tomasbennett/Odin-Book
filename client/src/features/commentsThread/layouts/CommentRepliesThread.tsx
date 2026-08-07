@@ -8,6 +8,7 @@ import { Post } from "../../posts/components/Post";
 import { usePostCommentThreadFetch } from "../hooks/usePostCommentsThreadFetch";
 import { useCommentRepliesThreadFetch } from "../hooks/useCommentRepliesThreadFetch";
 import { CreateCommentInput } from "../../comments/components/CreateCommentInput";
+import { useEffect } from "react";
 
 
 
@@ -26,7 +27,20 @@ export function CommentRepliesThread() {
         setParentComments
     } = useCommentRepliesThreadFetch();
 
+    // useEffect(() => {
+    //     setComment((prev) => {
 
+    //         if (prev === null || comment === null) {
+    //             return prev;
+    //         }
+
+    //         return {
+    //             ...prev,
+    //             repliesCount: replies.length
+    //         }
+    //     });
+
+    // }, [replies]);  
     
 
 
@@ -101,6 +115,7 @@ export function CommentRepliesThread() {
                                             <Comment 
                                                 key={comment.id}
                                                 {...comment}
+                                                commentCount={replies.length}
                                                 setLikeCount={createSingleLikeUpdater(setComment)}
                                             />
                                     }
@@ -114,7 +129,7 @@ export function CommentRepliesThread() {
                                             <CreateCommentInput 
                                                 setComments={setReplies}
                                                 postId={post.id}
-                                                parentCommentId={comment?.parentCommentId}
+                                                parentCommentId={comment?.id}
                                             />
 
                                     }

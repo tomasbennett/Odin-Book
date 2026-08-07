@@ -15,6 +15,8 @@ export function TextFileElement({
     fileDetails,
     removeFile
 }: IFileElementProps) {
+    // console.log(`DOES REMOVE FILE EXIST: ${!!removeFile}`);
+
 
     return (
         <>

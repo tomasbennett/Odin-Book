@@ -24,7 +24,7 @@ export function FileElementComponent({
 
 
 
-    console.log(`SO I GUESS THIS IS REMOVE FILE???: ${removeFile}`);
+    // console.log(`SO I GUESS THIS IS REMOVE FILE???: ${removeFile}`);
 
 
 

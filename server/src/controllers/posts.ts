@@ -500,42 +500,54 @@ router.post("/",
 
                 if (files) {
 
-                    const uploadedResult = await Promise.all(
-                        files.map(async (file) => {
+                    const uploadedResult: Prisma.FilesCreateManyInput[] =
+                        await Promise.all(
+                            files.map(async (file): Promise<Prisma.FilesCreateManyInput> => {
 
-                            const uploadResult = await uploadFileToSupabase(file);
+                                const uploadResult =
+                                    await uploadFileToSupabase(file);
 
-                            if (!uploadResult.ok) {
-                                throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
-                            }
-
-
-
-
-                            return {
-                                // id: newPrismaFile.id,
-                                mimetype: file.mimetype,
-                                filename: file.filename,
-                                filesize: file.size,
-                                uploadedAt: createdAt,
-                                postContentForId: newPost.id,
-                                supabaseFileId: uploadResult.supabaseFileId
-                            }
+                                if (!uploadResult.ok) {
+                                    throw new Error("Something went wrong with one of the file uploads: " + uploadResult.message)
+                                }
 
 
-                        })
-                    );
 
-                    const newPrismaFiles = await prisma.files.createManyAndReturn({
-                        data: uploadedResult,
-                    });
+
+                                return {
+                                    mimetype: file.mimetype,
+                                    filename: file.originalname,
+                                    filesize: file.size,
+                                    uploadedAt: createdAt,
+                                    // postContentForId: newPost.id,
+                                    supabaseFileId: uploadResult.supabaseFileId
+                                }
+
+
+                            })
+                        );
+
+
+                    const newPrismaFiles =
+                        await prisma.files.createManyAndReturn({
+                            data: uploadedResult,
+                        });
+
+
+                    const newPrismaPostFilesJunction =
+                        await prisma.postFileContent.createMany({
+                            data: newPrismaFiles.map((file) => ({
+                                postId: newPost.id,
+                                fileId: file.id
+                            }))
+                        });
 
 
                     const dbFilesArr = newPrismaFiles;
 
-                    const { 
-                        userProfileImgUrl: userUrl, 
-                        fileDetails: newPostFileDetails 
+                    const {
+                        userProfileImgUrl: userUrl,
+                        fileDetails: newPostFileDetails
                     } = await generatePostContentAndProfileImage({
                         ...newPost,
                         postFileContent: dbFilesArr.map((file) => ({
