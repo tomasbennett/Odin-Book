@@ -22,7 +22,9 @@ export function useSectionScrollFetch({
     limit,
     originalOffset,
     isOriginalFetchLoading,
-    isMoreAvailable
+    isMoreAvailable,
+    scrollContainerRef,
+    enabled = true
 }: IScrollFetchParams) {
 
     const errCtx = useError();
@@ -36,7 +38,7 @@ export function useSectionScrollFetch({
     const offsetRef = useRef<number>(originalOffset);
     const [isMoreDataAvailable, setIsMoreDataAvailable] = useState<boolean>(isMoreAvailable);
 
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = scrollContainerRef ?? useRef<HTMLDivElement | null>(null);
 
     const scrollFetch = async () => {
         if (!errCtx) {
@@ -49,7 +51,12 @@ export function useSectionScrollFetch({
             return;
         }
 
-        if (isLoadingRef.current || !isMoreDataAvailable || isOriginalFetchLoading) {
+        if (
+            isLoadingRef.current || 
+            !isMoreDataAvailable || 
+            isOriginalFetchLoading ||
+            !enabled
+        ) {
             return;
         }
 

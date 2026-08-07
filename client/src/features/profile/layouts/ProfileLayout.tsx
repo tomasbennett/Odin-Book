@@ -18,6 +18,7 @@ import { Comment } from "../../comments/components/Comment";
 import { Post } from "../../posts/components/Post";
 import { COMMENT_IMG_GIF_KEY } from "../../../../../shared/features/comments/constants";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
+import { useRef } from "react";
 
 
 
@@ -40,6 +41,9 @@ export function ProfileLayout() {
     if (!userId) {
         return <Navigate to={homePageRoute} replace={true} />
     }
+
+
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
 
     const {
@@ -71,7 +75,9 @@ export function ProfileLayout() {
             return {
                 success: false
             }
-        }
+        },
+        scrollContainerRef: scrollContainerRef,
+        enabled: state === "posts"
     });
 
     const {
@@ -103,7 +109,9 @@ export function ProfileLayout() {
             return {
                 success: false
             }
-        }
+        },
+        scrollContainerRef: scrollContainerRef,
+        enabled: state === "replies"
     });
 
     const {
@@ -135,7 +143,9 @@ export function ProfileLayout() {
             return {
                 success: false
             }
-        }
+        },
+        scrollContainerRef: scrollContainerRef,
+        enabled: state === "comments"
     });
 
 
@@ -150,7 +160,7 @@ export function ProfileLayout() {
 
     return (
         <>
-            <div className={styles.outerContainer}>
+            <div ref={scrollContainerRef} className={styles.outerContainer}>
 
 
                 <div className={styles.innerContainer}>
@@ -307,12 +317,6 @@ export function ProfileLayout() {
                                                         {
                                                             replies.map(reply => {
 
-                                                                // const parentPost = reply.parentPost ? {
-                                                                //     "parentPostId": reply.parentPost.parentPostId,
-                                                                //     "parentPostUserId": reply.parentPost.parentPostUserId,
-                                                                //     "parentPostUsername": reply.parentPost.parentPostUsername,
-                                                                //     "parentPostUserImgUrl": reply.parentPost.parentPostUserImgUrl,
-                                                                // } : undefined;
 
                                                                 return (
                                                                     <Post

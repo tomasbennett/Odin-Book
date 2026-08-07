@@ -1,4 +1,3 @@
-import z from "zod";
 
 export type IScrollFetchParams = {
     url: string;
@@ -9,6 +8,8 @@ export type IScrollFetchParams = {
     originalOffset: number;
     isOriginalFetchLoading: boolean;
     isMoreAvailable: boolean;
+    scrollContainerRef?: React.RefObject<HTMLDivElement | null> | undefined;
+    enabled?: boolean;
 }
 
 
