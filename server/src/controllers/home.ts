@@ -10,6 +10,7 @@ import { IPost } from "../../../shared/features/posts/models/IPost";
 import { generatePostContentAndProfileImage } from "../services/GeneratePostContentAndProfileImage";
 import { sortKeyWord } from "../../../shared/features/posts/constants";
 import { postsInclude } from "../constants/postInclude";
+import { IProfileRepliesParentPost } from "../../../shared/features/profiles/models/IRepliesParentPost";
 
 
 export const router = Router();
@@ -100,36 +101,52 @@ router.get("/",
                 take: limit,
                 skip: offset,
                 orderBy: postsOrderBy,
-                include: postsInclude
+                include: {
+                    ...postsInclude,
+                    parentPost: {
+                        include: {
+                            user: true
+                        }
+                    }
+                }
             });
 
 
 
 
-            const homePosts: IProfilePosts = await Promise.all(posts.map(async (post): Promise<IPost> => {
+            const homePosts: IProfilePosts = await Promise.all(
+                posts.map(async (post): Promise<IPost> => {
 
 
-                const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
+                    const { userProfileImgUrl, fileDetails } = await generatePostContentAndProfileImage(post);
+
+                    const parentPost: IProfileRepliesParentPost | undefined = 
+                        post.parentPost ? {
+                            "parentPostId": post.parentPost.id,
+                            "parentPostUserId": post.parentPost.userId,
+                            "parentPostUsername": post.parentPost.user.username,
+                        } : undefined
 
 
 
+                    return {
+                        id: post.id,
+                        userId: post.userId,
+                        username: post.user.username,
+                        createdAt: post.createdAt,
+                        title: post.title || undefined,
+                        likeCount: post.likes.length,
+                        commentCount: post.comments.length,
+                        repliesCount: post.replies.length,
+                        userProfileImgUrl: userProfileImgUrl,
+                        content: post.textContent || undefined,
+                        fileDetails: fileDetails,
+                        haveYouLiked: post.likes.some(like => like.userId === user.userId),
+                        parentPost: parentPost
+                    }
 
-                return {
-                    id: post.id,
-                    userId: post.userId,
-                    username: post.user.username,
-                    createdAt: post.createdAt,
-                    title: post.title || undefined,
-                    likeCount: post.likes.length,
-                    commentCount: post.comments.length,
-                    repliesCount: post.replies.length,
-                    userProfileImgUrl: userProfileImgUrl,
-                    content: post.textContent || undefined,
-                    fileDetails: fileDetails,
-                    haveYouLiked: post.likes.some(like => like.userId === user.userId),
-                }
-
-            }));
+                })
+            );
 
 
 
