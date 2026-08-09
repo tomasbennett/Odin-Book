@@ -35,6 +35,7 @@ import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
 import { IPostRepliesSuccessAPI } from "../../../shared/features/posts/models/IPostRepliesSuccessAPI";
 import { postsInclude } from "../constants/postInclude";
 import { getParentPosts } from "../services/GetParentPostsRecursive";
+import { incrementParentPostRepliesCount } from "../services/IncrementParentPostRepliesCount";
 
 
 export const router = Router();
@@ -82,7 +83,7 @@ router.get("/:userId",
                     title: post.title || undefined,
                     likeCount: post.likes.length,
                     commentCount: post.comments.length,
-                    repliesCount: post.replies.length,
+                    repliesCount: post.descendantRepliesCount,
                     userProfileImgUrl: userProfileImgUrl,
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
@@ -177,7 +178,7 @@ router.get("/:postId/replies",
                     title: post.title || undefined,
                     likeCount: post.likes.length,
                     commentCount: post.comments.length,
-                    repliesCount: post.replies.length,
+                    repliesCount: post.descendantRepliesCount,
                     userProfileImgUrl: userProfileImgUrl,
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
@@ -199,7 +200,7 @@ router.get("/:postId/replies",
                         title: reply.title || undefined,
                         likeCount: reply.likes.length,
                         commentCount: reply.comments.length,
-                        repliesCount: reply.replies.length,
+                        repliesCount: reply.descendantRepliesCount,
                         userProfileImgUrl: userProfileImgUrl,
                         content: reply.textContent || undefined,
                         fileDetails: fileDetails,
@@ -223,7 +224,7 @@ router.get("/:postId/replies",
                         title: parentPost.title || undefined,
                         likeCount: parentPost.likes.length,
                         commentCount: parentPost.comments.length,
-                        repliesCount: parentPost.replies.length,
+                        repliesCount: parentPost.descendantRepliesCount,
                         userProfileImgUrl: userProfileImgUrl,
                         content: parentPost.textContent || undefined,
                         fileDetails: fileDetails,
@@ -351,7 +352,7 @@ router.get("/:postId/comments",
                     createdAt: postDb.createdAt,
                     likeCount: postDb.likes.length,
                     commentCount: postDb.comments.length,
-                    repliesCount: postDb.replies.length,
+                    repliesCount: postDb.descendantRepliesCount,
                     title: postDb.title || undefined,
                     content: postDb.textContent || undefined,
                     haveYouLiked: postDb.likes.some(like => like.userId === user.userId)
@@ -377,7 +378,7 @@ router.get("/:postId/comments",
                             [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
                             createdAt: comment.createdAt,
                             likeCount: comment.likes.length,
-                            commentCount: comment.replies.length,
+                            commentCount: comment.descendantRepliesCount,
                             text: comment.textContent || undefined,
                             parentCommentId: undefined,
                             haveYouLiked: comment.likes.some(like => like.userId === user.userId)
@@ -489,7 +490,15 @@ router.post("/",
             });
 
 
+            const updateParentPostRepliesCountResult = 
+                await incrementParentPostRepliesCount(newPost.parentPostId);
 
+
+            if (!updateParentPostRepliesCountResult.ok) {
+                return res
+                    .status(updateParentPostRepliesCountResult.status)
+                    .json(updateParentPostRepliesCountResult);
+            }
 
 
 

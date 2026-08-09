@@ -114,6 +114,7 @@ model Post {
   parentPost   Post?   @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
 
   replies Post[] @relation("PostReplies")
+  descendantRepliesCount Int @default(0)
 }
 
 model Comment {
@@ -137,6 +138,7 @@ model Comment {
   parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
 
   replies Comment[] @relation("CommentReplies")
+  descendantRepliesCount Int @default(0)
 }
 
 model UserLikes {

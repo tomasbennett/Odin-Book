@@ -33,6 +33,7 @@ import { ILikeAPISuccess } from "../../../shared/features/likes/models/ILikeAPIS
 import { ISuccessUploadLike } from "../../../shared/features/likes/models/ISuccessUploadLike";
 import { ISendLike } from "../../../shared/features/likes/models/ISendLike";
 import { postsInclude } from "../constants/postInclude";
+import { incrementParentCommentsRepliesCount } from "../services/IncrementParentCommentsRepliesCount";
 
 
 export const router = Router();
@@ -175,7 +176,7 @@ router.get("/:userId",
                         postTitle: post.title || undefined,
                         postUserId: postUser.id,
                         postUserProfileImageUrl: postUserProfileImageUrl,
-                        commentCount: comment.replies.length,
+                        commentCount: comment.descendantRepliesCount,
                         haveYouLiked: hasUserLiked
                     };
                 })
@@ -294,7 +295,7 @@ router.get("/:commentId/replies",
                         likeCount: reply.likes.length,
                         text: reply.textContent || undefined,
                         [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                        commentCount: reply.replies.length,
+                        commentCount: reply.descendantRepliesCount,
                         haveYouLiked: reply.likes.some((like) => like.userId === user.userId),
                     }
                 })
@@ -316,7 +317,7 @@ router.get("/:commentId/replies",
                         likeCount: parentComment.likes.length,
                         text: parentComment.textContent || undefined,
                         [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                        commentCount: parentComment.replies.length,
+                        commentCount: parentComment.descendantRepliesCount,
                         haveYouLiked: parentComment.likes.some((like) => like.userId === user.userId),
                     }
                 })
@@ -336,7 +337,7 @@ router.get("/:commentId/replies",
                     likeCount: comment.likes.length,
                     text: comment.textContent || undefined,
                     [COMMENT_IMG_GIF_KEY]: imgOrGifDetails,
-                    commentCount: comment.replies.length,
+                    commentCount: comment.descendantRepliesCount,
                     haveYouLiked: comment.likes.some((like) => like.userId === user.userId),
                 };
 
@@ -415,7 +416,7 @@ router.get("/:commentId/replies",
                     userProfileImgUrl: userProfileImgUrl,
                     fileDetails: fileDetails,
                     commentCount: post.comments.length,
-                    repliesCount: post.replies.length,
+                    repliesCount: post.descendantRepliesCount,
                     haveYouLiked: post.likes.some((like) => like.userId === user.userId),
                 };
 
@@ -531,7 +532,23 @@ router.post("/",
 
             //NEED TO SEE ABOUT GETTING PUBLIC URL IF NECESSARY FOR ANYTHING TO SEND OUT TO THE SOCKETS, CHECK MESSAGING APP
 
-            const { userProfileImgUrl, imgOrGifDetails } = await generateCommentContentAndProfileImage(uploadedComment);
+            const { userProfileImgUrl, imgOrGifDetails } =
+                await generateCommentContentAndProfileImage(uploadedComment);
+
+
+
+
+
+            const incrementParentCommentsResult =
+                await incrementParentCommentsRepliesCount(uploadedComment.parentCommentId);
+
+
+            if (!incrementParentCommentsResult.ok) {
+                return res
+                    .status(incrementParentCommentsResult.status)
+                    .json(incrementParentCommentsResult);
+            }
+
 
 
 
