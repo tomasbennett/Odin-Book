@@ -23,24 +23,34 @@ export function RepliesThreadLayout() {
     } = useRepliesThreadFetch();
 
     const setNewPost = (newPost: IPost) => {
-        setReplies(prevReplies => [newPost, ...prevReplies]);
+        const uploadNewPost = {
+            ...newPost,
+            parentPost: undefined
+        }
+
+        setReplies(prevReplies => [uploadNewPost, ...prevReplies]);
         setPost(prevPost => {
 
             if (!prevPost) return prevPost;
 
             return {
                 ...prevPost,
-                commentCount: prevPost.repliesCount + 1
+                repliesCount: prevPost.repliesCount + 1
             }
         });
+        console.log("New post was added to the replies thread: !!!");
+
+
         setParentPosts(prevParentPosts => {
 
-            const updatedParentPosts = prevParentPosts.map(parentPost => {
-                return {
-                    ...parentPost,
-                    repliesCount: parentPost.repliesCount + 1
-                }
-            });
+
+            const updatedParentPosts =
+                prevParentPosts.map(parentPost => {
+                    return {
+                        ...parentPost,
+                        repliesCount: parentPost.repliesCount + 1
+                    }
+                });
 
             return updatedParentPosts;
         });
@@ -101,11 +111,11 @@ export function RepliesThreadLayout() {
                                                     setLikesCount={createSingleLikeUpdater(setPost)}
                                                 />
 
-                                                <CreatePostInput 
+                                                <CreatePostInput
                                                     setNewPost={setNewPost}
                                                     parentPostId={post.id}
                                                 />
-                                            
+
                                             </>
 
                                     }
@@ -130,7 +140,7 @@ export function RepliesThreadLayout() {
                                     }
 
                                 </div>
-                                
+
                             </div>
 
 

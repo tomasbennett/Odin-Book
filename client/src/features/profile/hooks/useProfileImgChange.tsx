@@ -25,7 +25,7 @@ export function useProfileImgChange(
     const nav = useNavigate();
     const { jwtFetchHandler } = useJWTFetch();
     const socket = useSocket();
-    const { setAuthLevel } = useAuth();
+    const { setAuthLevel, authLevel } = useAuth();
     
     const {
         // file,
@@ -117,6 +117,24 @@ export function useProfileImgChange(
 
             const successResult = SuccessPatchUserProfileAPISchema.safeParse(resJSON);
             if (successResult.success) {
+
+                const dataUpdate = successResult.data;
+
+                if (authLevel.userType !== "user") {
+                    errCtx.throwError({
+                        ok: false,
+                        status: 0,
+                        message: "Auth level is not user when it should be!!!"
+                    });
+                    setAuthLevel({ userType: "none" });
+                    return;
+                }
+
+                setAuthLevel({
+                    ...authLevel,
+                    userProfileImgUrl: dataUpdate[PATCH_USER_PROFILE_IMG_KEY],
+                });
+
                 const imgUrl = successResult.data[uploadFileKey];
 
                 prevFileRef.current = file; //TWO FILE VARIABLES BUT THIS SHOULD WORK TO SET THE CORRECT SERVER FILE AT ALL POINTS!!!

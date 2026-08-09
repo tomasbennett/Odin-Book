@@ -46,6 +46,9 @@ export function CreatePostInput({
             parentPostId
         }
 
+        console.log("ATTEMPT TO CREATE A NEW POST WAS MADE: ");
+        console.dir(newPost);
+
 
         const result = CreatePostFrontendSchema.safeParse(newPost);
         if (!result.success) {

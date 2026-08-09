@@ -18,6 +18,8 @@ import { useAuth } from '../../auth/contexts/AuthContext';
 import { IUpdateLikeCountParams } from '../../likes/models/IUpdateLikeCountParams';
 
 
+import defUserImg from "../../../assets/DEFAULT_USER_IMG.png";
+
 
 type ICommentProps = {
     setLikeCount: (params: IUpdateLikeCountParams) => void;
@@ -67,7 +69,13 @@ export function Comment({
                 <div className={styles.leftImgContainer}>
 
                     <div className={styles.imgContainer}>
-                        <img src={`${userProfileImgUrl}`} alt={`User image ${username}`} />
+                        <img src={`${((): string => {
+                            if (userId === authLevel.userId) {
+                                return authLevel.userProfileImgUrl || defUserImg;
+                            }
+
+                            return userProfileImgUrl || defUserImg;
+                        })()}`} alt={`User image ${username}`} />
                     </div>
 
                 </div>

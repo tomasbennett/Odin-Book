@@ -449,13 +449,10 @@ router.patch("/",
         try {
 
             
-
-
-
-            const files = req.files as {
-                [PATCH_USER_PROFILE_IMG_KEY]: Express.Multer.File[] | undefined;
-                [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]: Express.Multer.File[] | undefined;
-            }
+            const files = (req.files ?? {}) as {
+                [PATCH_USER_PROFILE_IMG_KEY]?: Express.Multer.File[];
+                [PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]?: Express.Multer.File[];
+            };
 
             const profileImgFile = files[PATCH_USER_PROFILE_IMG_KEY]?.[0];
             const accountBackgroundFile = files[PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY]?.[0];
@@ -480,18 +477,13 @@ router.patch("/",
             const createdAt = new Date();
 
 
-
-
-
-
-
             const updatedData: Prisma.UserUpdateInput = {};
 
             const patchUserProfileImg = async () => {
                 const userProfileImgInfo: IUserImgIds = {};
 
                 if (profileImgFile) {
-                    const { filename, size, mimetype } = profileImgFile;
+                    const { originalname, size, mimetype } = profileImgFile;
 
                     const uploadedFileResult = await uploadFileToSupabase(profileImgFile);
 
@@ -516,7 +508,7 @@ router.patch("/",
                     const buildPrismaFile = async () => {
                         const newFile = await prisma.files.create({
                             data: {
-                                filename,
+                                filename: originalname,
                                 filesize: size,
                                 mimetype,
                                 supabaseFileId: uploadedFileResult.supabaseFileId,
@@ -552,7 +544,7 @@ router.patch("/",
                 const accountBannerBackgroundInfo: IUserImgIds = {};
 
                 if (accountBackgroundFile) {
-                    const { filename, size, mimetype } = accountBackgroundFile;
+                    const { originalname, size, mimetype } = accountBackgroundFile;
 
                     const uploadedFileResult = await uploadFileToSupabase(accountBackgroundFile);
 
@@ -577,7 +569,7 @@ router.patch("/",
                     const buildPrismaFile = async () => {
                         const newFile = await prisma.files.create({
                             data: {
-                                filename,
+                                filename: originalname,
                                 filesize: size,
                                 mimetype,
                                 supabaseFileId: uploadedFileResult.supabaseFileId,

@@ -105,7 +105,13 @@ export function Post({
                             className={styles.leftSideUpperContainer}>
 
                             <div className={styles.userProfileImgContainer}>
-                                <img src={userProfileImgUrl ?? defUserImg} alt="user profile" />
+                                <img src={`${((): string => {
+                                    if (userId === authLevel.userId) {
+                                        return authLevel.userProfileImgUrl || defUserImg;
+                                    }
+
+                                    return userProfileImgUrl || defUserImg;
+                                })()}`} alt="user profile" />
                             </div>
 
                             <div className={styles.titleUsernameContainer}>

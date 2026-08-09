@@ -39,13 +39,13 @@ export function MulterFilesMultipleOptionalSchema(allowedFileTypes: string[], ma
             }
 
 
-            if (files.length < 1) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "A minimum of one file must be uploaded.",
-                });
-                return;
-            }
+            // if (files.length < 1) {
+            //     ctx.addIssue({
+            //         code: z.ZodIssueCode.custom,
+            //         message: "A minimum of one file must be uploaded.",
+            //     });
+            //     return;
+            // }
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
