@@ -13,12 +13,12 @@ import styles from "./CreatePostInput.module.css";
 
 
 type ICreatePostInputProps = {
-    setPosts: React.Dispatch<React.SetStateAction<IPost[]>>,
+    setNewPost: (post: IPost) => void,
     parentPostId?: string | undefined
 }
 
 export function CreatePostInput({
-    setPosts,
+    setNewPost,
     parentPostId
 }: ICreatePostInputProps) {
 
@@ -91,9 +91,14 @@ export function CreatePostInput({
 
         const result = UploadPostSuccessAPISchema.safeParse(data);
         if (result.success) {
-            setPosts(prev => {
-                return [result.data.post, ...prev]
-            });
+            // setPosts(prev => {
+            //     return [result.data.post, ...prev]
+            // });
+
+            setNewPost(result.data.post);
+
+
+            
             return {
                 ok: true
             };

@@ -415,7 +415,7 @@ router.get("/:commentId/replies",
                     likeCount: post.likes.length,
                     userProfileImgUrl: userProfileImgUrl,
                     fileDetails: fileDetails,
-                    commentCount: post.comments.length,
+                    commentCount: post.descendantCommentsCount,
                     repliesCount: post.descendantRepliesCount,
                     haveYouLiked: post.likes.some((like) => like.userId === user.userId),
                 };
@@ -540,7 +540,10 @@ router.post("/",
 
 
             const incrementParentCommentsResult =
-                await incrementParentCommentsRepliesCount(uploadedComment.parentCommentId);
+                await incrementParentCommentsRepliesCount(
+                    uploadedComment.parentCommentId,
+                    uploadedComment.postId
+                );
 
 
             if (!incrementParentCommentsResult.ok) {

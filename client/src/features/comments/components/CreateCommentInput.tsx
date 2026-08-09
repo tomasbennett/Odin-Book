@@ -14,13 +14,13 @@ import { filesToFileList } from "../../../util/filesToFileList";
 import { noSocketConnectionError } from "../../../constants/errorConstants";
 
 type ICreateCommentInputProps = {
-    setComments: React.Dispatch<React.SetStateAction<IComment[]>>,
+    setNewComment: (commment: IComment) => void,
     postId: string,
     parentCommentId?: string | undefined
 }
 
 export function CreateCommentInput({
-    setComments,
+    setNewComment,
     postId,
     parentCommentId
 }: ICreateCommentInputProps) {
@@ -90,9 +90,12 @@ export function CreateCommentInput({
         const result = UploadCommentSuccessAPISchema.safeParse(data);
 
         if (result.success) {
-            setComments(prev => {
-                return [result.data.comment, ...prev]
-            });
+            // setComments(prev => {
+            //     return [result.data.comment, ...prev]
+            // });
+
+            setNewComment(result.data.comment);
+
 
             return {
                 ok: true

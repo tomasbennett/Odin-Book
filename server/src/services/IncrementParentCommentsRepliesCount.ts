@@ -3,17 +3,27 @@ import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErr
 import { prisma } from "../../lib/prisma";
 
 export async function incrementParentCommentsRepliesCount(
-    parentCommentId: string | null
+    parentCommentId: string | null,
+    postId: string
 ): Promise<{ ok: true } | ICustomErrorResponse> {
-
-    if (!parentCommentId) {
-        return {
-            ok: true
-        };
-    }
-
-
+    
+    
     try {
+        
+        const postIncrement = await prisma.post.update({
+            where: { id: postId },
+            data: {
+                descendantCommentsCount: {
+                    increment: 1
+                }
+            }
+        });
+    
+        if (!parentCommentId) {
+            return {
+                ok: true
+            };
+        }
         
         let commentId: string | null = parentCommentId;
 

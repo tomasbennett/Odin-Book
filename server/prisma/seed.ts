@@ -13,7 +13,9 @@ import { faker } from "@faker-js/faker";
 import { supabase } from '../lib/client';
 import { randomItemFromArray } from '../../shared/features/util/services/randomItemFromArray';
 import { randomInt } from '../../shared/features/util/services/randomIntegerMinMax';
-import { ILikeableObject } from '../../shared/features/likes/models/ILikeableObject';
+
+import { incrementParentCommentsRepliesCount } from '../src/services/IncrementParentCommentsRepliesCount';
+import { incrementParentPostRepliesCount } from '../src/services/IncrementParentPostRepliesCount';
 
 // //AT THE END TEST IF YOU CAN IMPORT FROM THE SHARED FOLDER THROUGH A SEPARATE TSCONFIG.JSON FILE IN PRISMA FOLDER AND THEN ADD TO THE SEED COMMAND IN PACKAGE.JSON FILE
 const prisma = new PrismaClient();
@@ -266,13 +268,25 @@ const generateCommentMethods = [
 ]
 
 
-function createRandomComment(
+async function createRandomComment(
     context: CreateCommentContext
-): Prisma.CommentCreateManyInput {
+): Promise<Prisma.CommentCreateManyInput> {
 
     const generateMethod = faker.helpers.arrayElement(generateCommentMethods);
 
-    return generateMethod(context);
+    const generatedMethod = generateMethod(context);
+
+    const resultCommentIncrement = await incrementParentCommentsRepliesCount(
+        generatedMethod?.parentCommentId ?? null,
+        generatedMethod.postId
+    );
+
+
+    if (!resultCommentIncrement.ok) {
+        throw new Error(`Failed to increment parent comment's replies count: ${resultCommentIncrement.message}`);
+    }
+
+    return generatedMethod;
 }
 
 
@@ -297,56 +311,41 @@ async function generateRandomComments(
     rangeOfCommentsPerPost: { min: number; max: number }
 ): Promise<Comment[]> {
 
-    // const operations: Array<(userId: string, postId: string) => Prisma.CommentCreateManyInput> = [
-    //     (userId: string, postId: string) => ({
-    //         userId,
-    //         postId,
-    //         textContent: faker.lorem.paragraphs(1),
-    //     }),
-    //     (userId: string, postId: string) => {
-    //         const fileId = randomItemFromArray(files)?.id;
-    //         if (!fileId) {
-    //             throw new Error("No files available to associate with the comment.");
-    //         }
 
-    //         return {
-    //             userId,
-    //             postId,
-    //             singleGifOrImgId: fileId
-    //         }
-    //     }
-    // ]
+    const commentsData: Prisma.CommentCreateManyInput[] =
+        (
+            await Promise.all(
+                posts.map(async (post) => {
 
+                    const randomNoComments = randomInt({
+                        min: rangeOfCommentsPerPost.min,
+                        max: rangeOfCommentsPerPost.max
+                    });
 
-    const commentsData: Prisma.CommentCreateManyInput[] = posts.flatMap(post => {
+                    return Promise.all(
+                        Array.from(
+                            { length: randomNoComments },
+                            async () => {
 
-        const min = rangeOfCommentsPerPost.min;
-        const max = rangeOfCommentsPerPost.max;
+                                const user = randomItemFromArray(users);
 
-        const randomNoComments = randomInt({ min, max });
+                                if (!user) {
+                                    throw new Error(
+                                        "No users available to associate with the comment."
+                                    );
+                                }
 
-
-        return Array.from({ length: randomNoComments }, (): Prisma.CommentCreateManyInput => {
-            const user = randomItemFromArray(users);
-            if (!user) {
-                throw new Error("No users available to associate with the comment.");
-            }
-
-            // const operation =
-            //     operations[Math.floor(Math.random() * operations.length)];
-
-            return createRandomComment({
-                userId: user.id,
-                postId: post.id,
-                files,
-            });
-        });
-    });
-
-
-    // const commentsDb = await prisma.comment.createManyAndReturn({
-    //     data: commentsData
-    // });
+                                return createRandomComment({
+                                    userId: user.id,
+                                    postId: post.id,
+                                    files
+                                });
+                            }
+                        )
+                    );
+                })
+            )
+        ).flat();
 
 
     return await prismaComment(commentsData);
@@ -380,13 +379,14 @@ async function generateRandomCommentReplies(
                 throw new Error("No comments available to reply to.");
             }
 
-
-            generated.push(createRandomComment({
+            const res = await createRandomComment({
                 userId: user.id,
                 postId: parentComment.postId,
                 files,
                 parentCommentId: parentComment.id
-            }));
+            });
+
+            generated.push(res);
         }
 
         const newReplies = await prismaComment(generated);
@@ -589,6 +589,15 @@ async function generateRandomPostReplies(
         }
 
         const newReplies = await persistPosts(generated);
+
+        const incrementRepliesCountResult = await Promise.all(
+            newReplies.map(async (reply) => {
+                const res = await incrementParentPostRepliesCount(reply.parentPostId);
+                if (!res.ok) {
+                    throw new Error(`Failed to increment parent post's replies count: ${res.message}`);
+                }
+            })
+        );
 
         postsToReplyTo.push(...newReplies);
 

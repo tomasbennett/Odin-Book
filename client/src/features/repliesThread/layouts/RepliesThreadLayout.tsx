@@ -6,6 +6,7 @@ import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { Post } from "../../posts/components/Post";
 import { useRepliesThreadFetch } from "../hooks/useRepliesThreadFetch";
 import styles from "./RepliesThreadLayout.module.css";
+import { IPost } from "../../../../../shared/features/posts/models/IPost";
 
 
 
@@ -21,20 +22,30 @@ export function RepliesThreadLayout() {
         setParentPosts,
     } = useRepliesThreadFetch();
 
-    // useEffect(() => {
-    //     setPost((prev) => {
+    const setNewPost = (newPost: IPost) => {
+        setReplies(prevReplies => [newPost, ...prevReplies]);
+        setPost(prevPost => {
 
-    //         if (prev === null || post === null) {
-    //             return prev;
-    //         }
+            if (!prevPost) return prevPost;
 
-    //         return {
-    //             ...prev,
-    //             repliesCount: replies.length
-    //         }
-    //     });
+            return {
+                ...prevPost,
+                commentCount: prevPost.repliesCount + 1
+            }
+        });
+        setParentPosts(prevParentPosts => {
 
-    // }, [replies]);
+            const updatedParentPosts = prevParentPosts.map(parentPost => {
+                return {
+                    ...parentPost,
+                    repliesCount: parentPost.repliesCount + 1
+                }
+            });
+
+            return updatedParentPosts;
+        });
+
+    }
 
 
 
@@ -87,12 +98,11 @@ export function RepliesThreadLayout() {
 
                                                 <Post
                                                     {...post}
-                                                    repliesCount={replies.length}
                                                     setLikesCount={createSingleLikeUpdater(setPost)}
                                                 />
 
                                                 <CreatePostInput 
-                                                    setPosts={setReplies}
+                                                    setNewPost={setNewPost}
                                                     parentPostId={post.id}
                                                 />
                                             

@@ -8,6 +8,7 @@ import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { useOutletContext } from "react-router-dom";
 import { ISidebarCtx } from "../../../models/ISidebarCtx";
 import { useEffect } from "react";
+import { IPost } from "../../../../../shared/features/posts/models/IPost";
 
 
 
@@ -40,7 +41,11 @@ export function HomeLayout() {
                 <main className={styles.main}>
 
                     <CreatePostInput
-                        setPosts={homeFetch.setPosts}
+                        setNewPost={(post: IPost) => {
+                            homeFetch.setPosts(
+                                prevPosts => [post, ...prevPosts]
+                            );
+                        }}
 
                     />
                     

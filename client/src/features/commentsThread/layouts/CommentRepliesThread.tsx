@@ -9,6 +9,7 @@ import { usePostCommentThreadFetch } from "../hooks/usePostCommentsThreadFetch";
 import { useCommentRepliesThreadFetch } from "../hooks/useCommentRepliesThreadFetch";
 import { CreateCommentInput } from "../../comments/components/CreateCommentInput";
 import { useEffect } from "react";
+import { IComment } from "../../../../../shared/features/comments/models/IComment";
 
 
 
@@ -27,26 +28,38 @@ export function CommentRepliesThread() {
         setParentComments
     } = useCommentRepliesThreadFetch();
 
-    // useEffect(() => {
-    //     setComment((prev) => {
 
-    //         if (prev === null || comment === null) {
-    //             return prev;
-    //         }
+    const setNewComment = (newComment: IComment) => {
+        setReplies(prevReplies => [newComment, ...prevReplies]);
+        setPost(prevPost => {
 
-    //         return {
-    //             ...prev,
-    //             repliesCount: replies.length
-    //         }
-    //     });
+            if (!prevPost) return prevPost;
 
-    // }, [replies]);  
-    
+            return {
+                ...prevPost,
+                commentCount: prevPost.commentCount + 1
+            }
+        }
+        );
+        setParentComments(prevParentComments => {
+
+            const updatedParentComments = prevParentComments.map(parentComment => {
+                return {
+                    ...parentComment,
+                    commentCount: parentComment.commentCount + 1
+                }
+            });
+
+            return updatedParentComments;
+        });
+
+    }
+
 
 
     return (
         <>
-        
+
             <div className={styles.outerContainer}>
 
                 {
@@ -62,7 +75,7 @@ export function CommentRepliesThread() {
                         <>
 
                             <div className={styles.innerContainer}>
-                                
+
                                 <div className={styles.postInputContainer}>
 
                                     {
@@ -71,7 +84,7 @@ export function CommentRepliesThread() {
 
                                             :
 
-                                            <Post 
+                                            <Post
                                                 {...post}
                                                 setLikesCount={createSingleLikeUpdater(setPost)}
                                             />
@@ -82,13 +95,13 @@ export function CommentRepliesThread() {
                                 {
                                     parentComments.length > 0 ?
                                         <div className={styles.parentComments}>
-                                            
+
                                             {
                                                 parentComments.map(parentComment => {
 
 
                                                     return (
-                                                        <Comment 
+                                                        <Comment
                                                             key={parentComment.id}
                                                             {...parentComment}
                                                             setLikeCount={createArrayLikeUpdater(parentComment.id, setParentComments)}
@@ -99,23 +112,22 @@ export function CommentRepliesThread() {
 
                                         </div>
 
-                                    :
+                                        :
 
-                                    null
+                                        null
                                 }
 
                                 <div className={styles.commentInputContainer}>
 
                                     {
                                         comment === null ?
-                                            null 
+                                            null
 
                                             :
 
-                                            <Comment 
+                                            <Comment
                                                 key={comment.id}
                                                 {...comment}
-                                                commentCount={replies.length}
                                                 setLikeCount={createSingleLikeUpdater(setComment)}
                                             />
                                     }
@@ -126,8 +138,8 @@ export function CommentRepliesThread() {
 
                                             :
 
-                                            <CreateCommentInput 
-                                                setComments={setReplies}
+                                            <CreateCommentInput
+                                                setNewComment={setNewComment}
                                                 postId={post.id}
                                                 parentCommentId={comment?.id}
                                             />
@@ -139,13 +151,13 @@ export function CommentRepliesThread() {
 
 
                                 <div className={styles.repliesContainer}>
-                                    
+
                                     {
                                         replies.map(reply => {
 
 
                                             return (
-                                                <Comment 
+                                                <Comment
                                                     key={reply.id}
                                                     {...reply}
                                                     setLikeCount={createArrayLikeUpdater(reply.id, setReplies)}
@@ -159,8 +171,8 @@ export function CommentRepliesThread() {
                                 </div>
 
                             </div>
-                        
-                        
+
+
                         </>
 
 
@@ -169,7 +181,7 @@ export function CommentRepliesThread() {
 
 
             </div>
-        
+
         </>
     )
 }

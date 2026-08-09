@@ -8,6 +8,7 @@ import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { Post } from "../../posts/components/Post";
 import { usePostCommentThreadFetch } from "../hooks/usePostCommentsThreadFetch";
 import styles from "./PostCommentsThread.module.css";
+import { IComment } from "../../../../../shared/features/comments/models/IComment";
 
 
 
@@ -22,21 +23,20 @@ export function PostCommentsThread() {
         setComments
     } = usePostCommentThreadFetch();
 
-    // useEffect(() => {
-    //     setPost((prev) => {
+    const setNewComment = (newComment: IComment) => {
+        setComments(prevReplies => [newComment, ...prevReplies]);
+        setPost(prevPost => {
 
-    //         if (prev === null || post === null) {
-    //             return prev;
-    //         }
+            if (!prevPost) return prevPost;
 
-    //         return {
-    //             ...prev,
-    //             repliesCount: comments.length
-    //         }
-    //     });
+            return {
+                ...prevPost,
+                commentCount: prevPost.commentCount + 1
+            }
+        });
 
 
-    // }, [comments]);
+    }
 
     return (
         <>
@@ -68,12 +68,11 @@ export function PostCommentsThread() {
                                             <>
                                                 <Post 
                                                     {...post}
-                                                    commentCount={comments.length}
                                                     setLikesCount={createSingleLikeUpdater(setPost)}
                                                 />
                                             
                                                 <CreateCommentInput 
-                                                    setComments={setComments}
+                                                    setNewComment={setNewComment}
                                                     postId={post.id}
                                                 />
                                             </>
