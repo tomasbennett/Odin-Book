@@ -27,6 +27,16 @@ model User {
 
   aboutMe String?
 
+  email String? @unique
+
+  githubUsername String? @unique
+  githubProfileUrl String? @unique
+
+  linkedInUsername String? @unique
+  linkedInProfileUrl String? @unique
+
+
+
   createdAt DateTime @default(now())
 
   profileImgId String? @db.Uuid
