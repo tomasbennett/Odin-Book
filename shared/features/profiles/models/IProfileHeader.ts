@@ -1,5 +1,6 @@
 import z from "zod";
 import { DateFromStringSchema } from "../../util/models/IDateFromStringSchema";
+import { SocialInfoSchema } from "../../socials/models/ISocialInfo";
 
 
 
@@ -10,7 +11,8 @@ export const ProfileHeaderSchema = z.object({
     accountBackgroundImg: z.string().optional(),
     accountCreatedAt: DateFromStringSchema,
     aboutUser: z.string().optional()
-});
+})
+.merge(SocialInfoSchema);
 
 
 

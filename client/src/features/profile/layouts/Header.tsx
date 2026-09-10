@@ -13,6 +13,7 @@ import { LoadingCircle } from "../../../components/LoadingCircle";
 
 import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png"
 import cubeNightSky from "../../../assets/cube-night-sky.jpg"
+import { SocialLinks } from "../components/SocialLinks";
 
 export function Header({
     userId: userProfileId,
@@ -21,7 +22,12 @@ export function Header({
     accountBackgroundImg,
     accountCreatedAt,
     aboutUser,
-    isLoading: isInitialFetchLoading
+    isLoading: isInitialFetchLoading,
+    email,
+    githubLink,
+    githubUsername,
+    linkedinLink,
+    linkedinUsername
 }: IProfileHeader & { isLoading: boolean }) {
 
     const { authLevel } = useAuth();
@@ -153,7 +159,12 @@ export function Header({
 
                                 <div className={styles.topTextContainer}>
 
-                                    <h3 className={styles.username}>{username}</h3>
+                                    <div className={styles.userTitleContainer}>
+                                        <h3 className={styles.username}>{username}</h3>
+                                        {
+                                            email && <span className={styles.email}>{email}</span>
+                                        }
+                                    </div>
 
                                     <div className={styles.joinedAtContainer}>
 
@@ -282,7 +293,16 @@ export function Header({
                                 }
 
 
-
+                                <div className={styles.socialLinksContainer}>
+                                    <SocialLinks
+                                        userId={userProfileId}
+                                        linkedinLink={linkedinLink}
+                                        linkedinUsername={linkedinUsername}
+                                        githubLink={githubLink}
+                                        githubUsername={githubUsername}
+                                        email={email}
+                                    />
+                                </div>
 
                             </div>
 

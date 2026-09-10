@@ -124,6 +124,10 @@
         font-weight: bolder;
         font-size: 1.7rem;
 
+        /* background-color: white; */
+
+        cursor: pointer;
+
         height: 100%;
 
         display: flex;
@@ -173,7 +177,7 @@
             }
 
             .username {
-                cursor: pointer;
+                /* cursor: pointer; */
 
                 display: inline;
 
