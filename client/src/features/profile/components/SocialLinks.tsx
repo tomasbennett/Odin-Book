@@ -22,12 +22,12 @@ export function SocialLinks({
             <div className={styles.outerContainer}>
 
                 {
-                    linkedinLink && linkedinUsername && (
+                    !linkedinLink && !linkedinUsername && (
                         <a href={linkedinLink} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                             <LinkedIn />
                             <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{linkedinUsername}</span>
-                                <span className={styles.url}>{linkedinLink}</span>
+                                <span className={styles.username}>{"linkedinUsername"}</span>
+                                <span className={styles.url}>{"https://www.linkedinLink.com"}</span>
                             </div>
 
                         </a>
@@ -35,12 +35,12 @@ export function SocialLinks({
                 }
 
                 {
-                    githubLink && githubUsername && (
+                    !githubLink && !githubUsername && (
                         <a href={githubLink} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                             <Github />
                             <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{githubUsername}</span>
-                                <span className={styles.url}>{githubLink}</span>
+                                <span className={styles.username}>{"githubUsername"}</span>
+                                <span className={styles.url}>{"https://www.githubLink.co.uk"}</span>
                             </div>
 
 

@@ -1,0 +1,69 @@
+.outerContainer{
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+    width: 100%;
+
+
+}
+
+
+
+.optionContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 2rem;
+
+
+    height: 5rem;
+    width: 100%;
+
+    background-color: var(--inactive-input-colour);
+    color: black;
+
+    overflow: hidden;
+
+    border-radius: 4rem;
+
+    cursor: pointer;
+
+
+    .svgContainer{
+        height: 100%;
+        aspect-ratio: 1;
+
+        flex-shrink: 0;
+
+        /* background-color: purple; */
+
+        padding: .7rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+
+        svg{
+            height: 100%;
+            width: 100%;
+
+            object-fit: cover;
+        }
+    }   
+
+    .countinueText{
+        flex-shrink: 0;
+
+        min-width: 0;
+
+        font-size: 1.6rem;
+        /* font-weight: bolder; */
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+    }
+}

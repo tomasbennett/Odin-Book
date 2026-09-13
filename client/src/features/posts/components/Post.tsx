@@ -35,7 +35,8 @@ export function Post({
     content,
     fileDetails,
     haveYouLiked,
-    setLikesCount
+    setLikesCount,
+    email
 }: IPostProps) {
 
     const nav = useNavigate();
@@ -116,6 +117,9 @@ export function Post({
 
                             <div className={styles.titleUsernameContainer}>
                                 <p className={styles.username}>{username}</p>
+
+                                {email && <span className={styles.email}>{email}</span>}
+
 
                                 {/* {
                                     title && (

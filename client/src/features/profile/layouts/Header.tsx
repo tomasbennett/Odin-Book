@@ -5,7 +5,7 @@ import { logInPageRoute } from "../../../constants/routes";
 import { IProfileHeader } from "../../../../../shared/features/profiles/models/IProfileHeader";
 import { CalendarIcon } from "../../../assets/icons/Calendar";
 import { EditTextIcon } from "../../../assets/icons/EditTextIcon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAboutUserEdit } from "../hooks/useAboutUserEdit";
 import { useProfileImgChange } from "../hooks/useProfileImgChange";
 import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY } from "../../../../../shared/features/users/constants";
@@ -14,6 +14,7 @@ import { LoadingCircle } from "../../../components/LoadingCircle";
 import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png"
 import cubeNightSky from "../../../assets/cube-night-sky.jpg"
 import { SocialLinks } from "../components/SocialLinks";
+import { ThreeDots } from "../../../assets/icons/ThreeDots";
 
 export function Header({
     userId: userProfileId,
@@ -38,7 +39,7 @@ export function Header({
 
 
     const isUserProfileOwner: boolean = authLevel.userId === userProfileId;
-
+    const isValidEmail: boolean = !!email && email.includes("@") && email.includes(".");
 
     const {
         aboutUserEditState,
@@ -82,7 +83,20 @@ export function Header({
 
         textarea.style.height = "0px";
         textarea.style.height = `${textarea.scrollHeight}px`;
-    }, [textareaRef.current, aboutUserEditState])
+    }, [textareaRef.current, aboutUserEditState]);
+
+
+    // const textContainerClassName = useMemo<string>(() => {
+    //     let baseClassName = styles.topTextContainer;
+
+        
+
+
+
+    // }, [
+    //     isUserProfileOwner,
+    //     isValidEmail
+    // ])
 
 
     return (
@@ -160,21 +174,46 @@ export function Header({
                                 <div className={styles.topTextContainer}>
 
                                     <div className={styles.userTitleContainer}>
-                                        <h3 className={styles.username}>{username}</h3>
-                                        {
-                                            email && <span className={styles.email}>{email}</span>
-                                        }
+                                        
+                                        <span className={styles.username}>
+                                            {username}
+                                        </span>
+
+                                        <span className={styles.email}>
+                                            {email}
+                                        </span>
+
                                     </div>
 
-                                    <div className={styles.joinedAtContainer}>
+                                    <div className={
+                                        styles.socialsJoinedAtContainer
+                                    }>
+                                        
+                                        {
+                                            isUserProfileOwner && (
+                                                <div className={styles.socialsDialogSVGContainer}>
 
-                                        <div className={styles.joinedSVGContainer}>
-                                            <CalendarIcon />
+                                                    <ThreeDots />
+
+                                                </div>
+
+                                            )
+                                        }
+                                        
+                                        <div className={styles.joinedAtContainer}>
+
+                                            <div className={styles.joinedSVGContainer}>
+                                                <CalendarIcon />
+                                            </div>
+
+                                            <p className={styles.accountCreatedAt}>Joined: {accountCreatedAt.toLocaleDateString()}</p>
+
                                         </div>
 
-                                        <p className={styles.accountCreatedAt}>Joined: {accountCreatedAt.toLocaleDateString()}</p>
+                                        
 
                                     </div>
+
 
                                 </div>
 
@@ -294,6 +333,7 @@ export function Header({
 
 
                                 <div className={styles.socialLinksContainer}>
+
                                     <SocialLinks
                                         userId={userProfileId}
                                         linkedinLink={linkedinLink}
@@ -302,6 +342,7 @@ export function Header({
                                         githubUsername={githubUsername}
                                         email={email}
                                     />
+
                                 </div>
 
                             </div>

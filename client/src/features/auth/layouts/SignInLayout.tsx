@@ -13,6 +13,7 @@ import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/scr
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import loginImg from "../../../assets/github-profile-img.jpg";
 import { accessTokenLocalStorageKey } from "../../../constants/accessTokenLocalStorageKey";
+import { AlternateLoginMethods } from "../components/AlternateRegMethods";
 
 
 
@@ -215,7 +216,7 @@ export function SignInLayout() {
 
                         <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
                             {
-                                    <h1 className={styles.title}>{title}</h1>
+                                <h1 className={styles.title}>{title}</h1>
                             }
 
                             <div className={`${styles.errorsContainer} ${screenWidthClassName}`}>
@@ -264,6 +265,7 @@ export function SignInLayout() {
                                     />
                                 </div>
 
+
                                 <div className={`${styles.submitBtnContainer} ${screenWidthClassName}`}>
 
                                     {
@@ -273,9 +275,9 @@ export function SignInLayout() {
 
                                             :
 
-                                            <button 
-                                                disabled={isLoading} 
-                                                className={styles.submitButton} 
+                                            <button
+                                                disabled={isLoading}
+                                                className={styles.submitButton}
                                                 type="submit">
                                                 Submit
                                             </button>
@@ -285,6 +287,15 @@ export function SignInLayout() {
                                 </div>
 
                             </div>
+
+                            {
+                                submitUrl === "login" &&
+                                <div className={styles.alternateLogInContainer}>
+                                    <AlternateLoginMethods />
+
+                                </div>
+                            }
+
 
                             <div className={`${styles.bottomContainer} ${screenWidthClassName}`}>
 
