@@ -568,3 +568,13 @@
 .emptyAboutContainer {
     display: none;
 }
+
+
+.socialLinksContainer{
+    flex-shrink: 0;
+    width: 100%;
+
+    overflow: hidden;
+
+    
+}

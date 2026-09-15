@@ -15,6 +15,8 @@ import defUserProfileImg from "../../../assets/DEFAULT_USER_IMG.png"
 import cubeNightSky from "../../../assets/cube-night-sky.jpg"
 import { SocialLinks } from "../components/SocialLinks";
 import { ThreeDots } from "../../../assets/icons/ThreeDots";
+import { UserIcon } from "../../../assets/icons/UserIcon";
+import { UserCogsIcon } from "../../../assets/icons/UserCogsIcon";
 
 export function Header({
     userId: userProfileId,

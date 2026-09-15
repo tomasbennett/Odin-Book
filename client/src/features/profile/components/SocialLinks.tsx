@@ -22,12 +22,17 @@ export function SocialLinks({
             <div className={styles.outerContainer}>
 
                 {
-                    !linkedinLink && !linkedinUsername && (
-                        <a href={linkedinLink} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                            <LinkedIn />
+                    linkedinLink && linkedinUsername && (
+                        <a href={linkedinLink} target="_blank" rel="noopener noreferrer" className={`${styles.socialLink} ${styles.linkedin}`}>
+                            <div className={styles.svgContainer}>
+
+                                <LinkedIn />
+
+                            </div>
+
                             <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{"linkedinUsername"}</span>
-                                <span className={styles.url}>{"https://www.linkedinLink.com"}</span>
+                                <span className={styles.username}>{linkedinUsername}</span>
+                                <span className={styles.url}>{linkedinLink}</span>
                             </div>
 
                         </a>
@@ -35,12 +40,18 @@ export function SocialLinks({
                 }
 
                 {
-                    !githubLink && !githubUsername && (
-                        <a href={githubLink} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                            <Github />
+                    githubLink && githubUsername && (
+                        <a href={githubLink} target="_blank" rel="noopener noreferrer" className={`${styles.socialLink} ${styles.github}`}>
+                            
+                            <div className={styles.svgContainer}>
+                                
+                                <Github />
+
+                            </div>
+                            
                             <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{"githubUsername"}</span>
-                                <span className={styles.url}>{"https://www.githubLink.co.uk"}</span>
+                                <span className={styles.username}>{githubUsername}</span>
+                                <span className={styles.url}>{githubLink}</span>
                             </div>
 
 
