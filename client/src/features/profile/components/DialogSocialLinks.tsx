@@ -38,6 +38,10 @@ export function DialogSocialLinks({
 
                 <div className={styles.outerContainer}>
 
+                    <div className={styles.closeDialogContainer}>
+                        X
+                    </div>
+
                     {
                         (githubLink.socialLinkExists ||
                             linkedinLink.socialLinkExists || email) && (

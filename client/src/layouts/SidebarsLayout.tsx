@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./SidebarsLayout.module.css";
-import { NavLink, Navigate, Outlet } from "react-router-dom";
+import { NavLink, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { ISidebarCtx } from "../models/ISidebarCtx";
 import { PassiveSidebarVisual } from "../components/PassiveSidebarVisual";
 import { homePageRoute, profilePageRoute, searchPageRoute } from "../constants/routes";
@@ -10,6 +10,12 @@ import { HomeIcon } from "../assets/icons/HomeIcon";
 import { SearchIcon } from "../assets/icons/SearchIcon";
 
 import defUserImg from "../assets/DEFAULT_USER_IMG.png";
+import { LogoutIcon } from "../assets/icons/LogoutIcon";
+import { useError } from "../features/error/contexts/ErrorContext";
+import { knownError, notExpectedFormatError, unknownError } from "../constants/errorConstants";
+import { useJWTFetch } from "../hooks/useJWTFetch";
+import { domain } from "../constants/EnvironmentAPI";
+import { accessTokenLocalStorageKey } from "../constants/accessTokenLocalStorageKey";
 
 
 export function SidebarsLayout() {
@@ -20,13 +26,13 @@ export function SidebarsLayout() {
         setSidebarContent
     }
 
-    const { authLevel } = useAuth();
+    const { authLevel, setAuthLevel } = useAuth();
 
     if (authLevel.userType !== "user") {
         return <Navigate to={homePageRoute} replace={true} />
     }
 
-    const navLinkClassName = ({ isActive }: { 
+    const navLinkClassName = ({ isActive }: {
         isActive: boolean;
     }) => {
         let baseClass: string = styles.navLink;
@@ -36,6 +42,68 @@ export function SidebarsLayout() {
         }
 
         return `${baseClass} ${styles.inActiveLink}`
+
+    }
+
+
+    const errCtx = useError();
+    const nav = useNavigate();
+    const { jwtFetchHandler } = useJWTFetch();
+
+
+    const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+
+    const onLogoutClick = async () => {
+        if (isLoading) {
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            const res = await jwtFetchHandler(`${domain}/api/sign-in/logout`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            });
+
+
+            if (res.returnType === "fetchError") {
+                errCtx.throwError(res.error);
+                return;
+            }
+
+            if (res.returnType === "loginError") {
+                setAuthLevel({ userType: "none" });
+                errCtx.throwError(res.error);
+                return;
+            }
+
+            const response = res.data;
+
+            if (response.status === 204) {
+                setAuthLevel({ userType: "none" });
+                localStorage.removeItem(accessTokenLocalStorageKey);
+                return;
+            }
+
+            errCtx.throwError(notExpectedFormatError);
+            return
+
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                errCtx.throwError(knownError(error));
+            }
+            errCtx.throwError(unknownError);
+
+        } finally {
+            setIsLoading(false);
+
+        }
 
     }
 
@@ -82,13 +150,26 @@ export function SidebarsLayout() {
 
                     <div className={styles.lowerContainer}>
 
-                        <NavLink
-                            to={`${profilePageRoute}/${authLevel.userId}`}
-                            className={`${styles.imgNavLinkContainer} ${navLinkClassName}`}>
+                        <div 
+                            onClick={onLogoutClick} 
+                            className={`${styles.logOutContainer}`}>
 
-                            <img src={authLevel.userProfileImgUrl ?? defUserImg} alt={`User image: ${authLevel.username}`} />
+                            <LogoutIcon />
 
-                        </NavLink>
+                        </div>
+
+                        <div className={styles.userImgContainer}>
+
+                            <NavLink
+                                to={`${profilePageRoute}/${authLevel.userId}`}
+                                className={`${styles.imgNavLinkContainer} ${navLinkClassName}`}>
+
+                                <img src={authLevel.userProfileImgUrl ?? defUserImg} alt={`User image: ${authLevel.username}`} />
+
+                            </NavLink>
+
+                        </div>
+
 
                     </div>
 
