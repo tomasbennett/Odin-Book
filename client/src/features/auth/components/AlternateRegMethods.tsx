@@ -1,6 +1,8 @@
 import { Github } from "../../../assets/icons/Github";
 import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
+import { ModifySocialLink } from "../../../components/ModifySocialLink";
+import { useSocialsConnect } from "../../../hooks/useSocialsConnect";
 import styles from "./AlternateRegMethods.module.css";
 
 
@@ -9,17 +11,11 @@ import styles from "./AlternateRegMethods.module.css";
 export function AlternateLoginMethods() {
 
 
-    const onGmailClick = () => {
-
-    }
-
-    const onLinkedInClick = () => {
-
-    }
-
-    const onGithubClick = () => {
-
-    }
+    const {
+        onGithubClick,
+        onGmailClick,
+        onLinkedInClick
+    } = useSocialsConnect();
 
 
     return (
@@ -27,52 +23,15 @@ export function AlternateLoginMethods() {
 
             <div className={styles.outerContainer}>
 
-                <div className={styles.optionContainer} onClick={onGmailClick}>
+                <ModifySocialLink
+                    onClick={onGmailClick} svg={<Google />} continueText="Continue with Google" />
 
-                    <div className={styles.svgContainer}>
-
-                        <Google />
-
-                    </div>
+                <ModifySocialLink
+                    onClick={onLinkedInClick} svg={<LinkedIn />} continueText="Continue with LinkedIn" />
 
 
-                    <span className={styles.countinueText}>
-                        Continue with Google
-                    </span>
-
-                </div>
-
-                <div className={styles.optionContainer} onClick={onLinkedInClick}>
-
-                    <div className={styles.svgContainer}>
-
-
-                        <LinkedIn />
-
-                    </div>
-
-
-                    <span className={styles.countinueText}>
-                        Continue with LinkedIn
-                    </span>
-
-                </div>
-
-
-                <div className={styles.optionContainer} onClick={onGithubClick}>
-
-                    <div className={styles.svgContainer}>
-
-                        <Github />
-
-                    </div>
-
-
-                    <span className={styles.countinueText}>
-                        Continue with Github
-                    </span>
-
-                </div>
+                <ModifySocialLink
+                    onClick={onGithubClick} svg={<Github />} continueText="Continue with Github" />
 
 
             </div>

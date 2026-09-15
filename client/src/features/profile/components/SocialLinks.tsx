@@ -1,6 +1,7 @@
 import { ISocialInfo } from "../../../../../shared/features/socials/models/ISocialInfo";
 import { Github } from "../../../assets/icons/Github";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
+import { SocialLink } from "../../../components/SocialLink";
 import styles from "./SocialLinks.module.css";
 
 type ISocialLinksProps = {
@@ -23,39 +24,27 @@ export function SocialLinks({
 
                 {
                     linkedinLink && linkedinUsername && (
-                        <a href={linkedinLink} target="_blank" rel="noopener noreferrer" className={`${styles.socialLink} ${styles.linkedin}`}>
-                            <div className={styles.svgContainer}>
+                        <SocialLink
+                            link={linkedinLink}
+                            username={linkedinUsername}
+                            svg={<LinkedIn />} 
+                            bcgColor="#0077B5"
+                            color="white"
+                            />
 
-                                <LinkedIn />
-
-                            </div>
-
-                            <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{linkedinUsername}</span>
-                                <span className={styles.url}>{linkedinLink}</span>
-                            </div>
-
-                        </a>
+                        
                     )
                 }
 
                 {
                     githubLink && githubUsername && (
-                        <a href={githubLink} target="_blank" rel="noopener noreferrer" className={`${styles.socialLink} ${styles.github}`}>
-                            
-                            <div className={styles.svgContainer}>
-                                
-                                <Github />
-
-                            </div>
-                            
-                            <div className={styles.linkTextContainer}>
-                                <span className={styles.username}>{githubUsername}</span>
-                                <span className={styles.url}>{githubLink}</span>
-                            </div>
-
-
-                        </a>
+                        <SocialLink
+                            link={githubLink}
+                            username={githubUsername}
+                            svg={<Github />}
+                            bcgColor="#e0e0e0"
+                            color="black"
+                            />
                     )
                 }
 

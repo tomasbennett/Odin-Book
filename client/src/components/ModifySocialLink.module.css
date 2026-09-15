@@ -19,6 +19,8 @@
 
     cursor: pointer;
 
+    transition: background-color .2s linear;
+
 
     .svgContainer{
         height: 100%;
@@ -56,4 +58,9 @@
         white-space: nowrap;
 
     }
+}
+
+
+.optionContainer:hover{
+    background-color: white;
 }

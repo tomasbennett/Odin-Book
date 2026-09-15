@@ -38,7 +38,6 @@ export function useDialogToggle() {
 
     return {
         dialogRef,
-
         openDialog,
         closeDialog,
         handleClickOutside

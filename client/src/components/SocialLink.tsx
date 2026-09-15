@@ -2,11 +2,12 @@ import styles from "./SocialLink.module.css";
 
 
 type ISocialLinkProps = {
-    link: string;
+    link?: string | undefined;
     username: string;
     svg: React.ReactNode;
     bcgColor: string;
     color: string;
+    height?: string;
 }
 
 export function SocialLink({
@@ -14,7 +15,8 @@ export function SocialLink({
     username,
     svg,
     bcgColor,
-    color
+    color,
+    height = "8rem"
 }: ISocialLinkProps) {
 
 
@@ -23,7 +25,7 @@ export function SocialLink({
         <>
 
             <a
-                style={{ backgroundColor: bcgColor }}
+                style={{ backgroundColor: bcgColor, height: height }}
                 href={link} target="_blank" rel="noopener noreferrer" className={`${styles.socialLink}`}>
                 
                 <div className={styles.svgContainer}>
@@ -35,7 +37,7 @@ export function SocialLink({
                 <div className={styles.linkTextContainer}>
 
                     <span style={{ color: color }} className={styles.username}>{username}</span>
-                    <span className={styles.url}>{link}</span>
+                    {!!link && <span className={styles.url}>{link}</span>}
 
                 </div>
 

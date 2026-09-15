@@ -17,6 +17,8 @@ import { SocialLinks } from "../components/SocialLinks";
 import { ThreeDots } from "../../../assets/icons/ThreeDots";
 import { UserIcon } from "../../../assets/icons/UserIcon";
 import { UserCogsIcon } from "../../../assets/icons/UserCogsIcon";
+import { DialogSocialLinks } from "../components/DialogSocialLinks";
+import { useDialogToggle } from "../../../hooks/useDialogToggle";
 
 export function Header({
     userId: userProfileId,
@@ -88,17 +90,12 @@ export function Header({
     }, [textareaRef.current, aboutUserEditState]);
 
 
-    // const textContainerClassName = useMemo<string>(() => {
-    //     let baseClassName = styles.topTextContainer;
-
-        
-
-
-
-    // }, [
-    //     isUserProfileOwner,
-    //     isValidEmail
-    // ])
+    const {
+        dialogRef,
+        openDialog: openSocialLinksDialog,
+        closeDialog: closeSocialLinksDialog,
+        handleClickOutside: handleSocialLinksDialogClickOutside
+    } = useDialogToggle();
 
 
     return (
@@ -193,7 +190,7 @@ export function Header({
                                         
                                         {
                                             isUserProfileOwner && (
-                                                <div className={styles.socialsDialogSVGContainer}>
+                                                <div onClick={openSocialLinksDialog} className={styles.socialsDialogSVGContainer}>
 
                                                     <ThreeDots />
 
@@ -354,6 +351,16 @@ export function Header({
 
 
             </header>
+
+
+            <DialogSocialLinks 
+                dialogRef={dialogRef}
+                // githubLink={githubLink && githubUsername ? { socialLinkExists: true, link: githubLink, username: githubUsername } : { socialLinkExists: false }}
+                githubLink={{ socialLinkExists: true, link: "https://www.githubLink.com", username: "githubUsername" }}
+                email={"email.email@gmail.com"}
+                // linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }} 
+                linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
+                />
         </>
     );
 }
