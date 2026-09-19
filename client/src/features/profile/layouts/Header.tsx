@@ -355,11 +355,13 @@ export function Header({
 
             <DialogSocialLinks 
                 dialogRef={dialogRef}
-                // githubLink={githubLink && githubUsername ? { socialLinkExists: true, link: githubLink, username: githubUsername } : { socialLinkExists: false }}
-                githubLink={{ socialLinkExists: true, link: "https://www.githubLink.com", username: "githubUsername" }}
-                email={"email.email@gmail.com"}
-                // linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }} 
-                linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
+                closeDialog={closeSocialLinksDialog}
+                githubLink={githubLink && githubUsername ? { socialLinkExists: true, link: githubLink, username: githubUsername } : { socialLinkExists: false }}
+                // githubLink={{ socialLinkExists: true, link: "https://www.githubLink.com", username: "githubUsername" }}
+                email={email}
+                linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }} 
+                // linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
+                handleClickOutside={handleSocialLinksDialogClickOutside}
                 />
         </>
     );

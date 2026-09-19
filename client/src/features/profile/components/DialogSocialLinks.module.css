@@ -5,6 +5,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
 
+    transform-origin: center center;
+
     /* display: flex;
     align-items: center;
     justify-content: center; */
@@ -32,9 +34,73 @@
 
 
 
-.dialog::backdrop{
+/* .dialog::backdrop{
     background-color: rgba(0, 0, 0, .5);
+} */
+
+
+.dialog[data-animation-opening="true"]{
+    animation: openDialog .4s ease forwards;
 }
+
+/* .dialog[data-animation-opening="false"]{
+    animation: closeDialog .2s ease forwards;
+} */
+
+.dialog[data-animation-opening="true"]::backdrop{
+    animation: openBackdrop .4s ease forwards;
+}
+
+/* .dialog[data-animation-opening="false"]::backdrop{
+    animation: closeBackdrop .2s ease forwards;
+} */
+
+
+@keyframes openDialog {
+    from{
+        transform: translate(-50%, -50%) scale(0);
+    }
+    to{
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes closeDialog {
+    from{
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to{
+        transform: translate(-50%, -50%) scale(0);
+    }
+}
+
+@keyframes openBackdrop {
+    from{
+        background-color: rgba(0, 0, 0, 0);
+    }
+    to{
+        /* background-color: rgba(0, 0, 0, .4); */
+        background-color: rgba(0, 0, 0, .5)
+    }
+}
+
+@keyframes closeBackdrop {
+    from{
+        /* background-color: rgba(0, 0, 0, .4); */
+        background-color: rgba(0, 0, 0, .5)
+    }
+    to{
+        background-color: rgba(0, 0, 0, 0);
+    }
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -50,7 +116,7 @@
 
     display: flex;
     flex-direction: column;
-    row-gap: 1.6rem;
+    row-gap: 2.6rem;
 
 
     overflow-y: auto;

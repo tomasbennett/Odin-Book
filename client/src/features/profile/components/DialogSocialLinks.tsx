@@ -3,6 +3,7 @@ import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
 import { ModifySocialLink } from "../../../components/ModifySocialLink";
 import { SocialLink } from "../../../components/SocialLink";
+import { useDialogToggle } from "../../../hooks/useDialogToggle";
 import { useSocialsConnect } from "../../../hooks/useSocialsConnect";
 import { ISocialLink } from "../models/ISocialLink";
 import styles from "./DialogSocialLinks.module.css";
@@ -13,6 +14,8 @@ type IDialogSocialLinksProps = {
     linkedinLink: ISocialLink;
     email: string | undefined;
     dialogRef: React.RefObject<HTMLDialogElement | null>;
+    handleClickOutside: ReturnType<typeof useDialogToggle>["handleClickOutside"];
+    closeDialog: ReturnType<typeof useDialogToggle>["closeDialog"];
 }
 
 
@@ -20,7 +23,9 @@ export function DialogSocialLinks({
     githubLink,
     linkedinLink,
     email,
-    dialogRef
+    dialogRef,
+    handleClickOutside,
+    closeDialog
 }: IDialogSocialLinksProps) {
 
     const {
@@ -34,11 +39,18 @@ export function DialogSocialLinks({
     return (
         <>
 
-            <dialog ref={dialogRef} className={styles.dialog}>
+            <dialog 
+                onCancel={(event) => { 
+                    event.preventDefault(); 
+                    closeDialog();
+                }}
+                onClick={(event) => { handleClickOutside(event) }} 
+                ref={dialogRef} 
+                className={styles.dialog}>
 
                 <div className={styles.outerContainer}>
 
-                    <div className={styles.closeDialogContainer}>
+                    <div onClick={() => { closeDialog() }} className={styles.closeDialogContainer}>
                         X
                     </div>
 

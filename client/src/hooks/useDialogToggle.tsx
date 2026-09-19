@@ -11,15 +11,28 @@ export function useDialogToggle() {
 
     const closeDialog = (postCloseAction?: () => void) => {
         dialogRef.current?.setAttribute("data-animation-opening", "false");
-        dialogRef.current?.addEventListener("animationend", () => {
-            
+        const animations = dialogRef.current?.getAnimations();
+
+        if (animations && animations.length > 0) {
+            dialogRef.current?.addEventListener(
+                "animationend",
+                () => {
+                    dialogRef.current?.close();
+
+                    if (postCloseAction) {
+                        postCloseAction();
+                    }
+                },
+                { once: true }
+            );
+        } else {
             dialogRef.current?.close();
+
             if (postCloseAction) {
                 postCloseAction();
             }
-            // setDialogContentState(null);
-        }, { once: true });
-        
+        }
+
     };
 
     const handleClickOutside = (
