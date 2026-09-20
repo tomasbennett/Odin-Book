@@ -18,6 +18,17 @@ datasource db {
 //   ADMIN
 // }
 
+enum OAuthLinks {
+  GITHUB
+  LINKEDIN
+  GMAIL
+}
+
+enum OAuthPurpose {
+  LOGIN
+  LINK
+}
+
 model User {
   id       String @id @default(uuid()) @db.Uuid
   username String @unique
@@ -29,13 +40,11 @@ model User {
 
   email String? @unique
 
-  githubUsername String? @unique
+  githubUsername   String? @unique
   githubProfileUrl String? @unique
 
-  linkedInUsername String? @unique
+  linkedInUsername   String? @unique
   linkedInProfileUrl String? @unique
-
-
 
   createdAt DateTime @default(now())
 
@@ -50,6 +59,38 @@ model User {
   posts                Post[]
   comments             Comment[]
   likedCommentsOrPosts UserLikes[]
+
+  externalAccounts ExternalAccount[]
+  OAuthSessions  OAuthSession[]
+}
+
+model ExternalAccount {
+  id String @id @default(uuid()) @db.Uuid
+
+  provider   OAuthLinks
+  providerId String
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  providerEmail    String?
+  providerUsername String?
+  profileUrl       String?
+
+  @@unique([provider, providerId], name: "unique_provider_account")
+}
+
+model OAuthSession {
+  id       String     @id @default(uuid()) @db.Uuid
+  state    String     @unique
+  provider OAuthLinks
+  userId   String?    @db.Uuid
+  user     User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  purpose OAuthPurpose
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
 
 model RefreshToken {
@@ -81,7 +122,7 @@ model Files {
   // postContentForId String? @db.Uuid
   // postContentFor   Post?   @relation("PostFileContent", fields: [postContentForId], references: [id])
 
-  postContentFor  PostFileContent[] @relation("PostFileContent")
+  postContentFor PostFileContent[] @relation("PostFileContent")
 
   //NOTE TO SELF THIS PROBABLY NEEDS CHANGING / A POST SHOULD BE ABLE TO HAVE MULTIPLE FILES OBVIOUSLY BUT A FILE CAN BE THE CONTENT FOR MULTIPLE POSTS MEANING A JUNCTION TABLE
 }
@@ -89,16 +130,13 @@ model Files {
 model PostFileContent {
   id String @id @default(uuid()) @db.Uuid
 
-  fileId  String @db.Uuid
-  file  Files  @relation("PostFileContent", fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String @db.Uuid
+  file   Files  @relation("PostFileContent", fields: [fileId], references: [id], onDelete: Cascade)
 
-  postId  String @db.Uuid
-  post  Post @relation("PostFileContent", fields: [postId], references: [id], onDelete: Cascade)
-
-
+  postId String @db.Uuid
+  post   Post   @relation("PostFileContent", fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([fileId, postId])
-
 }
 
 model Post {
@@ -118,14 +156,14 @@ model Post {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 
-  comments Comment[]
-  descendantCommentsCount Int @default(0)
+  comments                Comment[]
+  descendantCommentsCount Int       @default(0)
 
   parentPostId String? @db.Uuid
   parentPost   Post?   @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
 
-  replies Post[] @relation("PostReplies")
-  descendantRepliesCount Int @default(0)
+  replies                Post[] @relation("PostReplies")
+  descendantRepliesCount Int    @default(0)
 }
 
 model Comment {
@@ -148,8 +186,8 @@ model Comment {
   parentCommentId String?  @db.Uuid
   parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
 
-  replies Comment[] @relation("CommentReplies")
-  descendantRepliesCount Int @default(0)
+  replies                Comment[] @relation("CommentReplies")
+  descendantRepliesCount Int       @default(0)
 }
 
 model UserLikes {

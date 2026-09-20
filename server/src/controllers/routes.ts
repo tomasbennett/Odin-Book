@@ -9,6 +9,7 @@ import { router as usersRouter } from "./users";
 import { router as homeRouter } from "./home";
 import { router as repliesRouter } from "./replies";
 import { router as profileRouter } from "./profile";
+import { router as oauthRouter } from "./OAuth";
 
 
 export const apiRouter = Router();
@@ -22,6 +23,7 @@ apiRouter.use("/users", usersRouter);
 apiRouter.use("/home", homeRouter);
 apiRouter.use("/replies", repliesRouter);
 apiRouter.use("/profile", profileRouter);
+apiRouter.use("/oauth", oauthRouter);
 
 
 
