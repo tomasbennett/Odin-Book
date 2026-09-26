@@ -89,6 +89,9 @@ model OAuthSession {
 
   purpose OAuthPurpose
 
+  codeVerifier String
+  codeChallenge String
+
   createdAt DateTime @default(now())
   expiresAt DateTime
 }

@@ -1,6 +1,17 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { CheckAccessTokenPayload } from "../auth/CheckAccessTokenPayload";
 
+import crypto from "crypto";
+import { prisma } from "../../lib/prisma";
+import { GmailOAuthResponseSchema } from "../models/IOAuthModels";
+import { domain } from "../constants/domain";
+import { google } from "googleapis";
+import { CodeChallengeMethod } from "google-auth-library";
+import { ISuccessRedirectUrl } from "../../../shared/features/oauth/models/IRedirect";
+import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
+import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
+
+
 export const router = Router();
 
 
@@ -11,25 +22,329 @@ const linkedInRouter = Router();
 const githubRouter = Router();
 
 
-router.use("/gmail", gmailRouter);
+router.use("/google", gmailRouter);
 router.use("/linkedin", linkedInRouter);
 router.use("/github", githubRouter);
 
 
 
+gmailRouter.get("/login",
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+        try {
+
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const oauth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                process.env.GOOGLE_CALLBACK_URL
+            );
+
+            const scopes: string[] = [
+                "openid",
+                "https://www.googleapis.com/auth/userinfo.email"
+            ];
+
+            const {
+                codeVerifier,
+                codeChallenge
+            } = await oauth2Client.generateCodeVerifierAsync();
+
+            if (typeof codeChallenge !== "string") {
+                return res.status(500).json({
+                    ok: false,
+                    status: 500,
+                    message: "Failed to generate code challenge for Google OAuth"
+                });
+            }
+
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: null,
+                    expiresAt: expiresAt,
+                    purpose: "LOGIN",
+                    provider: "GMAIL",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier
+                }
+            });
+
+
+            const googleAuthUrl: string = oauth2Client.generateAuthUrl({
+                // access_type: "offline",
+                response_type: "code",
+                scope: scopes,
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: CodeChallengeMethod.S256,
+            });
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: googleAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
 
 
 
 
-gmailRouter.get("/redirect", async (req: Request, res: Response, next: NextFunction) => {
-    
-    const header = req.headers.authorization;
-
-    const userResult = await CheckAccessTokenPayload(header);
-
-    
 
 
 
 
-});
+    });
+
+
+
+gmailRouter.post("/link",
+    ensureJWTAuthentication,
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+        try {
+
+            const user = req.user!;
+
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const oauth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                process.env.GOOGLE_CALLBACK_URL
+            );
+
+            const scopes: string[] = [
+                "openid",
+                "https://www.googleapis.com/auth/userinfo.email"
+            ];
+
+            const {
+                codeVerifier,
+                codeChallenge
+            } = await oauth2Client.generateCodeVerifierAsync();
+
+            if (typeof codeChallenge !== "string") {
+                return res.status(500).json({
+                    ok: false,
+                    status: 500,
+                    message: "Failed to generate code challenge for Google OAuth"
+                });
+            }
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: user.userId,
+                    expiresAt: expiresAt,
+                    purpose: "LINK",
+                    provider: "GMAIL",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier
+                }
+            });
+
+            // if (!userResult.ok) {
+            //     const oauthSession = await prisma.oAuthSession.create({
+            //         data: {
+            //             state: stateHash,
+            //             userId: null,
+            //             expiresAt: expiresAt,
+            //             purpose: "LOGIN",
+            //             provider: "GMAIL",
+            //             codeChallenge: codeChallenge,
+            //             codeVerifier: codeVerifier
+            //         }
+            //     });
+
+
+
+            // } else {
+
+
+
+
+
+            // }
+
+
+
+            // const googleAuthUrl: string =
+            //     "https://accounts.google.com/o/oauth2/v2/auth" +
+            //     `?client_id=${encodeURIComponent(process.env.GOOGLE_CLIENT_ID!)}` +
+            //     `&redirect_uri=${encodeURIComponent(process.env.GOOGLE_CALLBACK_URL!)}` +
+            //     `&response_type=code` +
+            //     `&scope=${encodeURIComponent("openid profile email")}` +
+            //     `&state=${encodeURIComponent(state)}`;
+
+
+            const googleAuthUrl: string = oauth2Client.generateAuthUrl({
+                // access_type: "offline",
+                response_type: "code",
+                scope: scopes,
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: CodeChallengeMethod.S256,
+            });
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: googleAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
+
+
+
+
+
+
+    });
+
+
+
+gmailRouter.get("/callback",
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        try {
+
+            const { code, state } = req.query;
+
+            if (
+                typeof code !== "string" ||
+                typeof state !== "string"
+            ) {
+                return res.status(400).send("Invalid OAuth response");
+            }
+
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const oauthSession = await prisma.oAuthSession.findUnique({
+                where: {
+                    state: stateHash
+                }
+            });
+
+
+            if (
+                !oauthSession ||
+                oauthSession.expiresAt.getTime() < Date.now() ||
+                oauthSession.provider !== "GMAIL"
+            ) {
+                return res.status(400).send("Invalid or expired OAuth session");
+            }
+
+
+            const tokenResponse = await fetch(
+                "https://oauth2.googleapis.com/token",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                        code,
+                        client_id: process.env.GOOGLE_CLIENT_ID!,
+                        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+                        redirect_uri:
+                            process.env.GOOGLE_CALLBACK_URL!,
+                        grant_type: "authorization_code",
+                    }),
+                }
+            );
+
+            if (!tokenResponse.ok) {
+                return res.status(400).send("Google token exchange failed");
+            }
+
+            const tokenData = await tokenResponse.json();
+
+            const result = GmailOAuthResponseSchema.safeParse(tokenData);
+            if (!result.success) {
+                return res.status(400).send("Invalid token response from Google");
+            }
+
+            const { email, sub } = result.data;
+
+
+            //UPSERT DOESN'T WORK HERE DURING A LOGIN PROCESS WITH A NEW UNRECOGNISABLE ACCOUNT BECAUSE THERE'LL BE NO USERID BUT WE WOULD STILL GET TO THIS LINE AND WE ARE DOING NO CHECK IF IT ACTUALLY EXISTS
+            const externalAccount = await prisma.externalAccount.upsert({
+                where: {
+                    unique_provider_account: {
+                        provider: "GMAIL",
+                        providerId: sub
+                    }
+                },
+                update: {
+                    providerEmail: email
+                },
+                create: {
+                    provider: "GMAIL",
+                    providerId: sub,
+                    providerEmail: email,
+                    userId: oauthSession.userId!
+                }
+            });
+
+            if (!externalAccount) {
+                return res.status(400).send("No account linked with this Google account");
+            }
+
+
+            if (oauthSession.purpose === "LINK") {
+
+                return res.redirect(`${domain}/profile/${oauthSession.userId}`);
+
+
+            } else if (oauthSession.purpose === "LOGIN") {
+
+                return res.redirect(`${domain}`);
+
+
+            } else {
+                res.status(400).send("Invalid OAuth session purpose");
+            }
+
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
+
+
+    });
