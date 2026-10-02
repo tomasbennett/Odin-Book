@@ -10,6 +10,10 @@ import { CodeChallengeMethod } from "google-auth-library";
 import { ISuccessRedirectUrl } from "../../../shared/features/oauth/models/IRedirect";
 import { ICustomErrorResponse } from "../../../shared/features/api/models/APIErrorResponse";
 import { ensureJWTAuthentication } from "../auth/ensureJWTAuthentication";
+import { IOauthErrorCode } from "../../../shared/features/oauth/models/IErrorOAuth";
+import { OAuthErrorKey } from "../../../shared/features/oauth/constants";
+import { OAuth2Client } from "google-auth-library";
+import { googleOAuthUserInfoFetch } from "../services/GoogleOAuth";
 
 
 export const router = Router();
@@ -238,14 +242,26 @@ gmailRouter.get("/callback",
 
         try {
 
-            const { code, state } = req.query;
+            const {
+                code,
+                state,
+                error,
+                error_description
+            } = req.query;
 
             if (
-                typeof code !== "string" ||
-                typeof state !== "string"
+                !state ||
+                typeof state !== "string" ||
+                !code ||
+                typeof code !== "string"
             ) {
-                return res.status(400).send("Invalid OAuth response");
+                const missingStateKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${domain}?${OAuthErrorKey}=${missingStateKey}`);
             }
+
+
+
 
             const stateHash = crypto
                 .createHash("sha256")
@@ -258,51 +274,85 @@ gmailRouter.get("/callback",
                 }
             });
 
+            if (!oauthSession || oauthSession.expiresAt.getTime() < Date.now()) {
+                const expiredStateKey: IOauthErrorCode = "session_expired";
 
-            if (
-                !oauthSession ||
-                oauthSession.expiresAt.getTime() < Date.now() ||
-                oauthSession.provider !== "GMAIL"
-            ) {
-                return res.status(400).send("Invalid or expired OAuth session");
+                return res.redirect(`${domain}?${OAuthErrorKey}=${expiredStateKey}`);
             }
 
 
-            const tokenResponse = await fetch(
-                "https://oauth2.googleapis.com/token",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({
-                        code,
-                        client_id: process.env.GOOGLE_CLIENT_ID!,
-                        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-                        redirect_uri:
-                            process.env.GOOGLE_CALLBACK_URL!,
-                        grant_type: "authorization_code",
-                    }),
-                }
+            const returnUrl = `${domain}/${oauthSession.purpose === "LINK" ? ("profile/" + oauthSession.userId) : oauthSession.purpose === "LOGIN" ? "login" : ""}`;
+
+
+
+
+            if (error === "access_denied") {
+
+                return res.redirect(`${returnUrl}`);
+            }
+
+            if (error) {
+                const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+                console.log(`OAuth error from provider: ${error} - ${error_description}`);
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+            }
+
+
+            const oauth2Client: OAuth2Client = new google.auth.OAuth2(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                process.env.GOOGLE_CALLBACK_URL
             );
 
-            if (!tokenResponse.ok) {
-                return res.status(400).send("Google token exchange failed");
+
+
+
+            const googleOAuthResponse = await googleOAuthUserInfoFetch({
+                code: code,
+                codeVerifier: oauthSession.codeVerifier,
+                oauth2Client: oauth2Client
+            });
+
+            if (!googleOAuthResponse.ok) {
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${googleOAuthResponse.error}`);
             }
 
-            const tokenData = await tokenResponse.json();
+            const { email, sub } = googleOAuthResponse;
 
-            const result = GmailOAuthResponseSchema.safeParse(tokenData);
-            if (!result.success) {
-                return res.status(400).send("Invalid token response from Google");
+
+
+            //FIRSTLY IF WE ARE LINKING AN ACCOUNT, WE NEED TO CHECK IF THE GOOGLE ACCOUNT IS ALREADY LINKED TO ANOTHER USER
+            //NEXT IF IT IS A LOGIN OR A LINK AND THE ACCOUNT DOESN'T ALREADY EXIST UNDER ANOTHER USER FOR LINK THEN WE CREATE OR UPDATE
+            //FINALLY IF ALL SUCCESSFUL WE WILL REDIRECT TO THE APPROPRIATE PAGE BASED ON THE PURPOSE OF THE OAUTH SESSION WITH A VALID ACCESS TOKEN AND REFRESH TOKEN SOMEHOW SENT FOR LOGIN
+
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_account: {
+                        provider: "GMAIL",
+                        providerId: sub
+                    }
+                }
+            });
+
+
+            if (oauthSession.purpose === "LINK" && existingAccount && existingAccount.userId !== oauthSession.userId) {
+                const accountAlreadyLinkedKey: IOauthErrorCode = "account_already_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountAlreadyLinkedKey}`);
             }
 
-            const { email, sub } = result.data;
+
+            if (oauthSession.purpose === "LOGIN" && !existingAccount) {
+                const accountNotLinkedKey: IOauthErrorCode = "account_not_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountNotLinkedKey}`);
+            }
 
 
-            //UPSERT DOESN'T WORK HERE DURING A LOGIN PROCESS WITH A NEW UNRECOGNISABLE ACCOUNT BECAUSE THERE'LL BE NO USERID BUT WE WOULD STILL GET TO THIS LINE AND WE ARE DOING NO CHECK IF IT ACTUALLY EXISTS
-            const externalAccount = await prisma.externalAccount.upsert({
+            await prisma.externalAccount.upsert({
                 where: {
                     unique_provider_account: {
                         provider: "GMAIL",
@@ -320,29 +370,123 @@ gmailRouter.get("/callback",
                 }
             });
 
-            if (!externalAccount) {
-                return res.status(400).send("No account linked with this Google account");
-            }
+            return res.redirect(`${returnUrl}`);
 
 
-            if (oauthSession.purpose === "LINK") {
-
-                return res.redirect(`${domain}/profile/${oauthSession.userId}`);
 
 
-            } else if (oauthSession.purpose === "LOGIN") {
-
-                return res.redirect(`${domain}`);
 
 
-            } else {
-                res.status(400).send("Invalid OAuth session purpose");
-            }
+
+
+
+            // if (
+            //     typeof code !== "string" ||
+            //     typeof state !== "string"
+            // ) {
+            //     return res.status(400).send("Invalid OAuth response");
+            // }
+
+            // const stateHash = crypto
+            //     .createHash("sha256")
+            //     .update(state)
+            //     .digest("hex");
+
+            // const oauthSession = await prisma.oAuthSession.findUnique({
+            //     where: {
+            //         state: stateHash
+            //     }
+            // });
+
+
+            // if (
+            //     !oauthSession ||
+            //     oauthSession.expiresAt.getTime() < Date.now() ||
+            //     oauthSession.provider !== "GMAIL"
+            // ) {
+            //     return res.status(400).send("Invalid or expired OAuth session");
+            // }
+
+
+            // const tokenResponse = await fetch(
+            //     "https://oauth2.googleapis.com/token",
+            //     {
+            //         method: "POST",
+            //         headers: {
+            //             "Content-Type":
+            //                 "application/x-www-form-urlencoded",
+            //         },
+            //         body: new URLSearchParams({
+            //             code,
+            //             client_id: process.env.GOOGLE_CLIENT_ID!,
+            //             client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+            //             redirect_uri:
+            //                 process.env.GOOGLE_CALLBACK_URL!,
+            //             grant_type: "authorization_code",
+            //         }),
+            //     }
+            // );
+
+            // if (!tokenResponse.ok) {
+            //     return res.status(400).send("Google token exchange failed");
+            // }
+
+            // const tokenData = await tokenResponse.json();
+
+            // const result = GmailOAuthResponseSchema.safeParse(tokenData);
+            // if (!result.success) {
+            //     return res.status(400).send("Invalid token response from Google");
+            // }
+
+            // const { email, sub } = result.data;
+
+
+            // //UPSERT DOESN'T WORK HERE DURING A LOGIN PROCESS WITH A NEW UNRECOGNISABLE ACCOUNT BECAUSE THERE'LL BE NO USERID BUT WE WOULD STILL GET TO THIS LINE AND WE ARE DOING NO CHECK IF IT ACTUALLY EXISTS
+            // const externalAccount = await prisma.externalAccount.upsert({
+            //     where: {
+            //         unique_provider_account: {
+            //             provider: "GMAIL",
+            //             providerId: sub
+            //         }
+            //     },
+            //     update: {
+            //         providerEmail: email
+            //     },
+            //     create: {
+            //         provider: "GMAIL",
+            //         providerId: sub,
+            //         providerEmail: email,
+            //         userId: oauthSession.userId!
+            //     }
+            // });
+
+            // if (!externalAccount) {
+            //     return res.status(400).send("No account linked with this Google account");
+            // }
+
+
+            // if (oauthSession.purpose === "LINK") {
+
+            //     return res.redirect(`${domain}/profile/${oauthSession.userId}`);
+
+
+            // } else if (oauthSession.purpose === "LOGIN") {
+
+            //     return res.redirect(`${domain}`);
+
+
+            // } else {
+            //     res.status(400).send("Invalid OAuth session purpose");
+            // }
 
 
 
         } catch (error: unknown) {
-            next(error);
+            const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+            console.log(`Error during OAuth callback processing: ${error instanceof Error ? error.message : String(error)}`);
+
+            return res.redirect(`${domain}?${OAuthErrorKey}=${unknownErrorKey}`);
 
         }
 
