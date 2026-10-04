@@ -9,11 +9,16 @@ import { useOutletContext } from "react-router-dom";
 import { ISidebarCtx } from "../../../models/ISidebarCtx";
 import { useEffect } from "react";
 import { IPost } from "../../../../../shared/features/posts/models/IPost";
+import { useParamsErrorPopout } from "../../../hooks/useParamsErrorPopout";
 
 
 
 
 export function HomeLayout() {
+
+
+    useParamsErrorPopout({});
+
 
 
     const homeFetch = useHomeFetch();

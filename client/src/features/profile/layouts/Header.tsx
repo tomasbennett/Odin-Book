@@ -5,7 +5,7 @@ import { logInPageRoute } from "../../../constants/routes";
 import { IProfileHeader } from "../../../../../shared/features/profiles/models/IProfileHeader";
 import { CalendarIcon } from "../../../assets/icons/Calendar";
 import { EditTextIcon } from "../../../assets/icons/EditTextIcon";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAboutUserEdit } from "../hooks/useAboutUserEdit";
 import { useProfileImgChange } from "../hooks/useProfileImgChange";
 import { PATCH_USER_ACCOUNT_BACKGROUND_IMG_KEY, PATCH_USER_PROFILE_IMG_KEY } from "../../../../../shared/features/users/constants";
@@ -19,6 +19,8 @@ import { UserIcon } from "../../../assets/icons/UserIcon";
 import { UserCogsIcon } from "../../../assets/icons/UserCogsIcon";
 import { DialogSocialLinks } from "../components/DialogSocialLinks";
 import { useDialogToggle } from "../../../hooks/useDialogToggle";
+import { useParamsErrorPopout } from "../../../hooks/useParamsErrorPopout";
+import { ICustomErrorResponse } from "../../../../../shared/features/api/models/APIErrorResponse";
 
 export function Header({
     userId: userProfileId,
@@ -98,6 +100,21 @@ export function Header({
     } = useDialogToggle();
 
 
+
+
+
+    const handleOAuthError = useCallback((error: ICustomErrorResponse) => {
+
+
+
+    }, []);
+
+    useParamsErrorPopout({
+        setError: handleOAuthError,
+    });
+
+
+
     return (
         <>
             <header className={styles.outerContainer}>
@@ -173,7 +190,7 @@ export function Header({
                                 <div className={styles.topTextContainer}>
 
                                     <div className={styles.userTitleContainer}>
-                                        
+
                                         <span className={styles.username}>
                                             {username}
                                         </span>
@@ -187,7 +204,7 @@ export function Header({
                                     <div className={
                                         styles.socialsJoinedAtContainer
                                     }>
-                                        
+
                                         {
                                             isUserProfileOwner && (
                                                 <div onClick={openSocialLinksDialog} className={styles.socialsDialogSVGContainer}>
@@ -198,7 +215,7 @@ export function Header({
 
                                             )
                                         }
-                                        
+
                                         <div className={styles.joinedAtContainer}>
 
                                             <div className={styles.joinedSVGContainer}>
@@ -209,7 +226,7 @@ export function Header({
 
                                         </div>
 
-                                        
+
 
                                     </div>
 
@@ -353,16 +370,16 @@ export function Header({
             </header>
 
 
-            <DialogSocialLinks 
+            <DialogSocialLinks
                 dialogRef={dialogRef}
                 closeDialog={closeSocialLinksDialog}
                 githubLink={githubLink && githubUsername ? { socialLinkExists: true, link: githubLink, username: githubUsername } : { socialLinkExists: false }}
                 // githubLink={{ socialLinkExists: true, link: "https://www.githubLink.com", username: "githubUsername" }}
                 email={email}
-                linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }} 
+                linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }}
                 // linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
                 handleClickOutside={handleSocialLinksDialogClickOutside}
-                />
+            />
         </>
     );
 }

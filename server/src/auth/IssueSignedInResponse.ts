@@ -9,37 +9,48 @@ import { IAccessTokenResponse } from "../../../shared/features/auth/models/IAcce
 import { CreateAccessToken } from "./CreateAccessToken";
 import { refreshTokenCookieKey } from "../constants/constants";
 import { IAuthUserInfo } from "../../../shared/features/auth/models/IAuthUserInfo";
+import { CreateRefreshToken } from "./CreateRefreshToken";
 
 
 export async function issueSignedInResponse(user: IAuthUserInfo, res: Response<ISignInError | ISuccessResSignIn>) {
     try {
         const accessToken = CreateAccessToken(user.userId);
+
+        const refreshTokenResponse = await CreateRefreshToken(user.userId);
+
+        if (!refreshTokenResponse.ok) {
+            return res.status(500).json({
+                message: refreshTokenResponse.error,
+                inputType: "root"
+            });
+        }
+
+
+
     
-        const refreshToken = crypto.randomBytes(64).toString('hex');
-        const refreshTokenHash = crypto
-            .createHash("sha256")
-            .update(refreshToken)
-            .digest("hex");
+        // const refreshToken = crypto.randomBytes(64).toString('hex');
+        // const refreshTokenHash = crypto
+        //     .createHash("sha256")
+        //     .update(refreshToken)
+        //     .digest("hex");
     
     
     
-        const expiry: number = 7 * 24 * 60 * 60 * 1000;
+        // const expiry: number = 7 * 24 * 60 * 60 * 1000;
     
-        await prisma.refreshToken.create({
-            data: {
-                hashedToken: refreshTokenHash,
-                userId: user.userId,
-                // expiresAt: new Date(Date.now() + expiry)
-            }
-        });
+        // await prisma.refreshToken.create({
+        //     data: {
+        //         hashedToken: refreshTokenHash,
+        //         userId: user.userId,
+        //         // expiresAt: new Date(Date.now() + expiry)
+        //     }
+        // });
+
+
+        const { refreshToken, cookieOptions } = refreshTokenResponse;
     
         return res
-            .cookie(refreshTokenCookieKey, refreshToken, {
-                httpOnly: true,
-                secure: environment === "PROD",
-                sameSite: environment === "PROD" ? "none" : "lax",
-                // maxAge: expiry
-            })
+            .cookie(refreshTokenCookieKey, refreshToken, cookieOptions)
             .status(200)
             .json({
                 message: "Login successful",
