@@ -349,25 +349,40 @@ gmailRouter.get("/callback",
             }
 
 
-            await prisma.externalAccount.upsert({
-                where: {
-                    unique_provider_account: {
-                        provider: "GMAIL",
-                        providerId: sub
-                    }
-                },
-                update: {
-                    providerEmail: email
-                },
-                create: {
-                    provider: "GMAIL",
-                    providerId: sub,
-                    providerEmail: email,
-                    userId: oauthSession.userId!
-                }
-            });
 
-            if (oauthSession.purpose ==="LOGIN") {
+
+            const userId: string = existingAccount?.userId ?? oauthSession.userId!;
+
+            await prisma.$transaction([
+                prisma.externalAccount.upsert({
+                    where: {
+                        unique_provider_account: {
+                            provider: "GMAIL",
+                            providerId: sub
+                        }
+                    },
+                    update: {
+                        providerEmail: email
+                    },
+                    create: {
+                        provider: "GMAIL",
+                        providerId: sub,
+                        providerEmail: email,
+                        userId: oauthSession.userId!
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: userId
+                    },
+                    data: {
+                        email: email
+                    }
+                })
+            ]);
+
+
+            if (oauthSession.purpose === "LOGIN") {
                 const refreshTokenResponse = await CreateRefreshToken(existingAccount!.userId);
 
                 if (!refreshTokenResponse.ok) {

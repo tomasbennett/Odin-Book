@@ -3,6 +3,7 @@ import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
 import { ModifySocialLink } from "../../../components/ModifySocialLink";
 import { SocialLink } from "../../../components/SocialLink";
+import { domain } from "../../../constants/EnvironmentAPI";
 import { useDialogToggle } from "../../../hooks/useDialogToggle";
 import { useSocialsConnect } from "../../../hooks/useSocialsConnect";
 import { ISocialLink } from "../models/ISocialLink";
@@ -32,7 +33,15 @@ export function DialogSocialLinks({
         onGithubClick,
         onGmailClick,
         onLinkedInClick
-    } = useSocialsConnect();
+    } = useSocialsConnect({
+        sessionUrl: (str) => `${domain}/api/oauth/${str}/link`,
+        reqOptions: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    });
 
 
 

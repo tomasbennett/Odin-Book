@@ -2,6 +2,7 @@ import { Github } from "../../../assets/icons/Github";
 import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
 import { ModifySocialLink } from "../../../components/ModifySocialLink";
+import { domain } from "../../../constants/EnvironmentAPI";
 import { useSocialsConnect } from "../../../hooks/useSocialsConnect";
 import styles from "./AlternateRegMethods.module.css";
 
@@ -15,7 +16,12 @@ export function AlternateLoginMethods() {
         onGithubClick,
         onGmailClick,
         onLinkedInClick
-    } = useSocialsConnect();
+    } = useSocialsConnect({
+        sessionUrl: (str) => `${domain}/api/oauth/${str}/login`,
+        reqOptions: {
+            method: "GET",
+        }
+    });
 
 
     return (
