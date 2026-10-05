@@ -63,90 +63,96 @@ export function DialogSocialLinks({
                         X
                     </div>
 
-                    {
-                        (githubLink.socialLinkExists ||
-                            linkedinLink.socialLinkExists || email) && (
 
-                            <div className={styles.innerContainer}>
+                    <div className={styles.infoOuterContainer}>
+                        
+                        {
+                            (githubLink.socialLinkExists ||
+                                linkedinLink.socialLinkExists || email) && (
 
-                                <span className={styles.title}>
-                                    Current Social Links
-                                </span>
+                                <div className={styles.innerContainer}>
 
-                                <div className={styles.currentSocialLinksContainer}>
+                                    <span className={styles.title}>
+                                        Current Social Links
+                                    </span>
 
-                                    {
-                                        githubLink.socialLinkExists && (
-                                            <SocialLink
-                                                link={githubLink.link}
-                                                username={githubLink.username}
-                                                svg={<Github />}
-                                                bcgColor="#e0e0e0"
-                                                color="black"
-                                                height="6rem"
-                                            />
-                                        )
-                                    }
+                                    <div className={styles.currentSocialLinksContainer}>
 
-                                    {
-                                        linkedinLink.socialLinkExists && (
-                                            <SocialLink
-                                                link={linkedinLink.link}
-                                                username={linkedinLink.username}
-                                                svg={<LinkedIn />}
-                                                bcgColor="#0077B5"
-                                                color="white"
-                                                height="6rem"
-                                            />
-                                        )
-                                    }
+                                        {
+                                            githubLink.socialLinkExists && (
+                                                <SocialLink
+                                                    link={githubLink.link}
+                                                    username={githubLink.username}
+                                                    svg={<Github />}
+                                                    bcgColor="#e0e0e0"
+                                                    color="black"
+                                                    height="6rem"
+                                                />
+                                            )
+                                        }
 
-                                    {
-                                        email && (
-                                            <SocialLink 
-                                                username={email}
-                                                svg={<Google />}
-                                                bcgColor="white"
-                                                color="black"
-                                                height="6rem"
-                                            />
-                                        )
-                                    }
+                                        {
+                                            linkedinLink.socialLinkExists && (
+                                                <SocialLink
+                                                    link={linkedinLink.link}
+                                                    username={linkedinLink.username}
+                                                    svg={<LinkedIn />}
+                                                    bcgColor="#0077B5"
+                                                    color="white"
+                                                    height="6rem"
+                                                />
+                                            )
+                                        }
 
+                                        {
+                                            email && (
+                                                <SocialLink 
+                                                    username={email}
+                                                    svg={<Google />}
+                                                    bcgColor="white"
+                                                    color="black"
+                                                    height="6rem"
+                                                />
+                                            )
+                                        }
+
+
+                                    </div>
 
                                 </div>
 
+                            )
+
+                        }
+
+
+                        <div className={styles.innerContainer}>
+
+                            <span className={styles.title}>
+                                Modify Social Links
+                            </span>
+
+
+                            <div className={styles.modifySocialLinksContainer}>
+
+                                <ModifySocialLink 
+                                    onClick={onGmailClick} svg={<Google />} 
+                                    continueText={`${email ? "Update Google Connect" : "Connect Google Account"}`} />
+
+                                <ModifySocialLink
+                                    onClick={onLinkedInClick} svg={<LinkedIn />}
+                                    continueText={`${linkedinLink.socialLinkExists ? "Update LinkedIn Connect" : "Connect LinkedIn Account"}`} />
+
+                                <ModifySocialLink
+                                    onClick={onGithubClick} svg={<Github />}
+                                    continueText={`${githubLink.socialLinkExists ? "Update Github Connect" : "Connect Github Account"}`} />
+
                             </div>
-
-                        )
-
-                    }
-
-
-                    <div className={styles.innerContainer}>
-
-                        <span className={styles.title}>
-                            Modify Social Links
-                        </span>
-
-
-                        <div className={styles.modifySocialLinksContainer}>
-
-                            <ModifySocialLink 
-                                onClick={onGmailClick} svg={<Google />} 
-                                continueText={`${email ? "Update Google Connect" : "Connect Google Account"}`} />
-
-                            <ModifySocialLink
-                                onClick={onLinkedInClick} svg={<LinkedIn />}
-                                continueText={`${linkedinLink.socialLinkExists ? "Update LinkedIn Connect" : "Connect LinkedIn Account"}`} />
-
-                            <ModifySocialLink
-                                onClick={onGithubClick} svg={<Github />}
-                                continueText={`${githubLink.socialLinkExists ? "Update Github Connect" : "Connect Github Account"}`} />
 
                         </div>
 
                     </div>
+
 
 
 

@@ -97,6 +97,7 @@ router.get("/:userId",
                             content: reply.textContent || undefined,
                             fileDetails: replyFileDetails,
                             haveYouLiked: reply.likes.some(like => like.userId === user.userId),
+                            email: reply.user.email || undefined,
                         }
 
                         return profileReply;

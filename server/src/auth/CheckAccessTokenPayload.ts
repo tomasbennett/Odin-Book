@@ -13,6 +13,9 @@ export async function CheckAccessTokenPayload(header: string | undefined): Promi
 
     
     if (!header || !header.startsWith("Bearer ")) {
+        console.log("Access token header is missing or invalid!!!");
+
+
         return {
             ok: false,
             status: expiredAccessTokenStatus,
@@ -87,6 +90,8 @@ export async function CheckAccessTokenPayload(header: string | undefined): Promi
         }
 
         if (err.name === "JsonWebTokenError") {
+            console.log("Invalid access token error 1:", err.message);
+
             return {
                 ok: false,
                 status: expiredAccessTokenStatus,
@@ -95,6 +100,8 @@ export async function CheckAccessTokenPayload(header: string | undefined): Promi
         }
 
         if (err.name === "TokenExpiredError") {
+            console.log("Access token expired error:", err.message);
+
             return {
                 ok: false,
                 status: expiredAccessTokenStatus,

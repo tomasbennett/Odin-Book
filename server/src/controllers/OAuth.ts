@@ -368,7 +368,7 @@ gmailRouter.get("/callback",
                         provider: "GMAIL",
                         providerId: sub,
                         providerEmail: email,
-                        userId: oauthSession.userId!
+                        userId: userId
                     }
                 }),
                 prisma.user.update({
@@ -383,12 +383,12 @@ gmailRouter.get("/callback",
 
 
             if (oauthSession.purpose === "LOGIN") {
-                const refreshTokenResponse = await CreateRefreshToken(existingAccount!.userId);
+                const refreshTokenResponse = await CreateRefreshToken(userId);
 
                 if (!refreshTokenResponse.ok) {
                     const unknownErrorKey: IOauthErrorCode = "unknown_error";
 
-                    console.log(`Error creating refresh token for user ${existingAccount!.userId}: ${refreshTokenResponse.error}`);
+                    console.log(`Error creating refresh token for user ${userId}: ${refreshTokenResponse.error}`);
 
                     return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
                 }

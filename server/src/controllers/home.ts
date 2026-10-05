@@ -142,7 +142,8 @@ router.get("/",
                         content: post.textContent || undefined,
                         fileDetails: fileDetails,
                         haveYouLiked: post.likes.some(like => like.userId === user.userId),
-                        parentPost: parentPost
+                        parentPost: parentPost,
+                        email: post.user.email || undefined
                     }
 
                 })

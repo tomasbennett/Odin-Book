@@ -118,22 +118,13 @@ export function Post({
                             <div className={styles.titleUsernameContainer}>
                                 <p className={styles.username}>{username}</p>
 
-                                {email && <span className={styles.email}>{email}</span>}
+                                {
+                                    email && 
+                                        <span className={styles.email}>
+                                            {email}
+                                        </span>
+                                }
 
-
-                                {/* {
-                                    title && (
-                                        <div className={styles.postTitleContainer}>
-                                            <p className={styles.postTitle}>{title}</p>
-                                        </div>
-                                    )
-                                } */}
-
-                                {/* <p>
-                                    {
-                                        userId
-                                    }
-                                </p> */}
                             </div>
 
 

@@ -197,6 +197,11 @@ router.get("/:userId",
                     aboutUser: userHeaderInfoDb.aboutMe || undefined,
                     userProfileImg: publicUserProfileImg,
                     accountBackgroundImg: publicBackgroundImg,
+                    email: userHeaderInfoDb.email || undefined,
+                    githubLink: userHeaderInfoDb.githubProfileUrl || undefined,
+                    githubUsername: userHeaderInfoDb.githubUsername || undefined,
+                    linkedinLink: userHeaderInfoDb.linkedInProfileUrl || undefined,
+                    linkedinUsername: userHeaderInfoDb.linkedInUsername || undefined,
                 }
 
                 return userHeaderInfoAPI;
@@ -224,6 +229,7 @@ router.get("/:userId",
                             title: post.title || undefined,
                             content: post.textContent || undefined,
                             haveYouLiked: post.likes.some(like => like.userId === user.userId),
+                            email: post.user.email || undefined,
                         }
 
 
@@ -275,6 +281,7 @@ router.get("/:userId",
                                 content: reply.textContent || undefined,
                                 fileDetails: replyFileDetails,
                                 haveYouLiked: reply.likes.some(like => like.userId === user.userId),
+                                email: reply.user.email || undefined,
                             }
 
                             return profileReply;

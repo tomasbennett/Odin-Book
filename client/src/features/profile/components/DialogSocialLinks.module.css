@@ -124,6 +124,18 @@
 
 
 
+.infoOuterContainer{
+    flex-shrink: 0;
+
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 3rem;
+}
+
+
+
 .innerContainer{
     flex-shrink: 0;
 

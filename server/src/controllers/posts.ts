@@ -88,6 +88,7 @@ router.get("/:userId",
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
                     haveYouLiked: post.likes.some(like => like.userId === user.userId),
+                    email: post.user.email || undefined
                 }
 
             }));
@@ -183,6 +184,7 @@ router.get("/:postId/replies",
                     content: post.textContent || undefined,
                     fileDetails: fileDetails,
                     haveYouLiked: post.likes.some(like => like.userId === user.userId),
+                    email: post.user.email || undefined
                 }
 
             }
@@ -205,6 +207,7 @@ router.get("/:postId/replies",
                         content: reply.textContent || undefined,
                         fileDetails: fileDetails,
                         haveYouLiked: reply.likes.some(like => like.userId === user.userId),
+                        email: reply.user.email || undefined
                     }
 
 
@@ -229,6 +232,7 @@ router.get("/:postId/replies",
                         content: parentPost.textContent || undefined,
                         fileDetails: fileDetails,
                         haveYouLiked: parentPost.likes.some(like => like.userId === user.userId),
+                        email: parentPost.user.email || undefined
                     }
 
 
@@ -356,7 +360,8 @@ router.get("/:postId/comments",
                     repliesCount: postDb.descendantRepliesCount,
                     title: postDb.title || undefined,
                     content: postDb.textContent || undefined,
-                    haveYouLiked: postDb.likes.some(like => like.userId === user.userId)
+                    haveYouLiked: postDb.likes.some(like => like.userId === user.userId),
+                    email: postDb.user.email || undefined
                 };
 
                 return postsApi;

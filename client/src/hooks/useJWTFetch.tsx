@@ -40,7 +40,7 @@ export function useJWTFetch() {
                     ...fetchOptions,
                     headers: {
                         ...fetchOptions?.headers,
-                        Authorization: `Bearer ${newAccessToken}`
+                        Authorization: `Bearer ${newAccessToken.data}`
                     }
                 };
 

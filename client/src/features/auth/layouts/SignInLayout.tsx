@@ -222,6 +222,11 @@ export function SignInLayout() {
 
 
 
+    const isRegisterPage: boolean = useMemo(() => {
+        return submitUrl === "register";
+    }, [submitUrl]);
+
+
     return (
         <>
 
@@ -235,10 +240,17 @@ export function SignInLayout() {
 
                         <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
                             {
-                                <h1 className={styles.title}>{title}</h1>
+                                <h1 className={`
+                                    ${styles.title} 
+                                    ${isRegisterPage ? styles.registerTitle : styles.loginTitle}
+                                `}>{title}</h1>
                             }
 
-                            <div className={`${styles.errorsContainer} ${screenWidthClassName}`}>
+                            <div className={`
+                                ${styles.errorsContainer} 
+                                ${isRegisterPage ? styles.registerErrorsContainer : styles.loginErrorsContainer} 
+                                ${screenWidthClassName}
+                            `}>
                                 {/* <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p>
                                 <p className={styles.errorMessage}>{`Lorem ipsum dolor sit amet consectetur adipisicing elit. In tempora laboriosam praesentium impedit magni, veniam necessitatibus repellat. Assumenda quasi unde dolor aspernatur officiis commodi, nesciunt architecto blanditiis sunt distinctio eius quisquam corrupti aliquam exercitationem cum at? Reprehenderit quidem, impedit optio obcaecati nostrum facilis repudiandae, omnis illum similique ipsam aliquid accusamus.`}</p>
                                 <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p> */}
@@ -338,17 +350,7 @@ export function SignInLayout() {
 
                         <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
 
-                            {/* <div className={styles.loginImgContainer}>
-                                <img
-                                    src={`${loginImg}`}
-                                    alt="Login Illustration"
-                                    className={`${styles.loginImg} ${screenWidthClassName}`}
-                                />
-                            </div> */}
-
                         </div>
-
-
 
 
                     </form>

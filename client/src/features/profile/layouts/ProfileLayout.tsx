@@ -183,6 +183,7 @@ export function ProfileLayout() {
                                     accountCreatedAt={headerInfo.accountCreatedAt}
                                     accountBackgroundImg={headerInfo.accountBackgroundImg}
                                     aboutUser={headerInfo.aboutUser}
+                                    email={headerInfo.email}
                                 />
 
                         }
@@ -291,6 +292,7 @@ export function ProfileLayout() {
                                                                 parentPost={post.parentPost}
                                                                 content={post.content}
                                                                 fileDetails={post.fileDetails}
+                                                                email={post.email}
                                                             />
                                                         )
                                                     })}
@@ -337,6 +339,7 @@ export function ProfileLayout() {
                                                                         parentPost={reply.parentPost}
                                                                         content={reply.content}
                                                                         fileDetails={reply.fileDetails}
+                                                                        email={reply.email}
                                                                     />
                                                                 )
                                                             })
