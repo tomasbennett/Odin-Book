@@ -184,6 +184,10 @@ export function ProfileLayout() {
                                     accountBackgroundImg={headerInfo.accountBackgroundImg}
                                     aboutUser={headerInfo.aboutUser}
                                     email={headerInfo.email}
+                                    githubLink={headerInfo.githubLink}
+                                    githubUsername={headerInfo.githubUsername}
+                                    linkedinLink={headerInfo.linkedinLink}
+                                    linkedinUsername={headerInfo.linkedinUsername}
                                 />
 
                         }

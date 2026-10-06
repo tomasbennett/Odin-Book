@@ -253,9 +253,9 @@ gmailRouter.get("/callback",
 
             if (
                 !state ||
-                typeof state !== "string" ||
-                !code ||
-                typeof code !== "string"
+                typeof state !== "string"
+                // !code ||
+                // typeof code !== "string"
             ) {
                 const missingStateKey: IOauthErrorCode = "missing_required_parameter";
 
@@ -272,7 +272,8 @@ gmailRouter.get("/callback",
 
             const oauthSession = await prisma.oAuthSession.findUnique({
                 where: {
-                    state: stateHash
+                    state: stateHash,
+                    provider: "GMAIL"
                 }
             });
 
@@ -299,6 +300,15 @@ gmailRouter.get("/callback",
                 console.log(`OAuth error from provider: ${error} - ${error_description}`);
 
                 return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+            }
+
+
+            if (
+                !code || typeof code !== "string"
+            ) {
+                const missingCodeKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${missingCodeKey}`);
             }
 
 
@@ -412,6 +422,400 @@ gmailRouter.get("/callback",
             return res.redirect(`${domain}?${OAuthErrorKey}=${unknownErrorKey}`);
 
         }
+
+
+    });
+
+
+
+
+
+
+
+
+githubRouter.get("/login",
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+        try {
+
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const scopes: string[] = [
+                "read:user"
+            ];
+
+            const codeVerifier = crypto.randomBytes(32).toString('hex');
+            const codeChallenge = crypto
+                .createHash("sha256")
+                .update(codeVerifier)
+                .digest("base64url");
+
+
+
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: null,
+                    expiresAt: expiresAt,
+                    purpose: "LOGIN",
+                    provider: "GITHUB",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier
+                }
+            });
+
+
+            const params = new URLSearchParams({
+                client_id: process.env.GITHUB_CLIENT_ID!,
+                redirect_uri: process.env.GITHUB_CALLBACK_URL!,
+                scope: scopes.join(" "),
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: "S256"
+            });
+
+
+            const githubAuthUrl: string =
+                `https://github.com/login/oauth/authorize?${params.toString()}`;
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: githubAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
+
+
+
+
+
+
+
+    });
+
+
+githubRouter.post("/link",
+    ensureJWTAuthentication,
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+        try {
+
+            const user = req.user!;
+
+
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const scopes: string[] = [
+                "read:user"
+            ];
+
+            const codeVerifier = crypto.randomBytes(32).toString('hex');
+            const codeChallenge = crypto
+                .createHash("sha256")
+                .update(codeVerifier)
+                .digest("base64url");
+
+
+
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: user.userId,
+                    expiresAt: expiresAt,
+                    purpose: "LINK",
+                    provider: "GITHUB",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier,
+
+                }
+            });
+
+
+            const params = new URLSearchParams({
+                client_id: process.env.GITHUB_CLIENT_ID!,
+                redirect_uri: process.env.GITHUB_CALLBACK_URL!,
+                scope: scopes.join(" "),
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: "S256"
+            });
+
+
+            const githubAuthUrl: string =
+                `https://github.com/login/oauth/authorize?${params.toString()}`;
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: githubAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
+
+
+    });
+
+
+
+githubRouter.get("/callback",
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        try {
+
+            const {
+                code,
+                state,
+                error,
+                error_description
+            } = req.query;
+
+
+            if (
+                !state ||
+                typeof state !== "string"
+                // !code ||
+                // typeof code !== "string"
+            ) {
+                const missingStateKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${domain}?${OAuthErrorKey}=${missingStateKey}`);
+            }
+
+
+
+
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const oauthSession = await prisma.oAuthSession.findUnique({
+                where: {
+                    state: stateHash,
+                    provider: "GITHUB"
+                }
+            });
+
+            if (!oauthSession || oauthSession.expiresAt.getTime() < Date.now()) {
+                const expiredStateKey: IOauthErrorCode = "session_expired";
+
+                return res.redirect(`${domain}?${OAuthErrorKey}=${expiredStateKey}`);
+            }
+
+
+            const returnUrl = `${domain}/${oauthSession.purpose === "LINK" ? ("profile/" + oauthSession.userId) : oauthSession.purpose === "LOGIN" ? "login" : ""}`;
+
+
+
+
+            if (error === "access_denied") {
+
+                return res.redirect(`${returnUrl}`);
+            }
+
+            if (error) {
+                const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+                console.log(`OAuth error from provider: ${error} - ${error_description}`);
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+            }
+
+            if (!code || typeof code !== "string") {
+                const missingCodeKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${missingCodeKey}`);
+            }
+
+
+            const tokenResponse = await fetch(`https://github.com/login/oauth/access_token`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    client_id: process.env.GITHUB_CLIENT_ID,
+                    client_secret: process.env.GITHUB_CLIENT_SECRET,
+                    code: code,
+                    redirect_uri: process.env.GITHUB_CALLBACK_URL,
+                    // state: state,
+                    code_verifier: oauthSession.codeVerifier
+                })
+            });
+
+
+            if (!tokenResponse.ok) {
+                const invalidCodeKey: IOauthErrorCode = "invalid_code_provided";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidCodeKey}`);
+            }
+
+
+            const tokenData = await tokenResponse.json();
+
+            if (!tokenData || !tokenData.access_token || typeof tokenData.access_token !== "string") {
+                const invalidCodeKey: IOauthErrorCode = "invalid_code_provided";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidCodeKey}`);
+            }
+
+            const access_token = tokenData.access_token;
+
+            const userResponse = await fetch(
+                `https://api.github.com/user`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${access_token}`,
+                        "Accept": "application/vnd.github.v3+json",
+                    }
+                }
+            );
+
+            if (!userResponse.ok) {
+                const invalidTokenKey: IOauthErrorCode = "invalid_token_payload";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidTokenKey}`);
+            }
+
+            const {
+                id: githubId,
+                html_url: githubProfileUrl,
+                login: githubUsername,
+            } = await userResponse.json();
+
+            if (
+                !githubId || typeof githubId !== "number" ||
+                !githubProfileUrl || typeof githubProfileUrl !== "string" ||
+                !githubUsername || typeof githubUsername !== "string"
+            ) {
+                const missingRequiredParam: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${missingRequiredParam}`);
+            }
+
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_account: {
+                        provider: "GITHUB",
+                        providerId: String(githubId)
+                    }
+                }
+            });
+
+            if (oauthSession.purpose === "LINK" && existingAccount && existingAccount.userId !== oauthSession.userId) {
+                const accountAlreadyLinkedKey: IOauthErrorCode = "account_already_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountAlreadyLinkedKey}`);
+            }
+
+            if (oauthSession.purpose === "LOGIN" && !existingAccount) {
+                const accountNotLinkedKey: IOauthErrorCode = "account_not_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountNotLinkedKey}`);
+            }
+
+            const userId: string = existingAccount?.userId ?? oauthSession.userId!;
+
+
+
+            await prisma.$transaction([
+                prisma.externalAccount.upsert({
+                    where: {
+                        unique_provider_account: {
+                            provider: "GITHUB",
+                            providerId: String(githubId)
+                        }
+                    },
+                    update: {
+                        providerUsername: githubUsername,
+                        profileUrl: githubProfileUrl
+                    },
+                    create: {
+                        provider: "GITHUB",
+                        providerId: String(githubId),
+                        providerUsername: githubUsername,
+                        profileUrl: githubProfileUrl,
+                        userId: userId
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: userId
+                    },
+                    data: {
+                        githubUsername: githubUsername,
+                        githubProfileUrl: githubProfileUrl
+                    }
+                })
+            ]);
+
+
+
+            if (oauthSession.purpose === "LOGIN") {
+                const refreshTokenResponse = await CreateRefreshToken(userId);
+
+                if (!refreshTokenResponse.ok) {
+                    const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+                    console.log(`Error creating refresh token for user ${userId}: ${refreshTokenResponse.error}`);
+
+                    return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+                }
+
+                return res
+                    .cookie(refreshTokenCookieKey, refreshTokenResponse.refreshToken, refreshTokenResponse.cookieOptions)
+                    .redirect(`${returnUrl}`);
+            }
+
+
+
+            return res.redirect(`${returnUrl}`);
+
+
+
+
+        } catch (error: unknown) {
+            const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+            console.log(`Error during OAuth callback processing: ${error instanceof Error ? error.message : String(error)}`);
+
+            return res.redirect(`${domain}?${OAuthErrorKey}=${unknownErrorKey}`);
+
+        }
+
+
+
 
 
     });
