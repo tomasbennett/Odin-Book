@@ -819,3 +819,37 @@ githubRouter.get("/callback",
 
 
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+linkedInRouter.get("/login",
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+    });
+
+
+
+
+
+linkedInRouter.post("/link",
+    ensureJWTAuthentication,
+    async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+
+    });
+
+
+
+linkedInRouter.get("/callback",
+    async (req: Request, res: Response, next: NextFunction) => {
+
+    });

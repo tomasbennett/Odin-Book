@@ -104,7 +104,7 @@ export function Header({
 
 
     const handleOAuthError = useCallback((error: ICustomErrorResponse) => {
-        openSocialLinksDialog();
+        // openSocialLinksDialog();
 
 
     }, []);

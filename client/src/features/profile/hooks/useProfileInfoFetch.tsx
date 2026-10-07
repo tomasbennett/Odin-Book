@@ -44,7 +44,7 @@ export function useProfileInfoFetch() {
     const errCtx = useError();
     const { jwtFetchHandler } = useJWTFetch();
     const { authLevel, setAuthLevel } = useAuth();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const { userId: routeUserId } = useParams<"userId">();
 
@@ -67,11 +67,18 @@ export function useProfileInfoFetch() {
             return;
         }
 
-        nav(
-            `/profile/${userId}?${profileStateQueryKey}=${profileDefaultStateQueryValue.toLowerCase()}`,
-            { replace: true }
-        );
-    }, [parsed.success, userId, nav]);
+        setSearchParams(prev => {
+            const newParams = new URLSearchParams(prev);
+
+            newParams.set(
+                profileStateQueryKey,
+                profileDefaultStateQueryValue.toLowerCase()
+            );
+
+            return newParams;
+        }, { replace: true });
+
+    }, [parsed.success, setSearchParams]);
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [replies, setReplies] = useState<IProfileReplies>([
@@ -235,7 +242,7 @@ export function useProfileInfoFetch() {
         //     fileDetails: undefined,
         //     haveYouLiked: false
         // },
-        
+
     ]);
     const [comments, setComments] = useState<IComment[]>([
         // {
@@ -416,7 +423,7 @@ export function useProfileInfoFetch() {
             if (successResult.success) {
                 console.log("SUCCESSFULLY FETCHED DATA!!!");
                 console.dir(successResult.data);
-                
+
                 setHeaderInfo(successResult.data.headerInfo);
                 setReplies(successResult.data.replies);
                 setPosts(successResult.data.posts);
