@@ -37,6 +37,7 @@ import { abortInitialFetchRequest } from "../constants/abortFetchReq";
 import cubeNightSky from "../../../assets/cube-night-sky.jpg"
 import githubProfileImg from "../../../assets/github-profile-img.jpg"
 import { IProfileReplies } from "../../../../../shared/features/profiles/models/IProfileReplies";
+import { IOauthProvider } from "../../../../../shared/features/oauth/models/IOAuthProviders";
 
 export function useProfileInfoFetch() {
 
@@ -582,6 +583,8 @@ export function useProfileInfoFetch() {
         }
     }, [userId]);
 
+    
+
 
 
     return {
@@ -590,6 +593,8 @@ export function useProfileInfoFetch() {
         posts,
         comments,
         headerInfo,
+        setHeaderInfo,
+        // onDeleteSocialLink,
         // repliesContainerRef,
         // postsContainerRef,
         // commentsContainerRef,

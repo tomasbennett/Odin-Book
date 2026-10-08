@@ -427,6 +427,63 @@ gmailRouter.get("/callback",
     });
 
 
+gmailRouter.delete("/unlink",
+    ensureJWTAuthentication,
+    async (req: Request, res: Response<ICustomErrorResponse>, next: NextFunction) => {
+
+        try {
+
+            const user = req.user!;
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_user: {
+                        userId: user.userId,
+                        provider: "GMAIL"
+                    }
+                }
+            });
+
+            if (!existingAccount) {
+                return res.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "No linked Gmail account found for this user!!!"
+                });
+            }
+
+            await prisma.$transaction([
+                prisma.externalAccount.delete({
+                    where: {
+                        id: existingAccount.id
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: user.userId
+                    },
+                    data: {
+                        email: null
+                    }
+                })
+            ]);
+
+
+
+            return res.sendStatus(204);
+
+
+        } catch (error: unknown) {
+
+            next(error);
+
+        }
+
+
+
+
+
+    });
 
 
 
@@ -822,7 +879,64 @@ githubRouter.get("/callback",
 
 
 
+githubRouter.delete("/unlink",
+    ensureJWTAuthentication,
+    async (req: Request, res: Response<ICustomErrorResponse>, next: NextFunction) => {
 
+        try {
+
+            const user = req.user!;
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_user: {
+                        userId: user.userId,
+                        provider: "GITHUB"
+                    }
+                }
+            });
+
+            if (!existingAccount) {
+                return res.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "No linked Github account found for this user!!!"
+                });
+            }
+
+            await prisma.$transaction([
+                prisma.externalAccount.delete({
+                    where: {
+                        id: existingAccount.id
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: user.userId
+                    },
+                    data: {
+                        githubUsername: null,
+                        githubProfileUrl: null
+                    }
+                })
+            ]);
+
+
+
+            return res.sendStatus(204);
+
+
+        } catch (error: unknown) {
+
+            next(error);
+
+        }
+
+
+
+
+
+    });
 
 
 

@@ -78,6 +78,7 @@ model ExternalAccount {
   profileUrl       String?
 
   @@unique([provider, providerId], name: "unique_provider_account")
+  @@unique([provider, userId], name: "unique_provider_user")
 }
 
 model OAuthSession {

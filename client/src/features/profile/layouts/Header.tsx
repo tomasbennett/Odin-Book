@@ -17,7 +17,7 @@ import { SocialLinks } from "../components/SocialLinks";
 import { ThreeDots } from "../../../assets/icons/ThreeDots";
 import { UserIcon } from "../../../assets/icons/UserIcon";
 import { UserCogsIcon } from "../../../assets/icons/UserCogsIcon";
-import { DialogSocialLinks } from "../components/DialogSocialLinks";
+import { DialogSocialLinks } from "./DialogSocialLinks";
 import { useDialogToggle } from "../../../hooks/useDialogToggle";
 import { useParamsErrorPopout } from "../../../hooks/useParamsErrorPopout";
 import { ICustomErrorResponse } from "../../../../../shared/features/api/models/APIErrorResponse";
@@ -34,8 +34,9 @@ export function Header({
     githubLink,
     githubUsername,
     linkedinLink,
-    linkedinUsername
-}: IProfileHeader & { isLoading: boolean }) {
+    linkedinUsername,
+    setHeaderInfo
+}: IProfileHeader & { isLoading: boolean } & { setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>>}) {
 
     const { authLevel } = useAuth();
 
@@ -104,7 +105,7 @@ export function Header({
 
 
     const handleOAuthError = useCallback((error: ICustomErrorResponse) => {
-        // openSocialLinksDialog();
+        openSocialLinksDialog();
 
 
     }, []);
@@ -379,6 +380,7 @@ export function Header({
                 linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }}
                 // linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
                 handleClickOutside={handleSocialLinksDialogClickOutside}
+                setHeaderInfo={setHeaderInfo}
             />
         </>
     );

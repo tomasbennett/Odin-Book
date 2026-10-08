@@ -97,7 +97,40 @@
 }
 
 
-.socialLink:hover .url {
-    text-decoration: underline;
 
+.socialLink:hover:not(:has(.deleteContainer:hover)) .url {
+    text-decoration: underline;
+}
+
+
+
+
+.deleteContainer{
+    flex-shrink: 0;
+
+    aspect-ratio: 1;
+    width: 2.8rem;
+
+    font-size: 1.4rem;
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    background-color: red;
+
+    border-radius: .8rem;
+
+    
+
+    overflow: hidden;
+
+    transition: background-color .2s linear;
+}
+
+
+.deleteContainer:hover{
+    background-color: rgb(175, 0, 29);
 }

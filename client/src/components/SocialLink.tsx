@@ -1,4 +1,9 @@
+import { MouseEventHandler } from "react";
 import styles from "./SocialLink.module.css";
+import { IOauthProvider } from "../../../shared/features/oauth/models/IOAuthProviders";
+import { useError } from "../features/error/contexts/ErrorContext";
+import { useJWTFetch } from "../hooks/useJWTFetch";
+import { useAuth } from "../features/auth/contexts/AuthContext";
 
 
 type ISocialLinkProps = {
@@ -8,6 +13,7 @@ type ISocialLinkProps = {
     bcgColor: string;
     color: string;
     height?: string;
+    onDelete?: () => void;
 }
 
 export function SocialLink({
@@ -16,8 +22,14 @@ export function SocialLink({
     svg,
     bcgColor,
     color,
-    height = "8rem"
+    height = "8rem",
+    onDelete
 }: ISocialLinkProps) {
+
+
+    
+
+
 
 
 
@@ -40,6 +52,19 @@ export function SocialLink({
                     {!!link && <span className={styles.url}>{link}</span>}
 
                 </div>
+
+                {
+                    onDelete && (
+                        <div onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onDelete();
+                        }} className={styles.deleteContainer}>
+                            X
+                        </div>
+                    )
+                }
+
 
             </a>
 

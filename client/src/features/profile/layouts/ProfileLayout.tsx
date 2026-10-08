@@ -31,6 +31,7 @@ export function ProfileLayout() {
         posts,
         comments,
         headerInfo,
+        setHeaderInfo,
         state,
         setComments,
         setPosts,
@@ -188,6 +189,7 @@ export function ProfileLayout() {
                                     githubUsername={headerInfo.githubUsername}
                                     linkedinLink={headerInfo.linkedinLink}
                                     linkedinUsername={headerInfo.linkedinUsername}
+                                    setHeaderInfo={setHeaderInfo}
                                 />
 
                         }
