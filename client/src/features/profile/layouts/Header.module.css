@@ -318,6 +318,14 @@
 
 }
 
+.textContainer.mediumScreen,
+.textContainer.thinScreen {
+    padding: 0 5rem;
+}
+
+.textContainer.extraSmallScreen {
+    padding: 0 2rem;
+}
 
 
 .userTitleContainer {

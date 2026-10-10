@@ -17,7 +17,7 @@ import { useJWTFetch } from "../hooks/useJWTFetch";
 import { domain } from "../constants/EnvironmentAPI";
 import { accessTokenLocalStorageKey } from "../constants/accessTokenLocalStorageKey";
 import { useMediaQuery } from "react-responsive";
-import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../constants/screenDimensions";
+import { extraSmallScreenMaxWidth, mediumScreenMaxWidth, thinScreenMaxWidth } from "../constants/screenDimensions";
 
 
 export function SidebarsLayout() {
@@ -35,6 +35,7 @@ export function SidebarsLayout() {
     }
 
 
+    const isExtraSmallScreen: boolean = useMediaQuery({ maxWidth: extraSmallScreenMaxWidth });
     const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
     const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
 
@@ -171,16 +172,17 @@ export function SidebarsLayout() {
 
                     </div>
 
-                    <div className={`
-                        ${styles.middleContainer} 
-                        ${screenWidthClassName}
-                        `}>
 
-                        {
-                            sidebarContent
-                        }
+                            <div className={`
+                                ${styles.middleContainer} 
+                                ${screenWidthClassName}
+                                `}>
 
-                    </div>
+                                {
+                                    !isExtraSmallScreen && sidebarContent
+                                }
+
+                            </div>
 
                     <div className={`
                         ${styles.lowerContainer} 

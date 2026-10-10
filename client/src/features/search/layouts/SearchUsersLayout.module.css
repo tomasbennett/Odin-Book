@@ -1,4 +1,4 @@
-.searchUsersLayoutContainer{
+.searchUsersLayoutContainer {
     width: 100%;
     max-width: var(--main-max-width);
 
@@ -22,8 +22,13 @@
 
 }
 
+.searchUsersLayoutContainer.thinScreen {
+    border-left: 0rem solid var(--low-light-gray);
+    border-right: 0rem solid var(--low-light-gray);
+}
 
-.searchBarContainer{
+
+.searchBarContainer {
     flex-shrink: 0;
 
     width: 100%;
@@ -36,7 +41,7 @@
 
 
 
-.searchResultsContainer{
+.searchResultsContainer {
     flex: 0 0 auto;
     width: 100%;
 

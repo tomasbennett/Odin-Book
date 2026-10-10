@@ -1,8 +1,11 @@
+import { useMediaQuery } from "react-responsive";
 import { LoadingCircle } from "../../../components/LoadingCircle";
 import { SearchBar } from "../components/SearchBar";
 import { UserResult } from "../components/UserResult";
 import { useSearchUser } from "../hooks/useSearchUser";
 import styles from "./SearchUsersLayout.module.css";
+import { useMemo } from "react";
+import { thinScreenMaxWidth, mediumScreenMaxWidth } from "../../../constants/screenDimensions";
 
 
 
@@ -19,11 +22,22 @@ export function SearchUsersLayout() {
         searchResultsContainerRef
     } = useSearchUser();
 
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
+
 
     return (
         <>
 
-            <div className={styles.searchUsersLayoutContainer}>
+            <div className={`
+                ${styles.searchUsersLayoutContainer} 
+                ${screenWidthClassName}
+                `}>
 
                 <div className={styles.searchBarContainer}>
                     <SearchBar

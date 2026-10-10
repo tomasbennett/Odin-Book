@@ -1,4 +1,41 @@
-.listScrollContainer{
+.outerContainer {
+    position: relative;
+
+    flex: 1 1 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.asideHomeSelectionContainer{
+    position: absolute;
+
+    top: 1rem;
+    right: 2.5rem;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+
+    width: var(--aside-bar-width);
+
+    overflow: hidden;
+
+    background-color: var(--background-colour);
+
+    padding: 1rem;
+
+    border: .1rem solid var(--low-light-gray);
+
+    border-radius: 4rem;
+
+
+}
+
+
+.listScrollContainer {
 
     flex: 1 1 0;
 
@@ -6,7 +43,7 @@
     /* max-width: 40rem; */
 
     width: 100%;
-    
+
 
     overflow-y: auto;
 
@@ -19,7 +56,7 @@
 }
 
 
-.posts{
+.posts {
     flex-shrink: 0;
 
     border: .1rem solid white;

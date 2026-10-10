@@ -27,6 +27,11 @@
 }
 
 
+.sectionsNavContainer.extraSmallScreen{
+    width: 9.3rem;
+}
+
+
 .active{
 
 }

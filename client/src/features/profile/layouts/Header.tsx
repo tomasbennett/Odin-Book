@@ -21,6 +21,8 @@ import { DialogSocialLinks } from "./DialogSocialLinks";
 import { useDialogToggle } from "../../../hooks/useDialogToggle";
 import { useParamsErrorPopout } from "../../../hooks/useParamsErrorPopout";
 import { ICustomErrorResponse } from "../../../../../shared/features/api/models/APIErrorResponse";
+import { useMediaQuery } from "react-responsive";
+import { extraSmallScreenMaxWidth, mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
 
 export function Header({
     userId: userProfileId,
@@ -115,6 +117,22 @@ export function Header({
     });
 
 
+    const isExtraSmallScreen: boolean = useMediaQuery({ maxWidth: extraSmallScreenMaxWidth });
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        console.log(`isExtraSmallScreen: ${isExtraSmallScreen}, isThinScreen: ${isThinScreen}, isMediumScreen: ${isMediumScreen}`);
+
+        return isExtraSmallScreen ? styles.extraSmallScreen :
+            isThinScreen ? styles.thinScreen : 
+            isMediumScreen ? styles.mediumScreen : 
+            styles.wideScreen;
+
+    }, [isThinScreen, isMediumScreen, isExtraSmallScreen]);
+
+
 
     return (
         <>
@@ -186,7 +204,10 @@ export function Header({
 
                             </div>
 
-                            <div className={styles.textContainer}>
+                            <div className={`
+                                ${styles.textContainer} 
+                                ${screenWidthClassName}
+                                `}>
 
                                 <div className={styles.topTextContainer}>
 

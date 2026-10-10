@@ -18,7 +18,9 @@ import { Comment } from "../../comments/components/Comment";
 import { Post } from "../../posts/components/Post";
 import { COMMENT_IMG_GIF_KEY } from "../../../../../shared/features/comments/constants";
 import { createArrayLikeUpdater } from "../../likes/services/likeArrayObjects";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import { useMediaQuery } from "react-responsive";
+import { extraSmallScreenMaxWidth, thinScreenMaxWidth, mediumScreenMaxWidth } from "../../../constants/screenDimensions";
 
 
 
@@ -160,6 +162,21 @@ export function ProfileLayout() {
 
 
 
+    const isExtraSmallScreen: boolean = useMediaQuery({ maxWidth: extraSmallScreenMaxWidth });
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isExtraSmallScreen ? styles.extraSmallScreen :
+            isThinScreen ? styles.thinScreen : 
+            isMediumScreen ? styles.mediumScreen : 
+            styles.wideScreen;
+    }, [isThinScreen, isMediumScreen, isExtraSmallScreen]);
+
+
+
+
 
     return (
         <>
@@ -200,7 +217,10 @@ export function ProfileLayout() {
 
                     <div className={styles.sectionsOuterContainer}>
 
-                        <div className={styles.sectionsHeaderContainer}>
+                        <div className={`
+                            ${styles.sectionsHeaderContainer} 
+                            ${screenWidthClassName}
+                            `}>
 
                             <SectionsHeaders sectionType={state} />
 

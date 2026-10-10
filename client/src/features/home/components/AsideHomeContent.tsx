@@ -14,7 +14,7 @@ import { CalendarIcon } from "../../../assets/icons/Calendar";
 import { HourGlassIcon } from "../../../assets/icons/HourGlassIcon";
 import React, { useMemo } from "react";
 import { useMediaQuery } from "react-responsive";
-import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
+import { extraSmallScreenMaxWidth, mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
 
 
 
@@ -33,14 +33,16 @@ export function AsideBar({
     }
 
 
-
+    const isExtraSmallScreen: boolean = useMediaQuery({ maxWidth: extraSmallScreenMaxWidth });
     const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
     const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
 
     const screenWidthClassName = useMemo<string>(() => {
 
-        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
-    }, [isThinScreen, isMediumScreen]);
+        return isThinScreen ? styles.thinScreen : 
+            isMediumScreen ? styles.mediumScreen : 
+            styles.wideScreen;
+    }, [isThinScreen, isMediumScreen, isExtraSmallScreen]);
 
 
     const navLinkClassName = ({ isActive, sortType }: {
@@ -50,6 +52,8 @@ export function AsideBar({
         let baseClass: string = `${styles.navLink} ${screenWidthClassName}`;
 
         if (isActive && (!sortType || currentSortType === sortType)) {
+            console.log("active link", sortType, currentSortType);
+
             return `${baseClass} ${styles.activeLink}`;
         }
 
@@ -63,10 +67,14 @@ export function AsideBar({
 
 
             <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={({ isActive }) => {
-                return navLinkClassName({
+                const className = navLinkClassName({
                     isActive,
                     sortType: "popular"
-                })
+                });
+
+                console.log("popular link", className);
+                
+                return className;
             }}>
                 <SolidThumbsUpIcon />
             </NavLink>
