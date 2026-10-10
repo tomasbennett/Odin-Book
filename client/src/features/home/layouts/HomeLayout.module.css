@@ -34,6 +34,13 @@
 }
 
 
+.main.thinScreen{
+    border-left: 0rem solid var(--low-light-gray);
+    border-right: 0rem solid var(--low-light-gray);
+}
+
+
+
 
 .passiveImgContainer{
     flex-shrink: 0;

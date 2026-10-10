@@ -1,84 +1,3 @@
-.outerContainer{
-    flex-shrink: 0;
-
-    height: 100%;
-    width: var(--aside-bar-width);
-
-    overflow: hidden;
-
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    row-gap: 3rem;
-
-    padding: 2rem 1rem;
-
-    fill: white;
-
-    border-left: .1rem solid var(--low-light-gray);
-    border-right: .1rem solid var(--low-light-gray);
-}
-
-
-.topContainer{
-    flex-shrink: 0;
-
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-
-    overflow: hidden;
-}
-
-.searchOuterContainer{
-    flex-shrink: 0;
-
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-
-    overflow: hidden;
-}
-
-.middleContainer{
-    flex: 1 1 0;
-
-    width: 100%;
-
-    overflow: hidden;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    row-gap: .8rem;
-}
-
-.lowerContainer{
-    flex-shrink: 0;
-
-    width: 100%;
-    aspect-ratio: 1;
-
-    align-self: flex-end;
-
-    overflow: hidden;
-
-    border-radius: 50%;
-    
-}
-
-
-
-
-
 
 
 .navLink{
@@ -107,25 +26,13 @@
     }
 }
 
-.imgNavLinkContainer{
 
-    width: 100%;
-    height: 100%;
+.navLink.thinScreen{
+    width: auto;
+    height: 95%;
 
-    
-
-    padding: 0;
-
-    overflow: hidden;
-
-    img{
-        width: 100%;
-        height: 100%;
-
-        object-fit: cover;
-
-    }
 }
+
 
 
 .activeLink{

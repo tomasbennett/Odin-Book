@@ -34,10 +34,21 @@ export function SidebarsLayout() {
         return <Navigate to={homePageRoute} replace={true} />
     }
 
+
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
+
+
+
     const navLinkClassName = ({ isActive }: {
         isActive: boolean;
     }) => {
-        let baseClass: string = styles.navLink;
+        let baseClass: string = `${styles.navLink} ${screenWidthClassName}`;
 
         if (isActive) {
             return `${baseClass} ${styles.activeLink}`;
@@ -112,25 +123,28 @@ export function SidebarsLayout() {
 
 
 
-    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
-    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
-
-    const screenWidthClassName = useMemo<string>(() => {
-
-        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
-    }, [isThinScreen, isMediumScreen]);
+    
 
 
     return (
         <>
 
-            <div className={styles.outerContainer}>
+            <div className={`
+                ${styles.outerContainer} 
+                ${screenWidthClassName}
+                `}>
 
-                {/* <AsideBar sortType={homeFetch.sort} /> */}
 
-                <div className={styles.sidebarOuterContainer}>
 
-                    <div className={styles.topContainer}>
+                <div className={`
+                    ${styles.sidebarOuterContainer} 
+                    ${screenWidthClassName}
+                    `}>
+
+                    <div className={`
+                        ${styles.topContainer} 
+                        ${screenWidthClassName}
+                        `}>
 
                         <NavLink
                             to={homePageRoute}
@@ -142,7 +156,10 @@ export function SidebarsLayout() {
 
                     </div>
 
-                    <div className={styles.searchOuterContainer}>
+                    <div className={`
+                        ${styles.searchOuterContainer} 
+                        ${screenWidthClassName}
+                        `}>
 
                         <NavLink to={searchPageRoute} className={({ isActive }) => {
                             return navLinkClassName({
@@ -154,7 +171,10 @@ export function SidebarsLayout() {
 
                     </div>
 
-                    <div className={styles.middleContainer}>
+                    <div className={`
+                        ${styles.middleContainer} 
+                        ${screenWidthClassName}
+                        `}>
 
                         {
                             sidebarContent
@@ -162,17 +182,26 @@ export function SidebarsLayout() {
 
                     </div>
 
-                    <div className={styles.lowerContainer}>
+                    <div className={`
+                        ${styles.lowerContainer} 
+                        ${screenWidthClassName}
+                        `}>
 
                         <div 
                             onClick={onLogoutClick} 
-                            className={`${styles.logOutContainer}`}>
+                            className={`
+                                ${styles.logOutContainer} 
+                                ${screenWidthClassName}
+                                `}>
 
                             <LogoutIcon />
 
                         </div>
 
-                        <div className={styles.userImgContainer}>
+                        <div className={`
+                            ${styles.userImgContainer} 
+                            ${screenWidthClassName}
+                            `}>
 
                             <NavLink
                                 to={`${profilePageRoute}/${authLevel.userId}`}
@@ -187,18 +216,21 @@ export function SidebarsLayout() {
 
                     </div>
 
-
-
-
                 </div>
 
-                <div className={styles.outletContainer}>
+                <div className={`
+                    ${styles.outletContainer} 
+                    ${screenWidthClassName}
+                    `}>
 
                     <Outlet context={ctx} />
 
                 </div>
 
-                <div className={styles.passiveImgContainer}>
+                <div className={`
+                    ${styles.passiveImgContainer}
+                    ${screenWidthClassName}
+                    `}>
                     <PassiveSidebarVisual />
                 </div>
 

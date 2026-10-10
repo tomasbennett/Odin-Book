@@ -7,9 +7,11 @@ import { LoadingCircle } from "../../../components/LoadingCircle";
 import { CreatePostInput } from "../../posts/components/CreatePostInput";
 import { useOutletContext } from "react-router-dom";
 import { ISidebarCtx } from "../../../models/ISidebarCtx";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { IPost } from "../../../../../shared/features/posts/models/IPost";
 import { useParamsErrorPopout } from "../../../hooks/useParamsErrorPopout";
+import { useMediaQuery } from "react-responsive";
+import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
 
 
 
@@ -34,7 +36,18 @@ export function HomeLayout() {
             setSidebarContent(null);
         }
 
-    }, [homeFetch.sort, setSidebarContent])
+    }, [homeFetch.sort, setSidebarContent]);
+
+
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
+
+
 
     return (
 
@@ -43,7 +56,10 @@ export function HomeLayout() {
 
 
             <>
-                <main className={styles.main}>
+                <main className={`
+                    ${styles.main} 
+                    ${screenWidthClassName}
+                    `}>
 
                     <CreatePostInput
                         setNewPost={(post: IPost) => {

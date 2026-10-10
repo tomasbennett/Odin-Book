@@ -12,7 +12,9 @@ import { ISortPostByQuery } from "../../../../../shared/features/posts/models/IS
 import { SolidThumbsUpIcon } from "../../../assets/icons/SolidThumbsUpIcon";
 import { CalendarIcon } from "../../../assets/icons/Calendar";
 import { HourGlassIcon } from "../../../assets/icons/HourGlassIcon";
-import React from "react";
+import React, { useMemo } from "react";
+import { useMediaQuery } from "react-responsive";
+import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../../../constants/screenDimensions";
 
 
 
@@ -30,19 +32,27 @@ export function AsideBar({
         return <Navigate to={homePageRoute} replace={true} />
     }
 
-    const navLinkClassName = ({ isActive, sortType }: { 
+
+
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
+
+
+    const navLinkClassName = ({ isActive, sortType }: {
         isActive: boolean;
         sortType?: ISortPostByQuery | undefined
     }) => {
-        let baseClass: string = styles.navLink;
+        let baseClass: string = `${styles.navLink} ${screenWidthClassName}`;
 
         if (isActive && (!sortType || currentSortType === sortType)) {
             return `${baseClass} ${styles.activeLink}`;
         }
 
-        // if (isActive && ) {
-        //     return `${baseClass} ${styles.activeLink}`;
-        // }
 
         return `${baseClass} ${styles.inActiveLink}`
 
@@ -50,81 +60,36 @@ export function AsideBar({
 
     return (
         <>
-        
-            {/* <div className={styles.outerContainer}>
-
-                <div className={styles.topContainer}>
-
-                    <NavLink 
-                        to={homePageRoute} 
-                        className={({ isActive }) => {
-                            return navLinkClassName({isActive})
-                        }}>
-                        <HomeIcon />
-                    </NavLink>
-
-                </div>
-
-                <div className={styles.searchOuterContainer}>
-
-                    <NavLink to={searchPageRoute} className={({ isActive }) => {
-                        return navLinkClassName({
-                            isActive
-                        })
-                    }}>
-                        <SearchIcon />
-                    </NavLink>
-
-                </div>
-
-                <div className={styles.middleContainer}> */}
-
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={({ isActive }) => {
-                        return navLinkClassName({
-                            isActive,
-                            sortType: "popular"
-                        })
-                    }}>
-                        <SolidThumbsUpIcon />
-                    </NavLink>
-
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"newest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
-                        return navLinkClassName({
-                            isActive,
-                            sortType: "newest"
-                        })
-                    }}>
-                        <CalendarIcon />
-                    </NavLink>
-
-                    <NavLink to={`${homePageRoute}?${sortKeyWord}=${"oldest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
-                        return navLinkClassName({
-                            isActive,
-                            sortType: "oldest"
-                        })
-                    }}>
-                        <HourGlassIcon />
-                    </NavLink>
-
-                {/* </div>
-
-                <div className={styles.lowerContainer}>
-
-                    <NavLink 
-                        to={`${profilePageRoute}/${authLevel.userId}`} 
-                        className={`${styles.imgNavLinkContainer} ${navLinkClassName}`}>
-
-                        <img src={authLevel.userProfileImgUrl ?? defUserImg} alt={`User image: ${authLevel.username}`} />
-
-                    </NavLink>
-
-                </div>
 
 
+            <NavLink to={`${homePageRoute}?${sortKeyWord}=${"popular" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                return navLinkClassName({
+                    isActive,
+                    sortType: "popular"
+                })
+            }}>
+                <SolidThumbsUpIcon />
+            </NavLink>
+
+            <NavLink to={`${homePageRoute}?${sortKeyWord}=${"newest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                return navLinkClassName({
+                    isActive,
+                    sortType: "newest"
+                })
+            }}>
+                <CalendarIcon />
+            </NavLink>
+
+            <NavLink to={`${homePageRoute}?${sortKeyWord}=${"oldest" satisfies ISortPostByQuery}`} className={({ isActive }) => {
+                return navLinkClassName({
+                    isActive,
+                    sortType: "oldest"
+                })
+            }}>
+                <HourGlassIcon />
+            </NavLink>
 
 
-            </div> */}
-        
         </>
     )
 }
