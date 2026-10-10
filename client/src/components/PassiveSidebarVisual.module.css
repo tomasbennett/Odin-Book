@@ -19,17 +19,14 @@
 
     overflow: hidden;
 
-    /* border: .1rem solid orange; */
 
     padding: 2rem;
 
     background-image: url("../../../assets/cube-night-sky.jpg");
     background-repeat: repeat;
     
-    animation: moveBackgroundPosition 100s linear alternate-reverse;
+    animation: moveBackgroundPosition 20s linear alternate infinite;
 
-    /* border-right: .1rem solid var(--inactive-input-colour);
-    border-left: .1rem solid var(--inactive-input-colour); */
 }
 
 @keyframes moveBackgroundPosition {

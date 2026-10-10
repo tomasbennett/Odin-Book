@@ -21,7 +21,7 @@ import { ICustomErrorResponse } from "../../../../../shared/features/api/models/
 
 export function SignInLayout() {
 
-    
+
 
 
 
@@ -215,7 +215,7 @@ export function SignInLayout() {
             message: error.message
         });
     }, [setLoginError]);
-    
+
     useParamsErrorPopout({
         setError: handleOAuthError
     });
@@ -226,53 +226,79 @@ export function SignInLayout() {
         return submitUrl === "register";
     }, [submitUrl]);
 
+    const isRegisterClassName: string = useMemo(() => {
+        return isRegisterPage ? styles.registerPage : styles.loginPage;
+    }, [isRegisterPage]);
+
 
     return (
         <>
 
             <div className={styles.outerContainer}>
 
-                <div className={styles.innerContainer}>
+                <div className={`
+                    ${styles.innerContainer}
+                    ${screenWidthClassName}
+                    `}>
 
 
-                    <form className={`${styles.form} ${screenWidthClassName}`} onSubmit={handleSubmit(onSubmit)}>
+                    <form className={`
+                        ${styles.form} 
+                        ${screenWidthClassName}
+                        `} onSubmit={handleSubmit(onSubmit)}>
 
 
-                        <div className={`${styles.textInputsContainer} ${screenWidthClassName}`}>
-                            {
-                                <h1 className={`
+                        <div className={`
+                            ${styles.textInputsContainer} 
+                            ${screenWidthClassName}
+                            `}>
+
+                            {/* ${isRegisterPage ? styles.registerTitle : styles.loginTitle} */}
+                            <h1 className={`
                                     ${styles.title} 
-                                    ${isRegisterPage ? styles.registerTitle : styles.loginTitle}
-                                `}>{title}</h1>
+                                `}>
+                                {title}
+                            </h1>
+
+
+                            {/* ${isRegisterPage ? styles.registerErrorsContainer : styles.loginErrorsContainer}  */}
+
+                            {
+                                errors.root ||
+                                    errors.username ||
+                                    errors.password ? (
+                                    <div className={`
+                                        ${styles.errorsContainer} 
+                                        ${screenWidthClassName}
+                                    `}>
+                                        {/* <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p> */}
+                                        {/* <p className={styles.errorMessage}>{`Lorem ipsum dolor sit amet consectetur adipisicing elit. In tempora laboriosam praesentium impedit magni, veniam necessitatibus repellat. Assumenda quasi unde dolor aspernatur officiis commodi, nesciunt architecto blanditiis sunt distinctio eius quisquam corrupti aliquam exercitationem cum at? Reprehenderit quidem, impedit optio obcaecati nostrum facilis repudiandae, omnis illum similique ipsam aliquid accusamus.`}</p>
+                                        <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p> */}
+                                        {
+                                            errors.root && (
+                                                <p className={styles.errorMessage}>{`Root error: ${errors.root.message}`}</p>
+                                            )
+                                        }
+                                        {
+                                            errors.username && (
+                                                <p className={styles.errorMessage}>{`Username error: ${errors.username.message}`}</p>
+                                            )
+                                        }
+                                        {
+                                            errors.password && (
+                                                <p className={styles.errorMessage}>{`Password error: ${errors.password.message}`}</p>
+                                            )
+                                        }
+
+                                    </div>
+                                ) : null
                             }
 
+
                             <div className={`
-                                ${styles.errorsContainer} 
-                                ${isRegisterPage ? styles.registerErrorsContainer : styles.loginErrorsContainer} 
+                                ${styles.inputGroupContainer} 
                                 ${screenWidthClassName}
-                            `}>
-                                {/* <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p>
-                                <p className={styles.errorMessage}>{`Lorem ipsum dolor sit amet consectetur adipisicing elit. In tempora laboriosam praesentium impedit magni, veniam necessitatibus repellat. Assumenda quasi unde dolor aspernatur officiis commodi, nesciunt architecto blanditiis sunt distinctio eius quisquam corrupti aliquam exercitationem cum at? Reprehenderit quidem, impedit optio obcaecati nostrum facilis repudiandae, omnis illum similique ipsam aliquid accusamus.`}</p>
-                                <p className={styles.errorMessage}>{`Root error: ${"ABFKHBASFKHASFBKHSABFBHSFHSBF"}`}</p> */}
-                                {
-                                    errors.root && (
-                                        <p className={styles.errorMessage}>{`Root error: ${errors.root.message}`}</p>
-                                    )
-                                }
-                                {
-                                    errors.username && (
-                                        <p className={styles.errorMessage}>{`Username error: ${errors.username.message}`}</p>
-                                    )
-                                }
-                                {
-                                    errors.password && (
-                                        <p className={styles.errorMessage}>{`Password error: ${errors.password.message}`}</p>
-                                    )
-                                }
-
-                            </div>
-
-                            <div className={`${styles.inputGroupContainer} ${screenWidthClassName}`}>
+                                `}>
 
                                 <div className={styles.inputGroup}>
                                     <label htmlFor="username">Username</label>
@@ -297,7 +323,10 @@ export function SignInLayout() {
                                 </div>
 
 
-                                <div className={`${styles.submitBtnContainer} ${screenWidthClassName}`}>
+                                <div className={`
+                                    ${styles.submitBtnContainer} 
+                                    ${screenWidthClassName}
+                                    `}>
 
                                     {
                                         isLoading ?
@@ -319,16 +348,20 @@ export function SignInLayout() {
 
                             </div>
 
-                            {
-                                submitUrl === "login" &&
-                                <div className={styles.alternateLogInContainer}>
+
+                            <div className={styles.alternateLogInContainer}>
+                                {
+                                    submitUrl === "login" &&
                                     <AlternateLoginMethods />
+                                }
+                            </div>
 
-                                </div>
-                            }
 
 
-                            <div className={`${styles.bottomContainer} ${screenWidthClassName}`}>
+                            <div className={`
+                                ${styles.bottomContainer} 
+                                ${screenWidthClassName}
+                                `}>
 
                                 {
                                     submitUrl === "login" ?
@@ -348,7 +381,10 @@ export function SignInLayout() {
                             </div>
                         </div>
 
-                        <div className={`${styles.imgContainer} ${screenWidthClassName}`}>
+                        <div className={`
+                            ${styles.imgContainer} 
+                            ${screenWidthClassName}
+                            `}>
 
                         </div>
 

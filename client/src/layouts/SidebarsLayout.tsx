@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styles from "./SidebarsLayout.module.css";
 import { NavLink, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { ISidebarCtx } from "../models/ISidebarCtx";
@@ -16,6 +16,8 @@ import { knownError, notExpectedFormatError, unknownError } from "../constants/e
 import { useJWTFetch } from "../hooks/useJWTFetch";
 import { domain } from "../constants/EnvironmentAPI";
 import { accessTokenLocalStorageKey } from "../constants/accessTokenLocalStorageKey";
+import { useMediaQuery } from "react-responsive";
+import { mediumScreenMaxWidth, thinScreenMaxWidth } from "../constants/screenDimensions";
 
 
 export function SidebarsLayout() {
@@ -107,6 +109,18 @@ export function SidebarsLayout() {
 
     }
 
+
+
+
+    const isThinScreen: boolean = useMediaQuery({ maxWidth: thinScreenMaxWidth });
+    const isMediumScreen: boolean = useMediaQuery({ maxWidth: mediumScreenMaxWidth });
+
+    const screenWidthClassName = useMemo<string>(() => {
+
+        return isThinScreen ? styles.thinScreen : isMediumScreen ? styles.mediumScreen : styles.wideScreen;
+    }, [isThinScreen, isMediumScreen]);
+
+
     return (
         <>
 
@@ -183,8 +197,6 @@ export function SidebarsLayout() {
                     <Outlet context={ctx} />
 
                 </div>
-
-
 
                 <div className={styles.passiveImgContainer}>
                     <PassiveSidebarVisual />
