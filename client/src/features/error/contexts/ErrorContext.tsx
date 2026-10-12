@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { ICustomErrorResponse } from "../../../../../shared/features/api/models/APIErrorResponse";
 import styles from "./ErrorContext.module.css";
-import { waitForAnimationEnd } from "../../../util/WaitForAnimationToEnd";
-import { popupTime } from "../../../constants/popUpConstants";
 import { usePopup } from "../../../hooks/usePopup";
 import { noErrorCtxError } from "../../../constants/errorConstants";
 

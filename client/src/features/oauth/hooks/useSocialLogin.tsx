@@ -1,25 +1,27 @@
 import { useNavigate } from "react-router-dom";
-import { useJWTFetch } from "./useJWTFetch";
-import { useError } from "../features/error/contexts/ErrorContext";
-import { errorPageRoute } from "../constants/routes";
-import { knownError, noErrorCtxError, notExpectedFormatError, unknownError } from "../constants/errorConstants";
-import { domain } from "../constants/EnvironmentAPI";
-import { useAuth } from "../features/auth/contexts/AuthContext";
-import { SuccessRedirectUrlSchema } from "../../../shared/features/oauth/models/IRedirect";
-import { APIErrorSchema } from "../../../shared/features/api/models/APIErrorResponse";
+import { useJWTFetch } from "../../../hooks/useJWTFetch";
+import { useError } from "../../error/contexts/ErrorContext";
+import { errorPageRoute } from "../../../constants/routes";
+import { knownError, noErrorCtxError, notExpectedFormatError, unknownError } from "../../../constants/errorConstants";
+import { domain } from "../../../constants/EnvironmentAPI";
+import { useAuth } from "../../auth/contexts/AuthContext";
+import { SuccessRedirectUrlSchema } from "../../../../../shared/features/oauth/models/IRedirect";
+import { APIErrorSchema } from "../../../../../shared/features/api/models/APIErrorResponse";
 
-type IUseSocialsConnect = {
+type IUseSocialsLogin = {
     sessionUrl: (str: string) => string;
     reqOptions: RequestInit;
 }
 
 
-export function useSocialsConnect({
+
+
+export function useSocialLogin({
     sessionUrl,
     reqOptions
-}: IUseSocialsConnect) {
+}: IUseSocialsLogin) {
 
-    const { jwtFetchHandler } = useJWTFetch();
+    // const { jwtFetchHandler } = useJWTFetch();
 
     const nav = useNavigate();
 
@@ -42,27 +44,27 @@ export function useSocialsConnect({
 
         try {
 
-            const response = await jwtFetchHandler(websiteStr, reqOptions);
+            const response = await fetch(websiteStr, reqOptions);
 
 
-            if (response.returnType === "fetchError") {
-                errCtx.throwError(response.error);
+            // if (response.returnType === "fetchError") {
+            //     errCtx.throwError(response.error);
 
-                return;
-            }
+            //     return;
+            // }
 
-            if (response.returnType === "loginError") {
-                if (authLevel.userType === "user") {
-                    setAuthLevel({
-                        userType: "none"
-                    });
-                }
-                errCtx.throwError(response.error);
+            // if (response.returnType === "loginError") {
+            //     if (authLevel.userType === "user") {
+            //         setAuthLevel({
+            //             userType: "none"
+            //         });
+            //     }
+            //     errCtx.throwError(response.error);
 
-                return;
-            }
+            //     return;
+            // }
 
-            const resJSON = await response.data.json();
+            const resJSON = await response.json();
 
             const oauthResult = SuccessRedirectUrlSchema.safeParse(resJSON);
             if (oauthResult.success) {
@@ -124,6 +126,8 @@ export function useSocialsConnect({
         onLinkedInClick,
         onGithubClick
     }
+
+
 
 
 

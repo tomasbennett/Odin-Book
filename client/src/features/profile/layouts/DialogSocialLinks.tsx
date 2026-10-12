@@ -2,7 +2,7 @@ import { useDialogToggle } from "../../../hooks/useDialogToggle";
 import { ISocialLink } from "../models/ISocialLink";
 import styles from "./DialogSocialLinks.module.css";
 import { IProfileHeader } from "../../../../../shared/features/profiles/models/IProfileHeader";
-import { SocialsDialogContent } from "../components/SocialsDialogContent";
+import { SocialsDialogContent } from "../../oauth/layouts/SocialsDialogContent";
 
 type IDialogSocialLinksProps = {
     githubLink: ISocialLink;

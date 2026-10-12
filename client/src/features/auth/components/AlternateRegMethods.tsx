@@ -3,8 +3,8 @@ import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
 import { ModifySocialLink } from "../../../components/ModifySocialLink";
 import { domain } from "../../../constants/EnvironmentAPI";
-import { useSocialLogin } from "../../../hooks/useSocialLogin";
-import { useSocialsConnect } from "../../../hooks/useSocialsConnect";
+import { useSocialLogin } from "../../oauth/hooks/useSocialLogin";
+import { useSocialsConnect } from "../../oauth/hooks/useSocialsConnect";
 import styles from "./AlternateRegMethods.module.css";
 
 

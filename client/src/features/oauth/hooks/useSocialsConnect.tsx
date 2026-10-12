@@ -1,27 +1,25 @@
 import { useNavigate } from "react-router-dom";
-import { useJWTFetch } from "./useJWTFetch";
-import { useError } from "../features/error/contexts/ErrorContext";
-import { errorPageRoute } from "../constants/routes";
-import { knownError, noErrorCtxError, notExpectedFormatError, unknownError } from "../constants/errorConstants";
-import { domain } from "../constants/EnvironmentAPI";
-import { useAuth } from "../features/auth/contexts/AuthContext";
-import { SuccessRedirectUrlSchema } from "../../../shared/features/oauth/models/IRedirect";
-import { APIErrorSchema } from "../../../shared/features/api/models/APIErrorResponse";
+import { useJWTFetch } from "../../../hooks/useJWTFetch";
+import { useError } from "../../error/contexts/ErrorContext";
+import { errorPageRoute } from "../../../constants/routes";
+import { knownError, noErrorCtxError, notExpectedFormatError, unknownError } from "../../../constants/errorConstants";
+import { domain } from "../../../constants/EnvironmentAPI";
+import { useAuth } from "../../auth/contexts/AuthContext";
+import { SuccessRedirectUrlSchema } from "../../../../../shared/features/oauth/models/IRedirect";
+import { APIErrorSchema } from "../../../../../shared/features/api/models/APIErrorResponse";
 
-type IUseSocialsLogin = {
+type IUseSocialsConnect = {
     sessionUrl: (str: string) => string;
     reqOptions: RequestInit;
 }
 
 
-
-
-export function useSocialLogin({
+export function useSocialsConnect({
     sessionUrl,
     reqOptions
-}: IUseSocialsLogin) {
+}: IUseSocialsConnect) {
 
-    // const { jwtFetchHandler } = useJWTFetch();
+    const { jwtFetchHandler } = useJWTFetch();
 
     const nav = useNavigate();
 
@@ -44,27 +42,27 @@ export function useSocialLogin({
 
         try {
 
-            const response = await fetch(websiteStr, reqOptions);
+            const response = await jwtFetchHandler(websiteStr, reqOptions);
 
 
-            // if (response.returnType === "fetchError") {
-            //     errCtx.throwError(response.error);
+            if (response.returnType === "fetchError") {
+                errCtx.throwError(response.error);
 
-            //     return;
-            // }
+                return;
+            }
 
-            // if (response.returnType === "loginError") {
-            //     if (authLevel.userType === "user") {
-            //         setAuthLevel({
-            //             userType: "none"
-            //         });
-            //     }
-            //     errCtx.throwError(response.error);
+            if (response.returnType === "loginError") {
+                if (authLevel.userType === "user") {
+                    setAuthLevel({
+                        userType: "none"
+                    });
+                }
+                errCtx.throwError(response.error);
 
-            //     return;
-            // }
+                return;
+            }
 
-            const resJSON = await response.json();
+            const resJSON = await response.data.json();
 
             const oauthResult = SuccessRedirectUrlSchema.safeParse(resJSON);
             if (oauthResult.success) {
@@ -110,10 +108,10 @@ export function useSocialLogin({
 
     }
 
-    const onLinkedInClick = async () => {
-        await onAuth(sessionUrl("linkedin"));
+    // const onPhoneClick = async () => {
+    //     await onAuth(sessionUrl("phone"));
 
-    }
+    // }
 
     const onGithubClick = async () => {
         await onAuth(sessionUrl("github"));
@@ -123,11 +121,9 @@ export function useSocialLogin({
 
     return {
         onGmailClick,
-        onLinkedInClick,
+        // onPhoneClick,
         onGithubClick
     }
-
-
 
 
 

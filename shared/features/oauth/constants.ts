@@ -16,3 +16,7 @@ export const OAUTH_ERRORS: IErrorOAuth = {
 
 
 export const OAuthErrorKey: string = "oauth_error";
+
+
+export const PHONE_OTP_CODE_LENGTH: number = 6;
+

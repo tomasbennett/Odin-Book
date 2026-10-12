@@ -1,0 +1,103 @@
+.innerContainer {
+    flex: 1 1 0;
+
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+
+
+    overflow: hidden;
+
+
+
+}
+
+
+.title {
+    flex-shrink: 0;
+
+    position: relative;
+
+    font-size: 3.6rem;
+
+    padding-bottom: 1rem;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+.title::after {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    height: .2rem;
+    width: 13rem;
+
+    border-radius: 1rem;
+
+    background-color: var(--low-light-gray);
+}
+
+
+
+
+
+.codeContainer {
+    flex: 1 1 0;
+
+    width: 100%;
+
+    display: flex;
+    align-items: flex-start;
+    column-gap: 1.5rem;
+
+    overflow: hidden;
+
+    padding: 1rem 1rem;
+
+}
+
+
+
+
+.codeLabel{
+    flex: 1 1 0;
+
+    height: 6rem;
+
+    background-color: white;
+
+    color: black;
+
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: .5rem;
+
+    border: .1rem solid var(--low-light-gray);
+}
+
+
+.codeInput{
+    font-size: 3rem;
+
+    text-align: center;
+
+    flex: 1 1 0;
+    max-width: 100%;
+    height: 100%;
+
+    color: black;
+
+    overflow: hidden;
+}

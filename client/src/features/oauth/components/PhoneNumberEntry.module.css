@@ -1,0 +1,131 @@
+.innerContainer {
+    flex: 1 1 0;
+
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+
+
+
+
+
+
+}
+
+
+.title {
+    flex-shrink: 0;
+
+    position: relative;
+
+    font-size: 3.6rem;
+
+    padding-bottom: 1rem;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+.title::after {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    height: .2rem;
+    width: 13rem;
+
+    border-radius: 1rem;
+
+    background-color: var(--low-light-gray);
+}
+
+
+
+
+
+.telePhoneContainer {
+
+    flex: 1 1 0;
+
+    width: 100%;
+
+    overflow: hidden;
+
+}
+
+
+.form{
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+    justify-content: space-between;
+
+}
+
+.label{
+
+    width: 100%;
+
+    padding: 1rem 2rem;
+
+    background-color: white;
+
+    border-radius: 2rem;
+
+    border: .1rem solid;
+    border-color: white;
+
+    transition: border-color .2s linear;
+
+
+    .input{
+        width: 100%;
+
+        background-color: transparent;
+
+        color: black;
+    }
+}
+
+.label:has(.input:focus){
+    border-color: var(--active-btn-colour);
+}
+
+
+
+.submitButton{
+    align-self: flex-start;
+
+    width: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem 2rem;
+
+    border-radius: 2rem;
+
+    cursor: pointer;
+
+    background-color: var(--active-btn-colour);
+
+    transition: background-color 0.2s linear;
+}
+
+.submitButton:hover{
+    background-color: var(--dark-blue);
+}
+
