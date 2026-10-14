@@ -3,6 +3,7 @@ import z from "zod";
 export const OAUTH_PROVIDERS = [
     "google",
     "github",
+    "discord"
 ] as const;
 
 

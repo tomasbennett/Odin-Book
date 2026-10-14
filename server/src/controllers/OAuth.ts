@@ -24,12 +24,12 @@ export const router = Router();
 
 
 const gmailRouter = Router();
-const linkedInRouter = Router();
+const discordRouter = Router();
 const githubRouter = Router();
 
 
 router.use("/google", gmailRouter);
-router.use("/linkedin", linkedInRouter);
+router.use("/discord", discordRouter);
 router.use("/github", githubRouter);
 
 
@@ -946,24 +946,446 @@ githubRouter.delete("/unlink",
 
 
 
-linkedInRouter.get("/login",
+discordRouter.get("/login",
     async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+        try {
 
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const scopes: string[] = [
+                "identify",
+                "email"
+            ];
+
+            const codeVerifier = crypto.randomBytes(32).toString('hex');
+            const codeChallenge = crypto
+                .createHash("sha256")
+                .update(codeVerifier)
+                .digest("base64url");
+
+
+
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: null,
+                    expiresAt: expiresAt,
+                    purpose: "LOGIN",
+                    provider: "DISCORD",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier
+                }
+            });
+
+
+            const params = new URLSearchParams({
+                client_id: process.env.DISCORD_CLIENT_ID!,
+                redirect_uri: process.env.DISCORD_CALLBACK_URL!,
+                scope: scopes.join(" "),
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: "S256",
+                response_type: "code"
+            });
+
+
+            const discordAuthUrl: string =
+                `https://discord.com/oauth2/authorize?${params.toString()}`;
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: discordAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
     });
 
 
 
 
 
-linkedInRouter.post("/link",
+discordRouter.post("/link",
     ensureJWTAuthentication,
     async (req: Request, res: Response<ISuccessRedirectUrl | ICustomErrorResponse>, next: NextFunction) => {
+        try {
+
+            const user = req.user!;
+
+            const state: string = crypto.randomBytes(64).toString('hex');
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const scopes: string[] = [
+                "identify",
+                "email"
+            ];
+
+            const codeVerifier = crypto.randomBytes(32).toString('hex');
+            const codeChallenge = crypto
+                .createHash("sha256")
+                .update(codeVerifier)
+                .digest("base64url");
+
+
+
+
+            const oauthSession = await prisma.oAuthSession.create({
+                data: {
+                    state: stateHash,
+                    userId: user.userId,
+                    expiresAt: expiresAt,
+                    purpose: "LINK",
+                    provider: "DISCORD",
+                    codeChallenge: codeChallenge,
+                    codeVerifier: codeVerifier
+                }
+            });
+
+
+            const params = new URLSearchParams({
+                client_id: process.env.DISCORD_CLIENT_ID!,
+                redirect_uri: process.env.DISCORD_CALLBACK_URL!,
+                scope: scopes.join(" "),
+                state: state,
+                code_challenge: codeChallenge,
+                code_challenge_method: "S256",
+                response_type: "code"
+            });
+
+
+            const discordAuthUrl: string =
+                `https://discord.com/oauth2/authorize?${params.toString()}`;
+
+
+
+            return res.status(200).json({
+                ok: true,
+                status: 200,
+                message: "Redirect URL generated successfully!!!",
+                url: discordAuthUrl
+            })
+
+
+        } catch (error: unknown) {
+            next(error);
+
+        }
+    });
+
+
+
+discordRouter.get("/callback",
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        try {
+
+            const { code, state, error, error_description } = req.query;
+
+            if (
+                !state ||
+                typeof state !== "string"
+            ) {
+                const missingStateKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${domain}?${OAuthErrorKey}=${missingStateKey}`);
+            }
+
+
+            const stateHash = crypto
+                .createHash("sha256")
+                .update(state)
+                .digest("hex");
+
+            const oauthSession = await prisma.oAuthSession.findUnique({
+                where: {
+                    state: stateHash,
+                    provider: "DISCORD"
+                }
+            });
+
+            if (!oauthSession || oauthSession.expiresAt.getTime() < Date.now()) {
+                const expiredStateKey: IOauthErrorCode = "session_expired";
+
+                return res.redirect(`${domain}?${OAuthErrorKey}=${expiredStateKey}`);
+            }
+
+
+            const returnUrl = `${domain}/${oauthSession.purpose === "LINK" ? ("profile/" + oauthSession.userId) : oauthSession.purpose === "LOGIN" ? "login" : ""}`;
+
+            if (error === "access_denied") {
+
+                return res.redirect(`${returnUrl}`);
+            }
+
+            if (error) {
+                const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+                console.log(`OAuth error from provider: ${error} - ${error_description}`);
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+            }
+
+            if (!code || typeof code !== "string") {
+                const missingCodeKey: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${missingCodeKey}`);
+            }
+
+
+            const body = new URLSearchParams({
+                client_id: process.env.DISCORD_CLIENT_ID!,
+                client_secret: process.env.DISCORD_CLIENT_SECRET!,
+                grant_type: "authorization_code",
+                code,
+                redirect_uri: process.env.DISCORD_CALLBACK_URL!,
+                code_verifier: oauthSession.codeVerifier,
+            });
+
+            const tokenResponse = await fetch(
+                "https://discord.com/api/oauth2/token",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body,
+                },
+            );
+
+            if (!tokenResponse.ok) {
+                const invalidCodeKey: IOauthErrorCode = "invalid_code_provided";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidCodeKey}`);
+            }
+
+            const tokenData = await tokenResponse.json();
+
+            if (!tokenData || !tokenData.access_token || typeof tokenData.access_token !== "string") {
+                const invalidCodeKey: IOauthErrorCode = "invalid_code_provided";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidCodeKey}`);
+            }
+
+            const access_token = tokenData.access_token;
+
+            const userResponse = await fetch(
+                "https://discord.com/api/v10/users/@me",
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                },
+            );
+
+
+
+            if (!userResponse.ok) {
+                const invalidTokenKey: IOauthErrorCode = "invalid_token_payload";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${invalidTokenKey}`);
+            }
+
+            const {
+                id: discordId,
+                username: discordUsername,
+                email: discordEmail
+            } = await userResponse.json();
+
+            if (
+                !discordId || typeof discordId !== "string" ||
+                !discordUsername || typeof discordUsername !== "string" ||
+                !(typeof discordUsername === "undefined" || typeof discordEmail === "string")
+            ) {
+                const missingRequiredParam: IOauthErrorCode = "missing_required_parameter";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${missingRequiredParam}`);
+            }
+
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_account: {
+                        provider: "DISCORD",
+                        providerId: discordId
+                    }
+                }
+            });
+
+            if (oauthSession.purpose === "LINK" && existingAccount && existingAccount.userId !== oauthSession.userId) {
+                const accountAlreadyLinkedKey: IOauthErrorCode = "account_already_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountAlreadyLinkedKey}`);
+            }
+
+            if (oauthSession.purpose === "LOGIN" && !existingAccount) {
+                const accountNotLinkedKey: IOauthErrorCode = "account_not_linked";
+
+                return res.redirect(`${returnUrl}?${OAuthErrorKey}=${accountNotLinkedKey}`);
+            }
+
+            const userId: string = existingAccount?.userId ?? oauthSession.userId!;
+
+
+
+            await prisma.$transaction([
+                prisma.externalAccount.upsert({
+                    where: {
+                        unique_provider_account: {
+                            provider: "DISCORD",
+                            providerId: discordId
+                        }
+                    },
+                    update: {
+                        providerUsername: discordUsername,
+                        providerEmail: discordEmail
+                    },
+                    create: {
+                        provider: "DISCORD",
+                        providerId: discordId,
+                        providerUsername: discordUsername,
+                        providerEmail: discordEmail,
+                        userId: userId
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: userId
+                    },
+                    data: {
+                        discordUsername: discordUsername,
+                        discordEmail: discordEmail
+                    }
+                })
+            ]);
+
+
+
+            if (oauthSession.purpose === "LOGIN") {
+                const refreshTokenResponse = await CreateRefreshToken(userId);
+
+                if (!refreshTokenResponse.ok) {
+                    const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+                    console.log(`Error creating refresh token for user ${userId}: ${refreshTokenResponse.error}`);
+
+                    return res.redirect(`${returnUrl}?${OAuthErrorKey}=${unknownErrorKey}`);
+                }
+
+                return res
+                    .cookie(refreshTokenCookieKey, refreshTokenResponse.refreshToken, refreshTokenResponse.cookieOptions)
+                    .redirect(`${returnUrl}`);
+            }
+
+
+
+            return res.redirect(`${returnUrl}`);
+
+
+
+
+
+
+
+
+
+
+        } catch (error) {
+            const unknownErrorKey: IOauthErrorCode = "unknown_error";
+
+            console.log(`Error during OAuth callback processing: ${error instanceof Error ? error.message : String(error)}`);
+
+            return res.redirect(`${domain}?${OAuthErrorKey}=${unknownErrorKey}`);
+
+        }
+
+
+
+
+
+
+
+
+
+
 
     });
 
 
 
-linkedInRouter.get("/callback",
+
+discordRouter.delete("/unlink",
+    ensureJWTAuthentication,
     async (req: Request, res: Response, next: NextFunction) => {
+
+        try {
+
+            const user = req.user!;
+
+            const existingAccount = await prisma.externalAccount.findUnique({
+                where: {
+                    unique_provider_user: {
+                        userId: user.userId,
+                        provider: "DISCORD"
+                    }
+                }
+            });
+
+            if (!existingAccount) {
+                return res.status(404).json({
+                    ok: false,
+                    status: 404,
+                    message: "No linked Github account found for this user!!!"
+                });
+            }
+
+            await prisma.$transaction([
+                prisma.externalAccount.delete({
+                    where: {
+                        id: existingAccount.id
+                    }
+                }),
+                prisma.user.update({
+                    where: {
+                        id: user.userId
+                    },
+                    data: {
+                        discordEmail: null,
+                        discordUsername: null
+                    }
+                })
+            ]);
+
+
+
+            return res.sendStatus(204);
+
+
+        } catch (error: unknown) {
+
+            next(error);
+
+        }
+
+
+
 
     });

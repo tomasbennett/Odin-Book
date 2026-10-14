@@ -8,8 +8,8 @@ export const SocialInfoSchema = z.object({
     email: z.string().email().optional(),
     githubUsername: z.string().optional(),
     githubLink: z.string().optional(),
-    linkedinUsername: z.string().optional(),
-    linkedinLink: z.string().optional(),
+    discordUsername: z.string().optional(),
+    discordEmail: z.string().optional(),
 });
 
 

@@ -110,8 +110,8 @@ export function useSocialLogin({
 
     }
 
-    const onLinkedInClick = async () => {
-        await onAuth(sessionUrl("linkedin"));
+    const onDiscordClick = async () => {
+        await onAuth(sessionUrl("discord"));
 
     }
 
@@ -123,7 +123,7 @@ export function useSocialLogin({
 
     return {
         onGmailClick,
-        onLinkedInClick,
+        onDiscordClick,
         onGithubClick
     }
 

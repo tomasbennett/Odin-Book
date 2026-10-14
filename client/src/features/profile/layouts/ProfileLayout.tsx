@@ -204,8 +204,8 @@ export function ProfileLayout() {
                                     email={headerInfo.email}
                                     githubLink={headerInfo.githubLink}
                                     githubUsername={headerInfo.githubUsername}
-                                    linkedinLink={headerInfo.linkedinLink}
-                                    linkedinUsername={headerInfo.linkedinUsername}
+                                    discordEmail={headerInfo.discordEmail}
+                                    discordUsername={headerInfo.discordUsername}
                                     setHeaderInfo={setHeaderInfo}
                                 />
 

@@ -22,6 +22,7 @@ export function useDeleteSocial() {
     const isLoading: Record<IOauthProvider, boolean> = {
         google: false,
         github: false,
+        discord: false
     };
 
     // useEffect(() => {

@@ -25,7 +25,7 @@ import { usePageSwitch } from "../hooks/usePageSwitch";
 
 type ISocialsDialogContentProps = {
     githubLink: ISocialLink;
-    linkedinLink: ISocialLink;
+    discordLink: ISocialLink;
     email: string | undefined;
     closeDialog: ReturnType<typeof useDialogToggle>["closeDialog"];
     setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>>
@@ -35,7 +35,7 @@ type ISocialsDialogContentProps = {
 
 export function SocialsDialogContent({
     githubLink,
-    linkedinLink,
+    discordLink,
     email,
     closeDialog,
     setHeaderInfo,
@@ -123,7 +123,7 @@ export function SocialsDialogContent({
                                 <SocialInfoContainer 
                                     githubLink={githubLink}
                                     email={email}
-                                    linkedinLink={linkedinLink}
+                                    discordLink={discordLink}
                                     setHeaderInfo={setHeaderInfo}
                                     nextPhonePage={nextPage}
                                 />

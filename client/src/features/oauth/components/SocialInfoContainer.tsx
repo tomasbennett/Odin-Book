@@ -1,5 +1,6 @@
 
 import { IProfileHeader } from "../../../../../shared/features/profiles/models/IProfileHeader";
+import { Discord } from "../../../assets/icons/Discord";
 import { Github } from "../../../assets/icons/Github";
 import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
@@ -17,7 +18,7 @@ import styles from "./SocialInfoContainer.module.css";
 
 type ISocialInfoContainerProps = {
     githubLink: ISocialLink;
-    linkedinLink: ISocialLink;
+    discordLink: ISocialLink;
     email: string | undefined;
     setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>>
     nextPhonePage: ReturnType<typeof usePageSwitch>["nextPage"]
@@ -25,7 +26,7 @@ type ISocialInfoContainerProps = {
 
 export function SocialInfoContainer({
     githubLink,
-    linkedinLink,
+    discordLink,
     email,
     setHeaderInfo,
     nextPhonePage
@@ -35,6 +36,7 @@ export function SocialInfoContainer({
         onGithubClick,
         onGmailClick,
         // onLinkedInClick
+        onDiscordClick
     } = useSocialsConnect({
         sessionUrl: (str) => `${domain}/api/oauth/${str}/link`,
         reqOptions: {
@@ -58,7 +60,7 @@ export function SocialInfoContainer({
 
                 {
                     (githubLink.socialLinkExists ||
-                        linkedinLink.socialLinkExists || email) && (
+                        discordLink.socialLinkExists || email) && (
 
                         <div className={styles.innerContainer}>
 
@@ -71,6 +73,7 @@ export function SocialInfoContainer({
                                 {
                                     githubLink.socialLinkExists && (
                                         <SocialLink
+                                            purpose={"link"}
                                             link={githubLink.link}
                                             username={githubLink.username}
                                             svg={<Github />}
@@ -97,14 +100,30 @@ export function SocialInfoContainer({
                                 }
 
                                 {
-                                    linkedinLink.socialLinkExists && (
+                                    discordLink.socialLinkExists && (
                                         <SocialLink
-                                            link={linkedinLink.link}
-                                            username={linkedinLink.username}
-                                            svg={<LinkedIn />}
-                                            bcgColor="#0077B5"
+                                            purpose={"cosmetics"}
+                                            link={discordLink.link}
+                                            username={discordLink.username}
+                                            svg={<Discord fill="white" />}
+                                            bcgColor="#5865F2"
                                             color="white"
                                             height="6rem"
+                                            onDelete={() => {
+                                                onDeleteSocialLink(
+                                                    "discord",
+                                                    () => {
+                                                        setHeaderInfo((prev) => {
+                                                            if (!prev) return prev;
+                                                            return {
+                                                                ...prev,
+                                                                discordEmail: undefined,
+                                                                discordUsername: undefined
+                                                            }
+                                                        })
+                                                    }
+                                                )
+                                            }}
                                         />
                                     )
                                 }
@@ -112,6 +131,7 @@ export function SocialInfoContainer({
                                 {
                                     email && (
                                         <SocialLink
+                                            purpose={"cosmetics"}
                                             username={email}
                                             svg={<Google />}
                                             bcgColor="white"
@@ -160,10 +180,8 @@ export function SocialInfoContainer({
                             continueText={`${email ? "Update Google Connect" : "Connect Google Account"}`} />
 
                         <ModifySocialLink
-                            onClick={() => {
-                                nextPhonePage();
-                            }} svg={<PhoneIcon />}
-                            continueText={`${linkedinLink.socialLinkExists ? "Update Phone Number" : "Connect Phone Number"}`} />
+                            onClick={onDiscordClick} svg={<Discord />}
+                            continueText={`${discordLink.socialLinkExists ? "Update Discord Connect" : "Connect Discord Account"}`} />
 
                         <ModifySocialLink
                             onClick={onGithubClick} svg={<Github />}

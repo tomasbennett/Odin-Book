@@ -1,4 +1,5 @@
 import { ISocialInfo } from "../../../../../shared/features/socials/models/ISocialInfo";
+import { Discord } from "../../../assets/icons/Discord";
 import { Github } from "../../../assets/icons/Github";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
 import { SocialLink } from "../../../components/SocialLink";
@@ -9,8 +10,8 @@ type ISocialLinksProps = {
 } & ISocialInfo;
 
 export function SocialLinks({
-    linkedinLink,
-    linkedinUsername,
+    discordEmail,
+    discordUsername,
     githubLink,
     githubUsername
 }: ISocialLinksProps) {
@@ -23,12 +24,13 @@ export function SocialLinks({
             <div className={styles.outerContainer}>
 
                 {
-                    linkedinLink && linkedinUsername && (
+                    (discordUsername || discordEmail) && (
                         <SocialLink
-                            link={linkedinLink}
-                            username={linkedinUsername}
-                            svg={<LinkedIn />} 
-                            bcgColor="#0077B5"
+                            purpose={"cosmetics"}
+                            link={discordEmail}
+                            username={discordUsername}
+                            svg={<Discord fill="white" />} 
+                            bcgColor="#5865F2"
                             color="white"
                             />
 
@@ -37,8 +39,9 @@ export function SocialLinks({
                 }
 
                 {
-                    githubLink && githubUsername && (
+                    (githubLink && githubUsername) && (
                         <SocialLink
+                            purpose={"link"}
                             link={githubLink}
                             username={githubUsername}
                             svg={<Github />}

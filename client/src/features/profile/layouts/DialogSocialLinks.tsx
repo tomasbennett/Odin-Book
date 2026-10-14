@@ -6,7 +6,7 @@ import { SocialsDialogContent } from "../../oauth/layouts/SocialsDialogContent";
 
 type IDialogSocialLinksProps = {
     githubLink: ISocialLink;
-    linkedinLink: ISocialLink;
+    discordLink: ISocialLink;
     email: string | undefined;
     dialogRef: React.RefObject<HTMLDialogElement | null>;
     handleClickOutside: ReturnType<typeof useDialogToggle>["handleClickOutside"];
@@ -17,7 +17,7 @@ type IDialogSocialLinksProps = {
 
 export function DialogSocialLinks({
     githubLink,
-    linkedinLink,
+    discordLink,
     email,
     dialogRef,
     handleClickOutside,
@@ -43,7 +43,7 @@ export function DialogSocialLinks({
 
                     <SocialsDialogContent
                         githubLink={githubLink}
-                        linkedinLink={linkedinLink}
+                        discordLink={discordLink}
                         email={email}
                         closeDialog={closeDialog}
                         setHeaderInfo={setHeaderInfo}

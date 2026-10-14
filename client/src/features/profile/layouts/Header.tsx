@@ -35,8 +35,8 @@ export function Header({
     email,
     githubLink,
     githubUsername,
-    linkedinLink,
-    linkedinUsername,
+    discordEmail,
+    discordUsername,
     setHeaderInfo
 }: IProfileHeader & { isLoading: boolean } & { setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>>}) {
 
@@ -107,7 +107,7 @@ export function Header({
 
 
     const handleOAuthError = useCallback((error: ICustomErrorResponse) => {
-        openSocialLinksDialog();
+        // openSocialLinksDialog();
 
 
     }, []);
@@ -374,8 +374,8 @@ export function Header({
 
                                     <SocialLinks
                                         userId={userProfileId}
-                                        linkedinLink={linkedinLink}
-                                        linkedinUsername={linkedinUsername}
+                                        discordEmail={discordEmail}
+                                        discordUsername={discordUsername}
                                         githubLink={githubLink}
                                         githubUsername={githubUsername}
                                         email={email}
@@ -398,7 +398,7 @@ export function Header({
                 githubLink={githubLink && githubUsername ? { socialLinkExists: true, link: githubLink, username: githubUsername } : { socialLinkExists: false }}
                 // githubLink={{ socialLinkExists: true, link: "https://www.githubLink.com", username: "githubUsername" }}
                 email={email}
-                linkedinLink={linkedinLink && linkedinUsername ? { socialLinkExists: true, link: linkedinLink, username: linkedinUsername } : { socialLinkExists: false }}
+                discordLink={discordEmail || discordUsername ? { socialLinkExists: true, link: discordEmail, username: discordUsername } : { socialLinkExists: false }}
                 // linkedinLink={{ socialLinkExists: true, link: "https://www.linkedinLink.com", username: "linkedinUsername" }}
                 handleClickOutside={handleSocialLinksDialogClickOutside}
                 setHeaderInfo={setHeaderInfo}

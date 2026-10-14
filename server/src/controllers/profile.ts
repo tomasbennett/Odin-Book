@@ -200,8 +200,8 @@ router.get("/:userId",
                     email: userHeaderInfoDb.email || undefined,
                     githubLink: userHeaderInfoDb.githubProfileUrl || undefined,
                     githubUsername: userHeaderInfoDb.githubUsername || undefined,
-                    linkedinLink: userHeaderInfoDb.linkedInProfileUrl || undefined,
-                    linkedinUsername: userHeaderInfoDb.linkedInUsername || undefined,
+                    discordEmail: userHeaderInfoDb.discordEmail || undefined,
+                    discordUsername: userHeaderInfoDb.discordUsername || undefined,
                 }
 
                 return userHeaderInfoAPI;

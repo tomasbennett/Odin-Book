@@ -20,7 +20,7 @@ datasource db {
 
 enum OAuthLinks {
   GITHUB
-  LINKEDIN
+  DISCORD
   GMAIL
 }
 
@@ -43,8 +43,8 @@ model User {
   githubUsername   String? @unique
   githubProfileUrl String? @unique
 
-  linkedInUsername   String? @unique
-  linkedInProfileUrl String? @unique
+  discordUsername   String? @unique
+  discordEmail String? @unique
 
   createdAt DateTime @default(now())
 

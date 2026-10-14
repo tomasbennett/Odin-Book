@@ -113,6 +113,11 @@ export function useSocialsConnect({
 
     // }
 
+    const onDiscordClick = async () => {
+        await onAuth(sessionUrl("discord"));
+
+    }
+
     const onGithubClick = async () => {
         await onAuth(sessionUrl("github"));
     }
@@ -122,6 +127,7 @@ export function useSocialsConnect({
     return {
         onGmailClick,
         // onPhoneClick,
+        onDiscordClick, 
         onGithubClick
     }
 

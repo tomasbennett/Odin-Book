@@ -1,3 +1,4 @@
+import { Discord } from "../../../assets/icons/Discord";
 import { Github } from "../../../assets/icons/Github";
 import { Google } from "../../../assets/icons/Google";
 import { LinkedIn } from "../../../assets/icons/LinkedIn";
@@ -16,7 +17,7 @@ export function AlternateLoginMethods() {
     const {
         onGithubClick,
         onGmailClick,
-        onLinkedInClick
+        onDiscordClick
     } = useSocialLogin({
         sessionUrl: (str) => `${domain}/api/oauth/${str}/login`,
         reqOptions: {
@@ -34,7 +35,7 @@ export function AlternateLoginMethods() {
                     onClick={onGmailClick} svg={<Google />} continueText="Continue with Google" />
 
                 <ModifySocialLink
-                    onClick={onLinkedInClick} svg={<LinkedIn />} continueText="Continue with LinkedIn" />
+                    onClick={onDiscordClick} svg={<Discord />} continueText="Continue with Discord" />
 
 
                 <ModifySocialLink

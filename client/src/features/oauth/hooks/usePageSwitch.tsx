@@ -15,8 +15,8 @@ export function usePageSwitch({
 }: IUsePageSwitch) {
 
     const [page, setPage] = useState<IDialogPages>(
-        // DIALOG_PAGES_MAP[pagesAvailable][0]
-        "phoneCode"
+        DIALOG_PAGES_MAP[pagesAvailable][0]
+        
     );
 
     const isFirstPage: boolean = useMemo(() => {
