@@ -38,7 +38,7 @@ export function Header({
     discordEmail,
     discordUsername,
     setHeaderInfo
-}: IProfileHeader & { isLoading: boolean } & { setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>>}) {
+}: IProfileHeader & { isLoading: boolean } & { setHeaderInfo: React.Dispatch<React.SetStateAction<IProfileHeader | null>> }) {
 
     const { authLevel } = useAuth();
 
@@ -126,9 +126,9 @@ export function Header({
         console.log(`isExtraSmallScreen: ${isExtraSmallScreen}, isThinScreen: ${isThinScreen}, isMediumScreen: ${isMediumScreen}`);
 
         return isExtraSmallScreen ? styles.extraSmallScreen :
-            isThinScreen ? styles.thinScreen : 
-            isMediumScreen ? styles.mediumScreen : 
-            styles.wideScreen;
+            isThinScreen ? styles.thinScreen :
+                isMediumScreen ? styles.mediumScreen :
+                    styles.wideScreen;
 
     }, [isThinScreen, isMediumScreen, isExtraSmallScreen]);
 
@@ -154,7 +154,10 @@ export function Header({
                             <div className={styles.headerImgContainer}>
 
                                 <label
-                                    className={`${isUserProfileOwner && styles.isUsersInputImgContainer} ${styles.backgroundImgContainer}`}>
+                                    className={`${isUserProfileOwner &&
+                                        styles.isUsersInputImgContainer} 
+                                            ${styles.backgroundImgContainer}
+                                    `}>
 
                                     <div className={styles.innerWrapper}>
 

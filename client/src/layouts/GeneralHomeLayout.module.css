@@ -1,4 +1,7 @@
-.backgroundContainer{
+.backgroundContainer {
+  /* background-image: url("../assets/cube-night-sky.jpg");
+  background-repeat: repeat;
+  background-size: 180px; */
   position: relative;
 
   flex: 1 1 0;
@@ -8,9 +11,20 @@
 
   overflow: hidden;
 
-  /* background-image: url("../assets/cube-night-sky.jpg");
-  background-repeat: repeat;
-  background-size: 180px; */
 
-  background-color: var(--background-colour);
+  /* background-color: blue; */
+
+
+  background:
+    radial-gradient(ellipse at 15% 0%,
+      rgba(91, 33, 182, 0.22),
+      transparent 45%),
+    radial-gradient(ellipse at 85% 20%,
+      rgba(29, 78, 216, 0.16),
+      transparent 42%),
+    #050711;
+
+  background-attachment: fixed;
+
+
 }

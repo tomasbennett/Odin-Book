@@ -41,6 +41,15 @@ export function CommentRepliesThread() {
             }
         }
         );
+        setComment((prevComment) => {
+
+            if (!prevComment) return prevComment;
+
+            return {
+                ...prevComment,
+                commentCount: prevComment.commentCount + 1
+            }
+        })
         setParentComments(prevParentComments => {
 
             const updatedParentComments = prevParentComments.map(parentComment => {

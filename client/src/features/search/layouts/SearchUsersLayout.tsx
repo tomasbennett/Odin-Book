@@ -48,7 +48,9 @@ export function SearchUsersLayout() {
 
                 {
                     searchResults.length > 0 && (
-                        <div ref={searchResultsContainerRef} className={styles.searchResultsContainer}>
+                        <div 
+                            ref={searchResultsContainerRef} 
+                            className={styles.searchResultsContainer}>
                             {
                                 searchResults.map((user) => (
                                     <UserResult
