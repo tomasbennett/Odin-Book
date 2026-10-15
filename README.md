@@ -1,2 +1,4 @@
 # Odin-Book
-A social media type web application that utilises authentication and authorization for a user base that can communicate in real time and post their own content for a public audience to view. 
+A social media type web application that utilises oauth 2.0 with PKCE and allows users to post and comment or reply to other users posts.
+
+Feel free to check out the live service here:

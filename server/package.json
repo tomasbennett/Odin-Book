@@ -9,7 +9,7 @@
     "save-db-changes": "npx prisma migrate dev",
     "insert-default-values-db": "npx prisma db seed",
     "generate-db-types": "npx prisma generate",
-    "migrate-prisma:prod": "npx prisma migrate deploy && npx prisma db seed"
+    "setup-prisma:prod": "npx prisma db push && npx prisma db seed"
   },
   "prisma": {
     "seed": "tsx ./prisma/seed.ts"
